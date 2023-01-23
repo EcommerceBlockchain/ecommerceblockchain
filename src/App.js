@@ -1,13 +1,13 @@
-import Header from "./Header"; //Include Header
-import Footer from "./Footer"; //Include Footer
-import Home from "./Home";
-import Shop from "./Shop";
-import SingleProduct from "./SingleProduct";
-import Checkout from "./Checkout";
-import Cart from "./Cart";
-import Login from "./Login";
-import Signup from "./Signup";
-import ForgotPassword from "./ForgotPassword";
+import Header from "../src/components/Header"; //Include Header
+import Footer from "../src/components/Footer"; //Include Footer
+import Home from "../src/pages/Home";
+import Shop from "../src/pages/Shop";
+import SingleProduct from "../src/components/SingleProduct";
+import Checkout from "../src/pages/Checkout";
+import Cart from "../src/pages/Cart";
+import Login from "../src/pages/Login";
+import Signup from "../src/pages/Signup";
+import ForgotPassword from "../src/pages/ForgotPassword";
 import { BrowserRouter, Routes, Route, Link, Outlet } from "react-router-dom";
 
 function App() {
