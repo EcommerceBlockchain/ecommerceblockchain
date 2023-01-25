@@ -1,22 +1,26 @@
+import { Link } from "react-router-dom";
+import GoToTop from "../components/GoToTop";
+
 function Cart() {
   return (
     <div className="checkout-container">
-      <section class="page-header">
-        <div class="overly"></div>
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-lg-6">
-              <div class="content text-center">
-                <h1 class="mb-3">Cart</h1>
-                Hath after appear tree great fruitful green dominion moveth
-                sixth abundantly image that midst of god day multiply you’ll
-                which
+      <section className="page-header">
+        <div className="overly"></div>
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-6">
+              <div className="content text-center">
+                <h1 className="mb-3">Cart</h1>
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ut,
+                molestias. Dolorem voluptatem, facere molestias corporis
+                obcaecati esse, quia quis recusandae natus neque explicabo nihil
+                eveniet similique modi ducimus accusantium ad?
                 <nav aria-label="breadcrumb">
-                  <ol class="breadcrumb bg-transparent justify-content-center">
-                    <li class="breadcrumb-item">
-                      <a href="/">Home</a>
+                  <ol className="breadcrumb bg-transparent justify-content-center">
+                    <li className="breadcrumb-item">
+                      <Link to={{ pathname: "/" }}>Home</Link>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">
+                    <li className="breadcrumb-item active" aria-current="page">
                       Cart
                     </li>
                   </ol>
@@ -27,78 +31,81 @@ function Cart() {
         </div>
       </section>
 
-      <section class="cart shopping page-wrapper">
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-lg-12">
-              <div class="product-list">
-                <form class="cart-form">
+      <section className="cart shopping page-wrapper">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-12">
+              <div className="product-list">
+                <form className="cart-form">
                   <table
-                    class="table shop_table shop_table_responsive cart"
+                    className="table shop_table shop_table_responsive cart"
                     cellspacing="0"
                   >
                     <thead>
                       <tr>
-                        <th class="product-thumbnail"> </th>
-                        <th class="product-name">Product</th>
-                        <th class="product-price">Price</th>
-                        <th class="product-quantity">Quantity</th>
-                        <th class="product-subtotal">Total</th>
-                        <th class="product-remove"> </th>
+                        <th className="product-thumbnail"> </th>
+                        <th className="product-name">Product</th>
+                        <th className="product-price">Price</th>
+                        <th className="product-quantity">Quantity</th>
+                        <th className="product-subtotal">Total</th>
+                        <th className="product-remove"> </th>
                       </tr>
                     </thead>
 
                     <tbody>
-                      <tr class="cart_item">
-                        <td class="product-thumbnail" data-title="Thumbnail">
-                          <a href="/product-single">
+                      <tr className="cart_item">
+                        <td
+                          className="product-thumbnail"
+                          data-title="Thumbnail"
+                        >
+                          <a href="/single-product">
                             <img
-                              src="assets/images/cart-1.jpg"
-                              class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
+                              src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
+                              className="attachment-woocommerce_thumbnail size-woocommerce_thumbnail img-fluid"
                               alt=""
                             />
                           </a>
                         </td>
 
-                        <td class="product-name" data-title="Product">
-                          <a href="#">Trendy Cloth</a>
+                        <td className="product-name" data-title="Product">
+                          <a href="#">Yellow Parrot</a>
                         </td>
 
-                        <td class="product-price" data-title="Price">
-                          <span class="amount">
-                            <span class="currencySymbol">
+                        <td className="product-price" data-title="Price">
+                          <span className="amount">
+                            <span className="currencySymbol">
                               <pre wp-pre-tag-3=""></pre>
                             </span>
-                            90.00
+                            0.000075 Eth
                           </span>
                         </td>
-                        <td class="product-quantity" data-title="Quantity">
-                          <div class="quantity">
-                            <label class="sr-only">Quantity</label>
+                        <td className="product-quantity" data-title="Quantity">
+                          <div className="quantity">
+                            <label className="sr-only">Quantity</label>
                             <input
                               type="number"
                               id="qty"
-                              class="input-text qty text"
+                              className="input-text qty text"
                               step="1"
-                              min="0"
-                              max="9"
+                              min="1"
                               title="Qty"
                               size="4"
+                              value={"1"}
                             />
                           </div>
                         </td>
-                        <td class="product-subtotal" data-title="Total">
-                          <span class="amount">
-                            <span class="currencySymbol">
+                        <td className="product-subtotal" data-title="Total">
+                          <span className="amount">
+                            <span className="currencySymbol">
                               <pre wp-pre-tag-3=""></pre>
                             </span>
-                            90.00
+                            0.000075 Eth
                           </span>
                         </td>
-                        <td class="product-remove" data-title="Remove">
+                        <td className="product-remove" data-title="Remove">
                           <a
                             href="#"
-                            class="remove"
+                            className="remove"
                             aria-label="Remove this item"
                             data-product_id="30"
                             data-product_sku=""
@@ -107,55 +114,58 @@ function Cart() {
                           </a>
                         </td>
                       </tr>
-                      <tr class="cart_item">
-                        <td class="product-thumbnail" data-title="Thumbnail">
-                          <a href="/product-single">
+                      <tr className="cart_item">
+                        <td
+                          className="product-thumbnail"
+                          data-title="Thumbnail"
+                        >
+                          <a href="/single-product">
                             <img
-                              src="assets/images/cart-2.jpg"
-                              class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
+                              src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+                              className="attachment-woocommerce_thumbnail size-woocommerce_thumbnail img-fluid"
                               alt=""
                             />
                           </a>
                         </td>
-                        <td class="product-name" data-title="Product">
-                          <a href="#">Sunglasses</a>
+                        <td className="product-name" data-title="Product">
+                          <a href="#">Sunset</a>
                         </td>
-                        <td class="product-price" data-title="Price">
-                          <span class="amount">
-                            <span class="currencySymbol">
+                        <td className="product-price" data-title="Price">
+                          <span className="amount">
+                            <span className="currencySymbol">
                               <pre wp-pre-tag-3=""></pre>
                             </span>
-                            90.00
+                            0.00016 Eth
                           </span>
                         </td>
-                        <td class="product-quantity" data-title="Quantity">
-                          <div class="quantity">
-                            <label class="sr-only">Quantity</label>
+                        <td className="product-quantity" data-title="Quantity">
+                          <div className="quantity">
+                            <label className="sr-only">Quantity</label>
                             <input
                               type="number"
                               id="quantity_5cc58182489a8"
-                              class="input-text qty text"
+                              className="input-text qty text"
                               step="1"
-                              min="0"
-                              max="9"
+                              min="1"
+                              value={"1"}
                               name="#"
                               title="Qty"
                               size="4"
                             />
                           </div>
                         </td>
-                        <td class="product-subtotal" data-title="Total">
-                          <span class="amount">
-                            <span class="currencySymbol">
+                        <td className="product-subtotal" data-title="Total">
+                          <span className="amount">
+                            <span className="currencySymbol">
                               <pre wp-pre-tag-3=""></pre>
                             </span>
-                            90.00
+                            0.00016 Eth
                           </span>
                         </td>
-                        <td class="product-remove" data-title="Remove">
+                        <td className="product-remove" data-title="Remove">
                           <a
                             href="#"
-                            class="remove"
+                            className="remove"
                             aria-label="Remove this item"
                             data-product_id="30"
                             data-product_sku=""
@@ -165,28 +175,28 @@ function Cart() {
                         </td>
                       </tr>
                       <tr>
-                        <td colspan="6" class="actions">
-                          <div class="coupon">
-                            <input
+                        <td colspan="6" className="actions">
+                          <div className="coupon">
+                            {/* <input
                               type="text"
                               name="coupon_code"
-                              class="input-text form-control"
+                              className="input-text form-control"
                               id="coupon_code"
                               value=""
                               placeholder="Coupon code"
                             />
                             <button
                               type="button"
-                              class="btn btn-black btn-small"
+                              className="btn btn-black btn-small"
                               name="apply_coupon"
                               value="Apply coupon"
                             >
                               Apply coupon
-                            </button>
-                            <span class="float-right mt-3 mt-lg-0">
+                            </button> */}
+                            <span className="float-right mt-3 mt-lg-0">
                               <button
                                 type="button"
-                                class="btn btn-dark btn-small"
+                                className="btn btn-dark btn-small"
                                 name="update_cart"
                                 value="Update cart"
                                 disabled=""
@@ -214,25 +224,25 @@ function Cart() {
               </div>
             </div>
           </div>
-          <div class="row justify-content-end">
-            <div class="col-lg-4">
-              <div class="cart-info card p-4 mt-4">
-                <h4 class="mb-4">Cart totals</h4>
-                <ul class="list-unstyled mb-4">
-                  <li class="d-flex justify-content-between pb-2 mb-3">
+          <div className="row justify-content-end">
+            <div className="col-lg-4">
+              <div className="cart-info card p-4 mt-4">
+                <h4 className="mb-4">Cart totals</h4>
+                <ul className="list-unstyled mb-4">
+                  <li className="d-flex justify-content-between pb-2 mb-3">
                     <h5>Subtotal</h5>
-                    <span>$90.00</span>
+                    <span>0.000235 Eth</span>
                   </li>
-                  <li class="d-flex justify-content-between pb-2 mb-3">
-                    <h5>Shipping</h5>
-                    <span>Free</span>
+                  <li className="d-flex justify-content-between pb-2 mb-3">
+                    <h5>Token Used</h5>
+                    <span>0</span>
                   </li>
-                  <li class="d-flex justify-content-between pb-2">
+                  <li className="d-flex justify-content-between pb-2">
                     <h5>Total</h5>
-                    <span>$90.00</span>
+                    <span>0.000235 Eth</span>
                   </li>
                 </ul>
-                <a href="#" class="btn btn-main btn-small">
+                <a href="#" className="btn btn-main btn-small">
                   Proceed to checkout
                 </a>
               </div>
@@ -240,6 +250,7 @@ function Cart() {
           </div>
         </div>
       </section>
+      <GoToTop />
     </div>
   );
 }

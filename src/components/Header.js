@@ -12,6 +12,7 @@ function Header() {
         <Link className="navbar-brand font-weight-bold" to={{ pathname: "/" }}>
           Digimart
         </Link>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -33,52 +34,25 @@ function Header() {
             </li>
 
             <li className="nav-item dropdown dropdown-slide">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown3"
-                role="button"
-                data-delay="350"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
+              <Link className="nav-link" to={{ pathname: "/shop" }}>
                 Shop
-              </a>
+              </Link>
             </li>
             <li className="nav-item dropdown dropdown-slide">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown3"
-                role="button"
-                data-delay="350"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
+              <Link className="nav-link" to={{ pathname: "/cart" }}>
                 Cart
-              </a>
+              </Link>
             </li>
 
             <li className="nav-item dropdown dropdown-slide">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown5"
-                role="button"
-                data-delay="350"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                Sign In
-              </a>
+              <Link className="nav-link" to={{ pathname: "/login" }}>
+                Login
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
+              <Link className="nav-link" to={{ pathname: "/aboutus" }}>
                 About Us
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -87,11 +61,11 @@ function Header() {
           className="top-menu list-inline mb-0 d-none d-lg-block"
           id="top-menu"
         >
-          <li className="list-inline-item">
+          {/* <li className="list-inline-item">
             <a href="#" className="search_toggle" id="search-icon">
               <i className="tf-ion-android-search"></i>
             </a>
-          </li>
+          </li> */}
 
           <li className="dropdown cart-nav dropdown-slide list-inline-item">
             <a
@@ -104,18 +78,18 @@ function Header() {
             </a>
             <div className="dropdown-menu cart-dropdown">
               <div className="media">
-                <a href="/product-single">
+                <a href="/single-product">
                   <img
                     className="media-object img- mr-3"
-                    src="assets/images/cart-1.jpg"
+                    src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
                     alt="image"
                   />
                 </a>
                 <div className="media-body">
-                  <h6>Ladies Bag</h6>
+                  <h6>Sunset</h6>
                   <div className="cart-price">
                     <span>1 x</span>
-                    <span>1250.00</span>
+                    <span>0.00016 Eth</span>
                   </div>
                 </div>
                 <a href="#" className="remove">
@@ -124,18 +98,18 @@ function Header() {
               </div>
 
               <div className="media">
-                <a href="/product-single">
+                <a href="/single-product">
                   <img
                     className="media-object img-fluid mr-3"
-                    src="assets/images/cart-2.jpg"
+                    src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
                     alt="image"
                   />
                 </a>
                 <div className="media-body">
-                  <h6>Skinny Jeans</h6>
+                  <h6>Sunset</h6>
                   <div className="cart-price">
                     <span>1 x</span>
-                    <span>1250.00</span>
+                    <span>0.00016 Eth</span>
                   </div>
                 </div>
                 <a href="#" className="remove">
@@ -145,7 +119,7 @@ function Header() {
 
               <div className="cart-summary">
                 <span className="h6">Total</span>
-                <span className="total-price h6">$1799.00</span>
+                <span className="total-price h6">0.000235 Eth</span>
 
                 <div className="text-center cart-buttons mt-3">
                   <a
@@ -161,11 +135,11 @@ function Header() {
               </div>
             </div>
           </li>
-          <li className="list-inline-item">
+          {/* <li className="list-inline-item">
             <a href="#">
               <i className="tf-ion-ios-person mr-3"></i>
             </a>
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>
