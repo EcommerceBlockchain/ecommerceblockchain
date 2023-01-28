@@ -22,6 +22,8 @@ import {
   collection,
 } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
 import GoToTop from "./components/GoToTop";
 
 function App() {
@@ -36,14 +38,19 @@ function App() {
       //     console.log("done");
       //   }
       // );
-      const storage = getStorage();
-      const pathReference = ref(
-        storage,
-        "gs://digimart-69f1f.appspot.com/preview_images/parrot.jpg"
+      // const storage = getStorage();
+      // const pathReference = ref(
+      //   storage,
+      //   "gs://digimart-69f1f.appspot.com/preview_images/parrot.jpg"
+      // );
+      // getDownloadURL(pathReference).then((url) => {
+      //   console.log(url);
+      // });
+      await createUserWithEmailAndPassword(
+        getAuth(),
+        "kevinmistry121@gmail.com",
+        "kevin1234"
       );
-      getDownloadURL(pathReference).then((url) => {
-        console.log(url);
-      });
     }
     getdata();
     window.addEventListener("contextmenu", (e) => {

@@ -61,6 +61,7 @@ function SignUp() {
     } else {
       setError("success");
       await createUserWithEmailAndPassword(auth, values.email, values.password);
+
       await setDoc(doc(collection(firestore, "users"), values.username), {
         username: values.username,
         email: values.email,
@@ -75,88 +76,106 @@ function SignUp() {
     <div className="signUp-container">
       {error === "email" && (
         <div
-          className="alert alert-danger alert-dismissible fade show"
+          className="alert alert-danger alert-dismissible fade show fixed-top"
           role="alert"
-          style={{ marginTop: "6rem" }}
+          style={{ marginTop: "5rem" }}
         >
           <strong>Error!</strong> This email is already taken!
           <button
             type="button"
-            className="btn-close"
+            className="close"
             data-bs-dismiss="alert"
             aria-label="Close"
             onClick={() => {
               setError("");
             }}
-          ></button>
+          >
+            &#10060;
+          </button>
         </div>
       )}
       {error === "username" && (
         <div
-          className="alert alert-danger alert-dismissible fade show"
+          className="alert alert-danger alert-dismissible fade show fixed-top"
           role="alert"
+          style={{ marginTop: "5rem" }}
         >
           <strong>Error!</strong> This username is already taken!
           <button
             type="button"
-            className="btn-close"
+            className="close"
             data-bs-dismiss="alert"
             aria-label="Close"
             onClick={() => {
               setError("");
             }}
-          ></button>
+          >
+            {" "}
+            &#10060;
+          </button>
         </div>
       )}
       {error === "both" && (
         <div
-          className="alert alert-danger alert-dismissible fade show"
+          className="alert alert-danger alert-dismissible fade show fixed-top"
           role="alert"
+          style={{ marginTop: "5rem" }}
         >
           <strong>Error!</strong> This email and username are already taken!
           <button
             type="button"
-            className="btn-close"
+            className="close"
             data-bs-dismiss="alert"
             aria-label="Close"
             onClick={() => {
               setError("");
             }}
-          ></button>
+          >
+            {" "}
+            &#10060;
+          </button>
         </div>
       )}
       {error === "password" && (
         <div
-          className="alert alert-danger alert-dismissible fade show"
+          className="alert alert-danger alert-dismissible fade show fixed-top"
           role="alert"
+          style={{ marginTop: "5rem" }}
         >
           <strong>Error!</strong> Paasword didn't match!
           <button
             type="button"
-            className="btn-close"
+            className="close"
             data-bs-dismiss="alert"
             aria-label="Close"
             onClick={() => {
               setError("");
             }}
-          ></button>
+          >
+            {" "}
+            &#10060;
+          </button>
         </div>
       )}
       {error === "success" && (
         <div
-          className="alert alert-success alert-dismissible fade show"
+          className="alert alert-success alert-dismissible fade show fixed-top"
           role="alert"
+          style={{ marginTop: "5rem" }}
         >
           <strong>Succeess!</strong> Account created successfully!
           <button
             type="button"
-            className="btn-close"
+            className="close"
             data-bs-dismiss="alert"
             aria-label="Close"
             onClick={() => {
               setError("");
             }}
-          ></button>
+          >
+            {" "}
+            &#10060;
+          </button>
         </div>
       )}
       <Formik
