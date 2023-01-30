@@ -25,6 +25,7 @@ import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 import GoToTop from "./components/GoToTop";
+import AddProduct from "./pages/AddProduct";
 
 function App() {
   useEffect(() => {
@@ -46,11 +47,6 @@ function App() {
       // getDownloadURL(pathReference).then((url) => {
       //   console.log(url);
       // });
-      await createUserWithEmailAndPassword(
-        getAuth(),
-        "kevinmistry121@gmail.com",
-        "kevin1234"
-      );
     }
     getdata();
     window.addEventListener("contextmenu", (e) => {
@@ -71,6 +67,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/addproduct" element={<AddProduct />} />
         </Routes>
         <Footer></Footer>
       </BrowserRouter>
