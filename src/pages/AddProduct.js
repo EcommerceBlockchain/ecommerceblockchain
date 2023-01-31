@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import GoToTop from "../components/GoToTop";
 import { Link } from "react-router-dom";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
+import { TagsInput } from "react-tag-input-component";
 
 function AddProduct() {
-  const [image, setimage] = useState("");
+  const [images, setimages] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [originalProduct, setOriginalProduct] = useState("");
+  const [originalProductName, setOriginalProductName] = useState("");
   return (
     <div className="checkout-container">
       <section className="page-header">
@@ -83,132 +88,263 @@ function AddProduct() {
                           Documents (.pdf, .xlxs, .pptx, etc. )
                         </option>
                       </select>
+                    </div>
+                  </div>
+                  <div className="section-title">
+                    <h2 className="d-block text-left-sm">Preview Images</h2>
+
+                    <div
+                      className="heading justify-content-between mb-2"
+                      style={{
+                        border: "1px solid lightgrey",
+                        borderRadius: "10px",
+                        padding: "10px",
+                      }}
+                    >
+                      <div className="product-info-own">
+                        <h5 className="result-count mb-2">Add Images</h5>
+                      </div>
+
                       <input
                         type="file"
                         multiple
                         accept=".jpeg,.png,.jpg,.webp"
-                        onInput={(e) => {
-                          console.log(e.target.value);
-                          console.log(typeof e.target.value);
-                          setimage(e.target.value);
+                        onChange={(e) => {
+                          console.log(e.target.files);
+                          Array.from(e.target.files).forEach((item) => {
+                            setimages((prev) => [
+                              ...prev,
+                              URL.createObjectURL(item),
+                            ]);
+                          });
                         }}
+                        name="uploadfile"
+                        id="img"
+                        style={{ display: "none" }}
                       />
-                      <img src={image} />
+
+                      <div className="row">
+                        {images.map((item, index) => {
+                          console.log(item);
+                          return (
+                            <div
+                              className="col-lg-3 col-12 col-md-6 col-sm-6 mb-2"
+                              style={{ position: "relative" }}
+                            >
+                              <img
+                                src={item}
+                                style={{
+                                  width: "150px",
+                                  height: "150px",
+                                  objectFit: "contain",
+                                  padding: "5px",
+                                  margin: "5px 0",
+                                  border: "1px solid lightgrey",
+                                  borderRadius: "10px",
+                                }}
+                                alt="preview img"
+                              />
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "-0.5rem",
+                                  left: "150px",
+                                  backgroundColor: "lightgrey",
+                                  height: "30px",
+                                  width: "30px",
+                                  borderRadius: "50%",
+                                  padding: "10px",
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => {
+                                  setimages(
+                                    images.filter((item, ind) => {
+                                      return ind !== index;
+                                    })
+                                  );
+                                }}
+                              >
+                                <i className="tf-ion-close"></i>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <div className="col-lg-3 col-12 col-md-6 col-sm-6 mb-2">
+                          <label for="img">
+                            <div
+                              style={{
+                                cursor: "pointer",
+                                width: "150px",
+                                height: "150px",
+                                border: "1px solid lightgrey",
+                                borderRadius: "10px",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              <img
+                                src="https://static.thenounproject.com/png/3752804-200.png"
+                                style={{
+                                  objectFit: "contain",
+                                  width: "30px",
+                                  height: "30px",
+                                  marginTop: "20px",
+                                }}
+                                alt="plus-image"
+                              />
+                              <p>Add Image</p>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div className="col-md-3">
-              <form className="mb-5">
-                <section className="widget widget-sizes mb-5">
-                  <h3 className="widget-title h4 mb-4">Shop by Category</h3>
-                  <div className="custom-control custom-checkbox">
-                    <input
-                      type="checkbox"
-                      className="custom-control-input"
-                      id="size1"
-                    />
-                    <label className="custom-control-label" for="size1">
-                      Image
-                    </label>
-                  </div>
-                  <div className="custom-control custom-checkbox">
-                    <input
-                      type="checkbox"
-                      className="custom-control-input"
-                      id="size2"
-                    />
-                    <label className="custom-control-label" for="size2">
-                      Video
-                    </label>
-                  </div>
-                  <div className="custom-control custom-checkbox">
-                    <input
-                      type="checkbox"
-                      className="custom-control-input"
-                      id="size3"
-                    />
-                    <label className="custom-control-label" for="size3">
-                      Audio
-                    </label>
-                  </div>
-                  <div className="custom-control custom-checkbox">
-                    <input
-                      type="checkbox"
-                      className="custom-control-input"
-                      id="size4"
-                    />
-                    <label className="custom-control-label" for="size4">
-                      GIF
-                    </label>
-                  </div>
-                  <div className="custom-control custom-checkbox">
-                    <input
-                      type="checkbox"
-                      className="custom-control-input"
-                      id="size5"
-                    />
-                    <label className="custom-control-label" for="size5">
-                      Documents (.xlsx, .pdf, .docx etc)
-                    </label>
-                  </div>
-                </section>
-
-                <button type="button" className="btn btn-black btn-small">
-                  Filter
-                </button>
-              </form>
-
-              <section className="widget widget-popular mb-5">
-                <h3 className="widget-title mb-4 h4">Popular Products</h3>
-                <a
-                  className="popular-products-item media"
-                  href="/single-product"
+              <section className="widget widget-sizes mb-5">
+                <h2 className="d-block text-left-sm">Tags</h2>
+                <div
+                  className="heading justify-content-between mb-5"
+                  style={{
+                    border: "1px solid lightgrey",
+                    borderRadius: "10px",
+                    padding: "10px",
+                  }}
                 >
-                  <img
-                    src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                    alt=""
-                    className="img-fluid mr-4"
-                  />
-                  <div className="media-body">
-                    <h6>Yellow Parrot</h6>
-                    <span className="price">0.000075 Eth</span>
-                    <span className="converted-price">{"  "}(₹10)</span>
+                  <div className="product-info-own">
+                    <h5 className="result-count mb-2">Tags you have added</h5>
                   </div>
-                </a>
-
-                <a
-                  className="popular-products-item media"
-                  href="/single-product"
+                  {tags.length === 0 ? (
+                    <p>No tag found.</p>
+                  ) : (
+                    <pre>{JSON.stringify(tags)}</pre>
+                  )}
+                  <TagsInput
+                    classNames={{ input: "form-control-tag", tag: "form-tag" }}
+                    value={tags}
+                    onChange={setTags}
+                    name="fruits"
+                    placeHolder="Enter tag here"
+                  />
+                  <em>Press enter add new tag</em>
+                </div>
+              </section>
+              <section className="widget widget-sizes mb-5">
+                <h2 className="d-block text-left-sm">Original Product</h2>
+                <div
+                  className="heading justify-content-between mb-5"
+                  style={{
+                    border: "1px solid lightgrey",
+                    borderRadius: "10px",
+                    padding: "10px",
+                  }}
                 >
-                  <img
-                    src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                    alt=""
-                    className="img-fluid mr-4"
-                  />
-                  <div className="media-body">
-                    <h6>Sunset</h6>
-                    <span className="price">0.00016 Eth</span>
-                    <span className="converted-price">{"  "}(₹20)</span>
+                  <div className="product-info-own">
+                    <h5 className="result-count mb-2">Add your file</h5>
                   </div>
-                </a>
+                  <input
+                    disabled={originalProduct ? true : false}
+                    type="file"
+                    onChange={(e) => {
+                      console.log(e.target.files);
+                      setOriginalProductName(e.target.files[0].name);
+                      setOriginalProduct(
+                        URL.createObjectURL(e.target.files[0])
+                      );
+                    }}
+                    name="uploadfile"
+                    id="img-2"
+                    style={{ display: "none" }}
+                  />
+                  <div style={{ position: "relative" }}>
+                    <label for="img-2">
+                      <div
+                        style={{
+                          cursor: "pointer",
+                          width: "150px",
+                          height: "150px",
+                          border: "1px solid lightgrey",
+                          borderRadius: "10px",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <img
+                          src={
+                            !originalProduct
+                              ? "https://cdn-icons-png.flaticon.com/512/1091/1091916.png"
+                              : "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/1200px-Eo_circle_green_checkmark.svg.png"
+                          }
+                          style={{
+                            objectFit: "contain",
+                            width: "30px",
+                            height: "30px",
+                            marginTop: "20px",
+                          }}
+                          alt="plus-image"
+                        />
 
-                <a
-                  className="popular-products-item media"
-                  href="/single-product"
-                >
-                  <img
-                    src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                    alt=""
-                    className="img-fluid mr-4"
-                  />
-                  <div className="media-body">
-                    <h6>Yellow Parrot</h6>
-                    <span className="price">0.000075 Eth</span>
-                    <span className="converted-price">{"  "}(₹10)</span>
+                        {!originalProduct && <p>Add File</p>}
+                      </div>
+                    </label>
+                    {originalProduct && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-15px",
+                          left: "135px",
+                          backgroundColor: "lightgrey",
+                          height: "30px",
+                          width: "30px",
+                          borderRadius: "50%",
+                          padding: "10px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          setOriginalProduct("");
+                          setOriginalProductName("");
+                        }}
+                      >
+                        <i className="tf-ion-close"></i>
+                      </div>
+                    )}
                   </div>
-                </a>
+                  <p>{originalProductName}</p>
+                </div>
+              </section>
+              <section className="widget widget-sizes mb-5">
+                <h2 className="d-block text-left-sm">Price</h2>
+                <div
+                  className="heading justify-content-between mb-5"
+                  style={{
+                    border: "1px solid lightgrey",
+                    borderRadius: "10px",
+                    padding: "10px",
+                  }}
+                >
+                  <div className="product-info-own">
+                    <h5 className="result-count mb-2">
+                      Product Price (in Eth){" "}
+                    </h5>
+                  </div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    style={{ backgroundColor: "white" }}
+                  />
+                </div>
               </section>
             </div>
           </div>

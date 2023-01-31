@@ -17,3 +17,5 @@ export const email = Yup.string()
   .required("Email is required")
   .email("Invalid Email")
   .label("Email");
+
+export const price = Yup.number().required("Price is required");
