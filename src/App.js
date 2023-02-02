@@ -8,23 +8,22 @@ import Cart from "../src/pages/Cart";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
 import ForgotPassword from "../src/pages/ForgotPassword";
-import { BrowserRouter, Routes, Route, Link, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "../src/config/firebaseConfig";
 import { useEffect } from "react";
-import {
-  getDocs,
-  getDoc,
-  doc,
-  getFirestore,
-  setDoc,
-  addDoc,
-  collection,
-} from "firebase/firestore";
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+// import {
+//   getDocs,
+//   getDoc,
+//   doc,
+//   getFirestore,
+//   setDoc,
+//   addDoc,
+//   collection,
+// } from "firebase/firestore";
+// import { getDownloadURL, getStorage, ref } from "firebase/storage";
+// import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-import GoToTop from "./components/GoToTop";
 import AddProduct from "./pages/AddProduct";
 
 function App() {
