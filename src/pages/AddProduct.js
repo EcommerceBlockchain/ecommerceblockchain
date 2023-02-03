@@ -16,6 +16,7 @@ function AddProduct() {
   const [originalProductFileName, setOriginalProductFileName] = useState("");
   const [category, setCategory] = useState("Select Category");
   const [formSub, setFormSub] = useState(false);
+  const [ogfile, setogfile] = useState(false);
   const navigate = useNavigate();
   const validation = Yup.object().shape({
     productName: name,
@@ -419,23 +420,30 @@ function AddProduct() {
                       <div className="product-info-own">
                         <h5 className="result-count mb-2">Add your file</h5>
                       </div>
-                      <input
-                        disabled={originalProductUrl ? true : false}
-                        type="file"
-                        onChange={(e) => {
-                          console.log(e.target.files);
-                          setOriginalProductFileName(e.target.files[0].name);
-                          setOriginalProductUrl(
-                            URL.createObjectURL(e.target.files[0])
-                          );
-                        }}
-                        name="uploadfile"
-                        id="img-2"
-                        style={{ display: "none" }}
-                      />
+                      {category === "Image" && (
+                        <input
+                          disabled={originalProductUrl ? true : false}
+                          type="file"
+                          accept=".jpeg,.png,.jpg,.webp"
+                          onChange={(e) => {
+                            setogfile(true);
+                            console.log(e.target.files);
+                            setOriginalProductFileName(e.target.files[0].name);
+                            setOriginalProductUrl(
+                              URL.createObjectURL(e.target.files[0])
+                            );
+                          }}
+                          name="uploadfile"
+                          id="img-2"
+                          style={{ display: "none" }}
+                        />
+                      )}
                       <div style={{ position: "relative" }}>
                         <label for="img-2">
                           <div
+                            onClick={() => {
+                              setogfile(true);
+                            }}
                             style={{
                               cursor: "pointer",
                               width: "150px",
@@ -475,6 +483,17 @@ function AddProduct() {
                             }}
                           >
                             Please add product
+                          </p>
+                        )}
+                        {category === "Select Category" && ogfile && (
+                          <p
+                            style={{
+                              fontSize: 14,
+                              marginBottom: "10px",
+                              color: colors.red,
+                            }}
+                          >
+                            Please select category
                           </p>
                         )}
                         {originalProductUrl && (
