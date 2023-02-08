@@ -130,6 +130,20 @@ a:hover {
   box-shadow: none !important;
 }
 
+.cart-btn {
+  background-color: #007bff;
+  outline: none;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  transition: 0.5s all ease;
+}
+
+.cart-btn:hover {
+  transition: 0.5s all ease;
+  background-color: #0069d9;
+}
+
 .navbar-toggle .icon-bar {
   background: #3071e7;
 }
@@ -1011,6 +1025,18 @@ a.text-primary:hover {
   object-fit: contain;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+}
+
+.product-img {
+  height: 300px;
+  width: 200px;
+  object-fit: contain;
+}
+
+.product-img img {
+  width: 100%;
+  height: 100%;
 }
 
 .product:hover .product-hover-overlay {

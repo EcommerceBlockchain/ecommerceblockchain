@@ -66,6 +66,14 @@ function SignUp() {
         username: values.username,
         email: values.email,
         name: values.name,
+        avg_rating: 0,
+        balance: 0,
+        bought: [],
+        contact: "",
+        is_active: true,
+        products: [],
+        reward: 0,
+        transaction: [],
       });
       navigate("/", { replace: true });
       console.log("success login");

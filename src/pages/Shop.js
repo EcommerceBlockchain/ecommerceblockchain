@@ -1,7 +1,48 @@
 import { Link } from "react-router-dom";
 import GoToTop from "../components/GoToTop";
+import Product from "../components/Product";
+import SmallProduct from "../components/SmallProduct";
+import { useEffect, useState } from "react";
+import {
+  getDocs,
+  collection,
+  getFirestore,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 
 function Shop() {
+  const [products, setProducts] = useState([]);
+  const [popularProducts, setPopularProducts] = useState([]);
+
+  const getProducts = async () => {
+    setProducts([]);
+    setPopularProducts([]);
+    let array = [];
+    let popProd = [];
+    let qu = query(collection(getFirestore(), "products"), limit(6));
+    const products = await getDocs(qu);
+    products.docs.forEach((product) => {
+      array.push({ ...product.data(), id: product.id });
+    });
+    setProducts(array);
+
+    let qu2 = query(
+      collection(getFirestore(), "products"),
+      orderBy("rating", "desc"),
+      limit(4)
+    );
+    const products2 = await getDocs(qu2);
+    products2.docs.forEach((product) => {
+      popProd.push({ ...product.data(), id: product.id });
+    });
+    setPopularProducts(popProd);
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
   return (
     <div className="shop-container">
       <section className="page-header">
@@ -69,177 +110,26 @@ function Shop() {
                 </div>
               </div>
 
-              <div className="row">
-                <div className="col-lg-4 col-12 col-md-6 col-sm-6 mb-5">
-                  <div className="product">
-                    <div className="product-wrap">
-                      <a href="/single-product">
-                        <img
-                          className="img-fluid w-100 mb-3 img-first"
-                          src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                          alt="product-img"
-                        />
-                      </a>
-                    </div>
-
-                    <span className="onsale">Sale</span>
-                    <div className="product-hover-overlay">
-                      <a href="#">
-                        <i className="tf-ion-android-cart"></i>
-                      </a>
-                    </div>
-
-                    <div className="product-info">
-                      <h2 className="product-title h5 mb-0">
-                        <a href="#">Sunset</a>
-                      </h2>
-                      <span className="price">0.00016 Eth</span>
-                      <span className="converted-price">{"  "}(₹20)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-4 col-12 col-md-6 col-sm-6 mb-5">
-                  <div className="product">
-                    <div className="product-wrap">
-                      <a href="/single-product">
-                        <img
-                          className="img-fluid w-100 mb-3 img-first"
-                          src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                          alt="product-img"
-                        />
-                      </a>
-                    </div>
-
-                    <div className="product-hover-overlay">
-                      <a href="#">
-                        <i className="tf-ion-android-cart"></i>
-                      </a>
-                    </div>
-
-                    <div className="product-info">
-                      <h2 className="product-title h5 mb-0">
-                        <a href="#">Yellow Parrot</a>
-                      </h2>
-                      <span className="price">0.000075 Eth</span>
-                      <span className="converted-price">{"  "}(₹10)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-4 col-12 col-md-6 col-sm-6 mb-5">
-                  <div className="product">
-                    <div className="product-wrap">
-                      <a href="/single-product">
-                        <img
-                          className="img-fluid w-100 mb-3 img-first"
-                          src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                          alt="product-img"
-                        />
-                      </a>
-                    </div>
-
-                    <span className="onsale">Sale</span>
-                    <div className="product-hover-overlay">
-                      <a href="#">
-                        <i className="tf-ion-android-cart"></i>
-                      </a>
-                    </div>
-
-                    <div className="product-info">
-                      <h2 className="product-title h5 mb-0">
-                        <a href="/single-product">Sunset</a>
-                      </h2>
-                      <span className="price">0.00016 Eth</span>
-                      <span className="converted-price">{"  "}(₹20)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-4 col-12 col-md-6 col-sm-6 mb-5">
-                  <div className="product">
-                    <div className="product-wrap">
-                      <a href="/single-product">
-                        <img
-                          className="img-fluid w-100 mb-3 img-first"
-                          src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                          alt="product-img"
-                        />
-                      </a>
-                    </div>
-
-                    <div className="product-hover-overlay">
-                      <a href="#">
-                        <i className="tf-ion-android-cart"></i>
-                      </a>
-                    </div>
-
-                    <div className="product-info">
-                      <h2 className="product-title h5 mb-0">
-                        <a href="/single-product">Yellow Parrot</a>
-                      </h2>
-                      <span className="price">0.000075 Eth</span>
-                      <span className="converted-price">{"  "}(₹10)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-4 col-12 col-md-6 col-sm-6 mb-5">
-                  <div className="product">
-                    <div className="product-wrap">
-                      <a href="/single-product">
-                        <img
-                          className="img-fluid w-100 mb-3 img-first"
-                          src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                          alt="product-img"
-                        />
-                      </a>
-                    </div>
-
-                    <div className="product-hover-overlay">
-                      <a href="#">
-                        <i className="tf-ion-android-cart"></i>
-                      </a>
-                    </div>
-
-                    <div className="product-info">
-                      <h2 className="product-title h5 mb-0">
-                        <a href="/single-product">Sunset</a>
-                      </h2>
-                      <span className="price">0.00016 Eth</span>
-                      <span className="converted-price">{"  "}(₹20)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-4 col-12 col-md-6 col-sm-6 mb-5">
-                  <div className="product">
-                    <div className="product-wrap">
-                      <a href="/single-product">
-                        <img
-                          className="img-fluid w-100 mb-3 img-first"
-                          src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                          alt="product-img"
-                        />
-                      </a>
-                    </div>
-
-                    <div className="product-hover-overlay">
-                      <a href="#">
-                        <i className="tf-ion-android-cart"></i>
-                      </a>
-                    </div>
-
-                    <div className="product-info">
-                      <h2 className="product-title h5 mb-0">
-                        <a href="/single-product">Yellow Parrot</a>
-                      </h2>
-                      <span className="price">0.000075 Eth</span>
-                      <span className="converted-price">{"  "}(₹10)</span>
-                    </div>
-                  </div>
-                </div>
-
+              <div
+                className="row"
+                style={{
+                  display: "grid",
+                  gap: "1rem",
+                  gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+                }}
+              >
+                {products.map((item) => {
+                  return (
+                    <Product
+                      key={item.id}
+                      name={item.name}
+                      price={item.cost}
+                      id={item.id}
+                      preImg={item.preview_image[0]}
+                    />
+                  );
+                })}
+                <div className="d-flex justify-content-center"></div>
                 <div className="col-12">
                   <nav aria-label="Page navigation">
                     <ul className="pagination">
@@ -336,53 +226,17 @@ function Shop() {
 
               <section className="widget widget-popular mb-5">
                 <h3 className="widget-title mb-4 h4">Popular Products</h3>
-                <a
-                  className="popular-products-item media"
-                  href="/single-product"
-                >
-                  <img
-                    src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                    alt=""
-                    className="img-fluid mr-4"
-                  />
-                  <div className="media-body">
-                    <h6>Yellow Parrot</h6>
-                    <span className="price">0.000075 Eth</span>
-                    <span className="converted-price">{"  "}(₹10)</span>
-                  </div>
-                </a>
-
-                <a
-                  className="popular-products-item media"
-                  href="/single-product"
-                >
-                  <img
-                    src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                    alt=""
-                    className="img-fluid mr-4"
-                  />
-                  <div className="media-body">
-                    <h6>Sunset</h6>
-                    <span className="price">0.00016 Eth</span>
-                    <span className="converted-price">{"  "}(₹20)</span>
-                  </div>
-                </a>
-
-                <a
-                  className="popular-products-item media"
-                  href="/single-product"
-                >
-                  <img
-                    src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                    alt=""
-                    className="img-fluid mr-4"
-                  />
-                  <div className="media-body">
-                    <h6>Yellow Parrot</h6>
-                    <span className="price">0.000075 Eth</span>
-                    <span className="converted-price">{"  "}(₹10)</span>
-                  </div>
-                </a>
+                {popularProducts.map((item) => {
+                  return (
+                    <SmallProduct
+                      key={item.id}
+                      name={item.name}
+                      price={item.cost}
+                      id={item.id}
+                      preImg={item.preview_image[0]}
+                    />
+                  );
+                })}
               </section>
             </div>
           </div>

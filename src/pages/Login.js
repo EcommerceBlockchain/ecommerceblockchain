@@ -16,7 +16,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 
-function Login() {
+function Login({ path }) {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ function Login() {
             console.log("signin done");
             setError("success");
             setTimeout(() => {
-              navigate("/", { replace: true });
+              navigate(path ? path : "/", { replace: true });
             }, 1000);
           })
           .catch(() => {

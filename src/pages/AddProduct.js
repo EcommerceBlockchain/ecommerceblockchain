@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import GoToTop from "../components/GoToTop";
 import { useNavigate } from "react-router-dom";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { addDoc, getFirestore, collection } from "firebase/firestore";
+import {
+  addDoc,
+  getFirestore,
+  collection,
+  Timestamp,
+} from "firebase/firestore";
 import { TagsInput } from "react-tag-input-component";
 import { description, name, price } from "../config/validationSchema";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import colors from "../colors";
-import { Timestamp } from "firebase/firestore";
+import getUsernameByEmail from "../service/getUsernameByEmail";
+import UserContext from "../context/UserContext";
+
 function AddProduct() {
+  const { user } = useContext(UserContext);
   const [images, setimages] = useState([]);
   const [tags, setTags] = useState([]);
   const [originalProductUrl, setOriginalProductUrl] = useState("");
@@ -78,7 +86,7 @@ function AddProduct() {
                 reviews: [],
                 tag: tags,
                 timestamp: Timestamp.fromDate(new Date()),
-                owner: "yashms25",
+                owner: await getUsernameByEmail(user.email),
               }).then(() => {
                 console.log("done");
                 navigate("/", { replace: true });
@@ -91,6 +99,8 @@ function AddProduct() {
         });
     }
   };
+
+  useEffect(() => {}, []);
 
   return (
     <div className="checkout-container">
@@ -424,7 +434,79 @@ function AddProduct() {
                         <input
                           disabled={originalProductUrl ? true : false}
                           type="file"
-                          accept=".jpeg,.png,.jpg,.webp"
+                          accept="image/*"
+                          onChange={(e) => {
+                            setogfile(true);
+                            console.log(e.target.files);
+                            setOriginalProductFileName(e.target.files[0].name);
+                            setOriginalProductUrl(
+                              URL.createObjectURL(e.target.files[0])
+                            );
+                          }}
+                          name="uploadfile"
+                          id="img-2"
+                          style={{ display: "none" }}
+                        />
+                      )}
+                      {category === "Video" && (
+                        <input
+                          disabled={originalProductUrl ? true : false}
+                          type="file"
+                          accept="video/*"
+                          onChange={(e) => {
+                            setogfile(true);
+                            console.log(e.target.files);
+                            setOriginalProductFileName(e.target.files[0].name);
+                            setOriginalProductUrl(
+                              URL.createObjectURL(e.target.files[0])
+                            );
+                          }}
+                          name="uploadfile"
+                          id="img-2"
+                          style={{ display: "none" }}
+                        />
+                      )}
+                      {category === "Audio" && (
+                        <input
+                          disabled={originalProductUrl ? true : false}
+                          type="file"
+                          accept=".MPEG,.MP3,.FLAC,.WAV,.WMA,.AAC"
+                          onChange={(e) => {
+                            setogfile(true);
+                            console.log(e.target.files);
+                            setOriginalProductFileName(e.target.files[0].name);
+                            setOriginalProductUrl(
+                              URL.createObjectURL(e.target.files[0])
+                            );
+                          }}
+                          name="uploadfile"
+                          id="img-2"
+                          style={{ display: "none" }}
+                        />
+                      )}
+                      {category === "GIF" && (
+                        <input
+                          disabled={originalProductUrl ? true : false}
+                          type="file"
+                          accept=".gif"
+                          onChange={(e) => {
+                            setogfile(true);
+                            console.log(e.target.files);
+                            setOriginalProductFileName(e.target.files[0].name);
+                            setOriginalProductUrl(
+                              URL.createObjectURL(e.target.files[0])
+                            );
+                          }}
+                          name="uploadfile"
+                          id="img-2"
+                          style={{ display: "none" }}
+                        />
+                      )}
+                      {category === "Documents" && (
+                        <input
+                          disabled={originalProductUrl ? true : false}
+                          type="file"
+                          accept=".doc,.docm,.docx,.dot,.dotm,.dotx,.htm,.html,.mht,.mhtml,.odt,.pdf,.rtf,.txt,.wps,.xml,.xps,.xlsx,.csv,.xls,.pptx,.ppt"
                           onChange={(e) => {
                             setogfile(true);
                             console.log(e.target.files);
@@ -570,7 +652,10 @@ function AddProduct() {
                     </div>
                   </section>
                   <button
-                    onClick={handleSubmit}
+                    onClick={() => {
+                      <GoToTop />;
+                      handleSubmit();
+                    }}
                     className="btn btn-main btn-small mt-3"
                   >
                     Add Product
