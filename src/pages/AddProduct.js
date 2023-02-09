@@ -13,11 +13,10 @@ import { description, name, price } from "../config/validationSchema";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import colors from "../colors";
-import getUsernameByEmail from "../service/getUsernameByEmail";
 import UserContext from "../context/UserContext";
 
 function AddProduct() {
-  const { user } = useContext(UserContext);
+  const { user, username } = useContext(UserContext);
   const [images, setimages] = useState([]);
   const [tags, setTags] = useState([]);
   const [originalProductUrl, setOriginalProductUrl] = useState("");
@@ -86,7 +85,7 @@ function AddProduct() {
                 reviews: [],
                 tag: tags,
                 timestamp: Timestamp.fromDate(new Date()),
-                owner: await getUsernameByEmail(user.email),
+                owner: username,
               }).then(() => {
                 console.log("done");
                 navigate("/", { replace: true });

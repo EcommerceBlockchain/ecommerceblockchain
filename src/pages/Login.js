@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Formik } from "formik";
-import { Link, useNavigate } from "react-router-dom";
+import { json, Link, useNavigate } from "react-router-dom";
 import GoToTop from "../components/GoToTop";
 import colors from "../colors";
 
@@ -39,14 +39,36 @@ function Login({ path }) {
           doc.data().email,
           values.password
         )
-          .then(() => {
-            console.log("signin done");
+          .then((user) => {
+            console.log("signin done", user.user.uid);
+            let users = JSON.parse(localStorage.getItem("users"));
+            console.log(
+              "users",
+              users,
+              JSON.parse(localStorage.getItem("users"))
+            );
+            if (users !== null) {
+              if (Object.keys(users).includes(user.user.uid)) {
+                console.log("exist in users obj");
+              } else {
+                users[user.user.uid] = [];
+                localStorage.setItem("users", JSON.stringify(users));
+              }
+            } else {
+              localStorage.setItem(
+                "users",
+                JSON.stringify({
+                  [user.user.uid]: [],
+                })
+              );
+            }
             setError("success");
             setTimeout(() => {
               navigate(path ? path : "/", { replace: true });
             }, 1000);
           })
-          .catch(() => {
+          .catch((err) => {
+            console.log(err);
             setError("error");
           });
       });

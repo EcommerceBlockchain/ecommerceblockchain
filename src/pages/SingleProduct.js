@@ -106,30 +106,33 @@ function SingleProduct() {
 
                 <h3 className="product-price">
                   <span className="price">{product.cost} Eth</span>
-                  <span className="converted-price">{"  "}(₹20)</span>
                 </h3>
 
                 <p className="product-description my-4 ">
                   {product.description}
                 </p>
 
-                <div className="quantity d-flex align-items-center">
-                  <input
-                    type="number"
-                    id="#"
-                    className="input-text qty text form-control w-25 mr-3"
-                    step="1"
-                    min="1"
-                    max="9"
-                    name="quantity"
-                    value="1"
-                    title="Qty"
-                    size="4"
-                  />
-                  <a href="#" className="btn btn-main btn-small">
-                    Add to cart
-                  </a>
-                </div>
+                <button
+                  type="button"
+                  style={{ marginRight: "0.5rem" }}
+                  className="cart-btn"
+                >
+                  -
+                </button>
+                <button
+                  style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
+                  type="button"
+                  className="cart-btn"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  type="button"
+                  className="cart-btn"
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  +
+                </button>
 
                 <div className="products-meta mt-4">
                   <div className="product-category d-flex align-items-center">

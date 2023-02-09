@@ -10,23 +10,38 @@ import {
   query,
   orderBy,
   limit,
+  getCountFromServer,
 } from "firebase/firestore";
 
 function Shop() {
   const [products, setProducts] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
+  const [start, setStart] = useState(1);
+  const [end, setEnd] = useState(0);
+  const [total, setTotal] = useState(0);
 
   const getProducts = async () => {
     setProducts([]);
-    setPopularProducts([]);
+    setEnd(0);
+    setTotal(0);
+    setStart(1);
+    const coll = collection(getFirestore(), "products");
+    const snapshot = await getCountFromServer(coll);
+    setTotal(snapshot.data().count);
     let array = [];
-    let popProd = [];
     let qu = query(collection(getFirestore(), "products"), limit(6));
     const products = await getDocs(qu);
+    setEnd(products.docs.length);
     products.docs.forEach((product) => {
       array.push({ ...product.data(), id: product.id });
     });
     setProducts(array);
+  };
+
+  const getPopularProducts = async () => {
+    setPopularProducts([]);
+
+    let popProd = [];
 
     let qu2 = query(
       collection(getFirestore(), "products"),
@@ -42,6 +57,7 @@ function Shop() {
 
   useEffect(() => {
     getProducts();
+    getPopularProducts();
   }, []);
   return (
     <div className="shop-container">
@@ -87,7 +103,7 @@ function Shop() {
                     <div className="heading d-flex justify-content-between mb-5">
                       <p className="result-count mb-0">
                         {" "}
-                        Showing 1–6 of 17 results
+                        Showing {start}–{end} of {total} results
                       </p>
                       <form className="ordering " method="get">
                         <select

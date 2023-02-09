@@ -28,7 +28,6 @@ function SmallProduct({ name, id, price, preImg }) {
           <a href="#">{name}</a>
         </h6>
         <span className="price">{price} Eth</span>
-        <span className="converted-price">{"  "}(₹10)</span>
       </div>
     </div>
   );
