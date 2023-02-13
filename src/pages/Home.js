@@ -59,7 +59,6 @@ function Home() {
 
   useEffect(() => {
     getProducts();
-    console.log(JSON.parse(localStorage.getItem("users")));
   }, []);
 
   return (

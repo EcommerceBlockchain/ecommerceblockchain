@@ -7,6 +7,9 @@ import {
   getFirestore,
   collection,
   Timestamp,
+  getDoc,
+  doc,
+  setDoc,
 } from "firebase/firestore";
 import { TagsInput } from "react-tag-input-component";
 import { description, name, price } from "../config/validationSchema";
@@ -37,7 +40,7 @@ function AddProduct() {
       originalProductUrl &&
       originalProductFileName &&
       category !== "Select Category" &&
-      images.length
+      images.length !== 0
     ) {
       let preImgArr = [];
       const storage = getStorage();
@@ -86,8 +89,22 @@ function AddProduct() {
                 tag: tags,
                 timestamp: Timestamp.fromDate(new Date()),
                 owner: username,
-              }).then(() => {
-                console.log("done");
+              }).then(async (document) => {
+                console.log("done", document.id);
+                getDoc(doc(getFirestore(), "users", username)).then(
+                  (userdoc) => {
+                    setDoc(
+                      doc(getFirestore(), "users", username),
+                      {
+                        ...userdoc.data(),
+                        products: [...userdoc.data().products, document.id],
+                      },
+                      { merge: true }
+                    ).then(() => {
+                      console.log("done updation");
+                    });
+                  }
+                );
                 navigate("/", { replace: true });
               });
             });
@@ -270,7 +287,7 @@ function AddProduct() {
                           <input
                             type="file"
                             multiple
-                            accept=".jpeg,.png,.jpg,.webp"
+                            accept=".jpeg,.png,.jpg,.webp,.gif"
                             onChange={(e) => {
                               console.log(e.target.files);
                               Array.from(e.target.files).forEach((item) => {

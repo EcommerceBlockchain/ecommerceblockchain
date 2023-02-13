@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Formik } from "formik";
-import { json, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GoToTop from "../components/GoToTop";
 import colors from "../colors";
 
@@ -14,7 +14,10 @@ import {
   collection,
   where,
   getDocs,
+  getDoc,
+  doc,
 } from "firebase/firestore";
+import UserContext from "../context/UserContext";
 
 function Login({ path }) {
   const [error, setError] = useState("");
@@ -33,39 +36,20 @@ function Login({ path }) {
     if (querySnapshot.size === 0) {
       setError("error");
     } else {
-      querySnapshot.forEach(async (doc) => {
+      querySnapshot.forEach(async (docs) => {
         await signInWithEmailAndPassword(
           getAuth(),
-          doc.data().email,
+          docs.data().email,
           values.password
         )
-          .then((user) => {
+          .then(async (user) => {
             console.log("signin done", user.user.uid);
-            let users = JSON.parse(localStorage.getItem("users"));
-            console.log(
-              "users",
-              users,
-              JSON.parse(localStorage.getItem("users"))
-            );
-            if (users !== null) {
-              if (Object.keys(users).includes(user.user.uid)) {
-                console.log("exist in users obj");
-              } else {
-                users[user.user.uid] = [];
-                localStorage.setItem("users", JSON.stringify(users));
-              }
-            } else {
-              localStorage.setItem(
-                "users",
-                JSON.stringify({
-                  [user.user.uid]: [],
-                })
-              );
-            }
             setError("success");
-            setTimeout(() => {
-              navigate(path ? path : "/", { replace: true });
-            }, 1000);
+            let cartdoc = await getDoc(
+              doc(getFirestore(), "cart", values.username)
+            );
+            console.log(cartdoc.data());
+            navigate(path ? path : "/", { replace: true });
           })
           .catch((err) => {
             console.log(err);

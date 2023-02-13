@@ -7,7 +7,7 @@ import getUsernameByEmail from "../service/getUsernameByEmail";
 
 function UserState(props) {
   const [user, setUser] = useState(null);
-  const [username, setUserName] = useState(null);
+  const [username, setUserName] = useState("  ");
   const auth = getAuth(initializeApp(firebaseConfig));
 
   onAuthStateChanged(auth, async (user) => {
@@ -17,6 +17,7 @@ function UserState(props) {
       setUserName(data);
     } else {
       setUser(null);
+      setUserName("  ");
     }
   });
 

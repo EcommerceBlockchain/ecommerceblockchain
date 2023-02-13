@@ -1,22 +1,103 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+} from "firebase/firestore";
 
 function Product({ name, id, price, preImg }) {
   const naviagte = useNavigate();
-  const [cart, setCart] = useState({});
   // products:[{productid:id,quan:quan,price:price,preimg:preimg,name:name}],
-
   const { username } = useContext(UserContext);
+  const [count, setCount] = useState(0);
+  const [cart, setCart] = useState([]);
 
-  const getCart = async () => {
-    const data = await getDoc(doc(getFirestore(), "cart", username));
-    setCart(data.data());
+  const getCart = () => {
+    getDoc(doc(getFirestore(), "cart", username)).then((doc) => {
+      setCart(doc.data().products);
+      setCount(
+        doc.data().products[id]?.quantity !== undefined
+          ? doc.data().products[id]?.quantity
+          : 0
+      );
+      console.log("get cart");
+    });
   };
+
+  const updateCart = (val) => {
+    if (val == "add") {
+      if (cart.find((obj) => obj["productId"] === id) !== undefined) {
+        let cartDoc = [...cart];
+        for (const iterator of cartDoc) {
+          if (iterator.productId === id) {
+            iterator.quantity += 1;
+          }
+        }
+        setDoc(
+          doc(getFirestore(), "cart", username),
+          {
+            products: cartDoc,
+          },
+          { merge: true }
+        ).then(() => {
+          console.log("done in add ");
+        });
+      } else {
+        setCart((prev) => [
+          ...prev,
+          {
+            productId: id,
+            quantity: 1,
+            price: price,
+            name: name,
+            preImg: preImg,
+          },
+        ]);
+        setDoc(
+          doc(getFirestore(), "cart", username),
+          {
+            products: [
+              ...cart,
+              {
+                productId: id,
+                quantity: 1,
+                price: price,
+                name: name,
+                preImg: preImg,
+              },
+            ],
+          },
+          { merge: true }
+        ).then(() => {
+          console.log("done in add else");
+        });
+      }
+    } else {
+      let cartDoc = [...cart];
+      for (const iterator of cartDoc) {
+        if (iterator.productId === id) {
+          iterator.quantity -= 1;
+        }
+      }
+      setDoc(
+        doc(getFirestore(), "cart", username),
+        {
+          products: cartDoc,
+        },
+        { merge: true }
+      ).then(() => {
+        console.log("done in remove");
+      });
+    }
+  };
+
   useEffect(() => {
+    setCount(0);
     getCart();
-    localStorage.getItem("users");
   }, []);
 
   return (
@@ -53,34 +134,44 @@ function Product({ name, id, price, preImg }) {
           alignItems: "center",
         }}
       >
-        {/* <button
-          type="button"
-          style={{ marginRight: "0.5rem" }}
-          className="cart-btn"
-        >
-          -
-        </button> */}
-        <button
-          style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
-          type="button"
-          className="cart-btn"
-          onClick={() => {
-            localStorage.setItem("products", [
-              {
-                name: "yash",
-              },
-            ]);
-          }}
-        >
-          Add to Cart
-        </button>
-        {/* <button
-          type="button"
-          className="cart-btn"
-          style={{ marginLeft: "0.5rem" }}
-        >
-          +
-        </button> */}
+        {count !== 0 && (
+          <button
+            type="button"
+            style={{ marginRight: "0.5rem" }}
+            className="cart-btn"
+            onClick={() => {
+              updateCart("remove");
+            }}
+          >
+            -
+          </button>
+        )}
+        {!count ? (
+          <button
+            style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
+            type="button"
+            className="cart-btn"
+            onClick={() => {
+              updateCart("add");
+            }}
+          >
+            Add to Cart
+          </button>
+        ) : (
+          <div>{count}</div>
+        )}
+        {count !== 0 && (
+          <button
+            type="button"
+            className="cart-btn"
+            style={{ marginLeft: "0.5rem" }}
+            onClick={() => {
+              updateCart("add");
+            }}
+          >
+            +
+          </button>
+        )}
       </div>
     </div>
   );

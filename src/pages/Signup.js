@@ -75,6 +75,10 @@ function SignUp() {
         reward: 0,
         transaction: [],
       });
+      await setDoc(doc(collection(firestore, "cart"), values.username), {
+        products: [],
+      });
+
       navigate("/", { replace: true });
       console.log("success login");
     }

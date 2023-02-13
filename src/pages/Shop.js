@@ -12,37 +12,36 @@ import {
   limit,
   getCountFromServer,
 } from "firebase/firestore";
+import ReactPaginate from "react-paginate";
 
 function Shop() {
   const [products, setProducts] = useState([]);
+  const [currentProducts, setCurrentProducts] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
-  const [start, setStart] = useState(1);
-  const [end, setEnd] = useState(0);
   const [total, setTotal] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+  const [itemOffset, setItemOffset] = useState(0);
 
   const getProducts = async () => {
     setProducts([]);
-    setEnd(0);
     setTotal(0);
-    setStart(1);
     const coll = collection(getFirestore(), "products");
     const snapshot = await getCountFromServer(coll);
     setTotal(snapshot.data().count);
+    setPageCount(Math.ceil(snapshot.data().count / 6));
     let array = [];
-    let qu = query(collection(getFirestore(), "products"), limit(6));
-    const products = await getDocs(qu);
-    setEnd(products.docs.length);
-    products.docs.forEach((product) => {
+    let qu = query(collection(getFirestore(), "products"), limit(50));
+    const productsAll = await getDocs(qu);
+    productsAll.docs.forEach((product) => {
       array.push({ ...product.data(), id: product.id });
     });
     setProducts(array);
+    setCurrentProducts(array.slice(0, 6));
   };
 
   const getPopularProducts = async () => {
     setPopularProducts([]);
-
     let popProd = [];
-
     let qu2 = query(
       collection(getFirestore(), "products"),
       orderBy("rating", "desc"),
@@ -54,6 +53,19 @@ function Shop() {
     });
     setPopularProducts(popProd);
   };
+
+  const handlePageClick = (event) => {
+    const newOffset = (event.selected * 6) % total;
+    console.log(
+      `User requested page number ${event.selected}, which is offset ${newOffset}  ${pageCount}`
+    );
+    setItemOffset(newOffset);
+  };
+  useEffect(() => {
+    // Fetch items from another resources.
+    const endOffset = itemOffset + 6;
+    setCurrentProducts(products.slice(itemOffset, endOffset));
+  }, [itemOffset]);
 
   useEffect(() => {
     getProducts();
@@ -103,7 +115,9 @@ function Shop() {
                     <div className="heading d-flex justify-content-between mb-5">
                       <p className="result-count mb-0">
                         {" "}
-                        Showing {start}–{end} of {total} results
+                        Showing {itemOffset + 1}–
+                        {itemOffset + 6 <= total ? itemOffset + 6 : total} of{" "}
+                        {total} results{" "}
                       </p>
                       <form className="ordering " method="get">
                         <select
@@ -134,7 +148,7 @@ function Shop() {
                   gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
                 }}
               >
-                {products.map((item) => {
+                {currentProducts.map((item) => {
                   return (
                     <Product
                       key={item.id}
@@ -145,38 +159,26 @@ function Shop() {
                     />
                   );
                 })}
-                <div className="d-flex justify-content-center"></div>
-                <div className="col-12">
-                  <nav aria-label="Page navigation">
-                    <ul className="pagination">
-                      <li className="page-item">
-                        <a className="page-link" href="#" aria-label="Previous">
-                          <span aria-hidden="true">&laquo;</span>
-                        </a>
-                      </li>
-                      <li className="page-item active">
-                        <a className="page-link" href="#">
-                          1
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          2
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          3
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#" aria-label="Next">
-                          <span aria-hidden="true">&raquo;</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
+              </div>
+              <div className="d-flex justify-content-center">
+                <ReactPaginate
+                  nextLabel=">"
+                  onPageChange={handlePageClick}
+                  pageCount={pageCount}
+                  previousLabel="<"
+                  pageClassName="page-item"
+                  pageLinkClassName="page-link"
+                  previousClassName="page-item"
+                  previousLinkClassName="page-link"
+                  nextClassName="page-item"
+                  nextLinkClassName="page-link"
+                  breakLabel="..."
+                  breakClassName="page-item"
+                  breakLinkClassName="page-link"
+                  containerClassName="pagination"
+                  activeClassName="active"
+                  renderOnZeroPageCount={null}
+                />
               </div>
             </div>
             <div className="col-md-3">

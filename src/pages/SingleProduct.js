@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import GoToTop from "../components/GoToTop";
 import Product from "../components/Product";
+import colors from "../colors";
 
 function SingleProduct() {
   const [product, setProduct] = useState({});
   const [images, setImages] = useState([]);
+  const [count, setCount] = useState(0);
   const [tag, setTags] = useState([]);
   const location = useLocation();
   const { id } = location.state;
@@ -14,6 +16,7 @@ function SingleProduct() {
   const getProduct = async () => {
     setProduct({});
     const pro = await getDoc(doc(getFirestore(), "products", id));
+    console.log(pro.data());
     setProduct(pro.data());
     setImages(pro.data().preview_image);
     setTags(pro.data().tag);
@@ -35,7 +38,11 @@ function SingleProduct() {
             <div className="col-lg-6">
               <div className="content text-center">
                 <h1 className="mb-3">{product.name}</h1>
-                <p>{product.description}</p>
+                <p>
+                  {product?.description?.length > 150
+                    ? product.description.slice(0, 150) + "..."
+                    : product.description}
+                </p>
 
                 <nav aria-label="breadcrumb">
                   <ol className="breadcrumb bg-transparent justify-content-center">
@@ -112,38 +119,67 @@ function SingleProduct() {
                   {product.description}
                 </p>
 
-                <button
-                  type="button"
-                  style={{ marginRight: "0.5rem" }}
-                  className="cart-btn"
-                >
-                  -
-                </button>
-                <button
-                  style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
-                  type="button"
-                  className="cart-btn"
-                >
-                  Add to Cart
-                </button>
-                <button
-                  type="button"
-                  className="cart-btn"
-                  style={{ marginLeft: "0.5rem" }}
-                >
-                  +
-                </button>
+                {count !== 0 && (
+                  <button
+                    type="button"
+                    style={{ marginRight: "0.5rem" }}
+                    className="cart-btn"
+                  >
+                    -
+                  </button>
+                )}
+                {!count && (
+                  <button
+                    style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
+                    type="button"
+                    className="cart-btn"
+                  >
+                    Add to Cart
+                  </button>
+                )}
+                {count !== 0 && (
+                  <button
+                    type="button"
+                    className="cart-btn"
+                    style={{ marginLeft: "0.5rem" }}
+                  >
+                    +
+                  </button>
+                )}
 
                 <div className="products-meta mt-4">
                   <div className="product-category d-flex align-items-center">
                     <span className="font-weight-bold text-capitalize product-meta-title">
                       Tags :
                     </span>
-                    {tag.length > 0
-                      ? tag.map((item) => {
-                          return <a href="#">{item},</a>;
-                        })
-                      : "No Tags"}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: "20px",
+                        alignItems: "flex-start",
+                        position: "relative",
+                        left: "-3rem",
+                      }}
+                    >
+                      {tag.length > 0
+                        ? tag.map((item) => {
+                            return (
+                              <Link to={"/"}>
+                                <div
+                                  style={{
+                                    backgroundColor: "lightgrey",
+                                    padding: "0.25rem 0.5rem",
+                                    borderRadius: "0.5rem",
+                                  }}
+                                >
+                                  {item}
+                                </div>
+                              </Link>
+                            );
+                          })
+                        : "No Tags"}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -158,17 +194,6 @@ function SingleProduct() {
                   id="nav-tab"
                   role="tablist"
                 >
-                  {/* <a
-                    className="nav-item nav-link active"
-                    id="nav-home-tab"
-                    data-toggle="tab"
-                    href="#nav-home"
-                    role="tab"
-                    aria-controls="nav-home"
-                    aria-selected="true"
-                  >
-                    Description
-                  </a> */}
                   <a
                     className="nav-item nav-link active"
                     id="nav-profile-tab"
@@ -368,7 +393,7 @@ function SingleProduct() {
             <Product
               description={product.description}
               name={product.name}
-              preImg={""}
+              preImg={product?.preview_image ? product?.preview_image[0] : ""}
               id={id}
               price={product.cost}
             />
