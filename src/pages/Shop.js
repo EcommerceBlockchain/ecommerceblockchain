@@ -11,18 +11,26 @@ import {
   orderBy,
   limit,
   getCountFromServer,
+  where,
 } from "firebase/firestore";
+import spinner from "../images/spinner.gif";
+
 import ReactPaginate from "react-paginate";
 
 function Shop() {
   const [products, setProducts] = useState([]);
   const [currentProducts, setCurrentProducts] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
+  const [categoryList, setCategoryList] = useState(
+    "ImageVideoAudioGIFDocuments"
+  );
   const [total, setTotal] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const getProducts = async () => {
+    setLoading(true);
     setProducts([]);
     setTotal(0);
     const coll = collection(getFirestore(), "products");
@@ -37,6 +45,87 @@ function Shop() {
     });
     setProducts(array);
     setCurrentProducts(array.slice(0, 6));
+    setLoading(false);
+  };
+
+  const getFilterProducts = async () => {};
+
+  const popularSorting = async () => {
+    setLoading(true);
+    setItemOffset(0);
+    setProducts([]);
+    setCurrentProducts([]);
+    let popProd = [];
+    let qu2 = query(
+      collection(getFirestore(), "products"),
+      orderBy("rating", "desc"),
+      limit(50)
+    );
+    const productsAll = await getDocs(qu2);
+    productsAll.docs.forEach((product) => {
+      popProd.push({ ...product.data(), id: product.id });
+    });
+    setLoading(false);
+    setProducts(popProd);
+    setCurrentProducts(popProd.slice(0, 6));
+  };
+
+  const latestSorting = async () => {
+    setLoading(true);
+    setItemOffset(0);
+    setProducts([]);
+    setCurrentProducts([]);
+    let popProd = [];
+    let qu2 = query(
+      collection(getFirestore(), "products"),
+      orderBy("timestamp", "desc"),
+      limit(50)
+    );
+    const productsAll = await getDocs(qu2);
+    productsAll.docs.forEach((product) => {
+      popProd.push({ ...product.data(), id: product.id });
+    });
+    setLoading(false);
+    setProducts(popProd);
+    setCurrentProducts(popProd.slice(0, 6));
+  };
+  const highToLowSorting = async () => {
+    setLoading(true);
+    setItemOffset(0);
+    setProducts([]);
+    setCurrentProducts([]);
+    let popProd = [];
+    let qu2 = query(
+      collection(getFirestore(), "products"),
+      orderBy("cost", "desc"),
+      limit(50)
+    );
+    const productsAll = await getDocs(qu2);
+    productsAll.docs.forEach((product) => {
+      popProd.push({ ...product.data(), id: product.id });
+    });
+    setLoading(false);
+    setProducts(popProd);
+    setCurrentProducts(popProd.slice(0, 6));
+  };
+  const lowToHighSorting = async () => {
+    setLoading(true);
+    setItemOffset(0);
+    setProducts([]);
+    setCurrentProducts([]);
+    let popProd = [];
+    let qu2 = query(
+      collection(getFirestore(), "products"),
+      orderBy("cost"),
+      limit(50)
+    );
+    const productsAll = await getDocs(qu2);
+    productsAll.docs.forEach((product) => {
+      popProd.push({ ...product.data(), id: product.id });
+    });
+    setLoading(false);
+    setProducts(popProd);
+    setCurrentProducts(popProd.slice(0, 6));
   };
 
   const getPopularProducts = async () => {
@@ -55,6 +144,7 @@ function Shop() {
   };
 
   const handlePageClick = (event) => {
+    setLoading(true);
     const newOffset = (event.selected * 6) % total;
     console.log(
       `User requested page number ${event.selected}, which is offset ${newOffset}  ${pageCount}`
@@ -65,9 +155,11 @@ function Shop() {
     // Fetch items from another resources.
     const endOffset = itemOffset + 6;
     setCurrentProducts(products.slice(itemOffset, endOffset));
+    setLoading(false);
   }, [itemOffset]);
 
   useEffect(() => {
+    setItemOffset(0);
     getProducts();
     getPopularProducts();
   }, []);
@@ -119,22 +211,39 @@ function Shop() {
                         {itemOffset + 6 <= total ? itemOffset + 6 : total} of{" "}
                         {total} results{" "}
                       </p>
-                      <form className="ordering " method="get">
+                      <div className="ordering">
                         <select
                           name="orderby"
                           className="orderby form-control"
                           aria-label="Shop order"
+                          onChange={(e) => {
+                            let v = e.target.value;
+                            if (v === "default-sorting") {
+                              getProducts();
+                            } else if (v === "popularity") {
+                              popularSorting();
+                            } else if (v === "latest") {
+                              latestSorting();
+                            } else if (v === "low-to-high") {
+                              lowToHighSorting();
+                            } else if (v === "high-to-low") {
+                              highToLowSorting();
+                            }
+                          }}
                         >
-                          <option value="" selected="selected">
+                          <option value="default-sorting">
                             Default sorting
                           </option>
-                          <option value="">Sort by popularity</option>
-                          <option value="">Sort by average rating</option>
-                          <option value="">Sort by latest</option>
-                          <option value="">Sort by price: low to high</option>
-                          <option value="">Sort by price: high to low</option>
+                          <option value="popularity">Sort by popularity</option>
+                          <option value="latest">Sort by latest</option>
+                          <option value="low-to-high">
+                            Sort by price: low to high
+                          </option>
+                          <option value="high-to-low">
+                            Sort by price: high to low
+                          </option>
                         </select>
-                      </form>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -148,17 +257,23 @@ function Shop() {
                   gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
                 }}
               >
-                {currentProducts.map((item) => {
-                  return (
-                    <Product
-                      key={item.id}
-                      name={item.name}
-                      price={item.cost}
-                      id={item.id}
-                      preImg={item.preview_image[0]}
-                    />
-                  );
-                })}
+                {loading ? (
+                  <div className="d-flex justify-content-center">
+                    <img width={100} src={spinner} />
+                  </div>
+                ) : (
+                  currentProducts.map((item) => {
+                    return (
+                      <Product
+                        key={item.id}
+                        name={item.name}
+                        price={item.cost}
+                        id={item.id}
+                        preImg={item.preview_image[0]}
+                      />
+                    );
+                  })
+                )}
               </div>
               <div className="d-flex justify-content-center">
                 <ReactPaginate
@@ -182,7 +297,7 @@ function Shop() {
               </div>
             </div>
             <div className="col-md-3">
-              <form className="mb-5">
+              <div className="mb-5">
                 <section className="widget widget-sizes mb-5">
                   <h3 className="widget-title h4 mb-4">Shop by Category</h3>
                   <div className="custom-control custom-checkbox">
@@ -190,6 +305,11 @@ function Shop() {
                       type="checkbox"
                       className="custom-control-input"
                       id="size1"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                        } else {
+                        }
+                      }}
                     />
                     <label className="custom-control-label" for="size1">
                       Image
@@ -236,11 +356,7 @@ function Shop() {
                     </label>
                   </div>
                 </section>
-
-                <button type="button" className="btn btn-black btn-small">
-                  Filter
-                </button>
-              </form>
+              </div>
 
               <section className="widget widget-popular mb-5">
                 <h3 className="widget-title mb-4 h4">Popular Products</h3>
