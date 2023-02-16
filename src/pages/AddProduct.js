@@ -90,6 +90,7 @@ function AddProduct() {
                 timestamp: Timestamp.fromDate(new Date()),
                 owner: username,
                 rating: 0,
+                quantity_sold: 0,
               }).then(async (document) => {
                 console.log("done", document.id);
                 getDoc(doc(getFirestore(), "users", username)).then(

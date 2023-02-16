@@ -24,7 +24,6 @@ function Product({ name, id, price, preImg }) {
           ? doc.data().products[id]?.quantity
           : 0
       );
-      console.log("get cart");
     });
   };
 

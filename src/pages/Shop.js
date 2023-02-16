@@ -21,9 +21,7 @@ function Shop() {
   const [products, setProducts] = useState([]);
   const [currentProducts, setCurrentProducts] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
-  const [categoryList, setCategoryList] = useState(
-    "ImageVideoAudioGIFDocuments"
-  );
+  const [sorting, setSorting] = useState("default-sorting");
   const [total, setTotal] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
@@ -48,9 +46,179 @@ function Shop() {
     setLoading(false);
   };
 
-  const getFilterProducts = async () => {};
+  const getCategoryProducts = async (CategoryList) => {
+    if (sorting === "default-sorting") {
+      setLoading(true);
+      setProducts([]);
+      setTotal(0);
+      const coll = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList)
+      );
+      const snapshot = await getCountFromServer(coll);
+      setTotal(snapshot.data().count);
+      setPageCount(Math.ceil(snapshot.data().count / 6));
+      let array = [];
+      let qu = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList),
+        limit(50)
+      );
+      const productsAll = await getDocs(qu);
+      productsAll.docs.forEach((product) => {
+        array.push({ ...product.data(), id: product.id });
+      });
+      setProducts(array);
+      setCurrentProducts(array.slice(0, 6));
+      setLoading(false);
+    } else if (sorting === "popularity") {
+      setLoading(true);
+      setProducts([]);
+      setTotal(0);
+      const coll = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList)
+      );
+      const snapshot = await getCountFromServer(coll);
+      setTotal(snapshot.data().count);
+      setPageCount(Math.ceil(snapshot.data().count / 6));
+      let array = [];
+      let qu = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList),
+        orderBy("quantity_sold", "desc"),
+        limit(50)
+      );
+      const productsAll = await getDocs(qu);
+      productsAll.docs.forEach((product) => {
+        array.push({ ...product.data(), id: product.id });
+      });
+      setProducts(array);
+      setCurrentProducts(array.slice(0, 6));
+      setLoading(false);
+    } else if (sorting === "rating") {
+      setLoading(true);
+      setProducts([]);
+      setTotal(0);
+      const coll = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList)
+      );
+      const snapshot = await getCountFromServer(coll);
+      setTotal(snapshot.data().count);
+      setPageCount(Math.ceil(snapshot.data().count / 6));
+      let array = [];
+      let qu = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList),
+        orderBy("rating", "desc"),
+        limit(50)
+      );
+      const productsAll = await getDocs(qu);
+      productsAll.docs.forEach((product) => {
+        array.push({ ...product.data(), id: product.id });
+      });
+      setProducts(array);
+      setCurrentProducts(array.slice(0, 6));
+      setLoading(false);
+    } else if (sorting === "latest") {
+      setLoading(true);
+      setProducts([]);
+      setTotal(0);
+      const coll = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList)
+      );
+      const snapshot = await getCountFromServer(coll);
+      setTotal(snapshot.data().count);
+      setPageCount(Math.ceil(snapshot.data().count / 6));
+      let array = [];
+      let qu = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList),
+        orderBy("timestamp", "desc"),
+        limit(50)
+      );
+      const productsAll = await getDocs(qu);
+      productsAll.docs.forEach((product) => {
+        array.push({ ...product.data(), id: product.id });
+      });
+      setProducts(array);
+      setCurrentProducts(array.slice(0, 6));
+      setLoading(false);
+    } else if (sorting === "low-to-high") {
+      setLoading(true);
+      setProducts([]);
+      setTotal(0);
+      const coll = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList)
+      );
+      const snapshot = await getCountFromServer(coll);
+      setTotal(snapshot.data().count);
+      setPageCount(Math.ceil(snapshot.data().count / 6));
+      let array = [];
+      let qu = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList),
+        orderBy("cost"),
+        limit(50)
+      );
+      const productsAll = await getDocs(qu);
+      productsAll.docs.forEach((product) => {
+        array.push({ ...product.data(), id: product.id });
+      });
+      setProducts(array);
+      setCurrentProducts(array.slice(0, 6));
+      setLoading(false);
+    } else if (sorting === "high-to-low") {
+      setLoading(true);
+      setProducts([]);
+      setTotal(0);
+      const coll = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList)
+      );
+      const snapshot = await getCountFromServer(coll);
+      setTotal(snapshot.data().count);
+      setPageCount(Math.ceil(snapshot.data().count / 6));
+      let array = [];
+      let qu = query(
+        collection(getFirestore(), "products"),
+        where("category", "in", CategoryList),
+        orderBy("cost", "desc"),
+        limit(50)
+      );
+      const productsAll = await getDocs(qu);
+      productsAll.docs.forEach((product) => {
+        array.push({ ...product.data(), id: product.id });
+      });
+      setProducts(array);
+      setCurrentProducts(array.slice(0, 6));
+      setLoading(false);
+    }
+  };
 
   const popularSorting = async () => {
+    setLoading(true);
+    setItemOffset(0);
+    setProducts([]);
+    setCurrentProducts([]);
+    let popProd = [];
+    let qu2 = query(
+      collection(getFirestore(), "products"),
+      orderBy("quantity_sold", "desc"),
+      limit(50)
+    );
+    const productsAll = await getDocs(qu2);
+    productsAll.docs.forEach((product) => {
+      popProd.push({ ...product.data(), id: product.id });
+    });
+    setLoading(false);
+    setProducts(popProd);
+    setCurrentProducts(popProd.slice(0, 6));
+  };
+  const ratingSorting = async () => {
     setLoading(true);
     setItemOffset(0);
     setProducts([]);
@@ -218,10 +386,13 @@ function Shop() {
                           aria-label="Shop order"
                           onChange={(e) => {
                             let v = e.target.value;
+                            setSorting(v);
                             if (v === "default-sorting") {
                               getProducts();
                             } else if (v === "popularity") {
                               popularSorting();
+                            } else if (v === "rating") {
+                              ratingSorting();
                             } else if (v === "latest") {
                               latestSorting();
                             } else if (v === "low-to-high") {
@@ -235,6 +406,7 @@ function Shop() {
                             Default sorting
                           </option>
                           <option value="popularity">Sort by popularity</option>
+                          <option value="rating">Sort by rating</option>
                           <option value="latest">Sort by latest</option>
                           <option value="low-to-high">
                             Sort by price: low to high
@@ -305,11 +477,8 @@ function Shop() {
                       type="checkbox"
                       className="custom-control-input"
                       id="size1"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                        } else {
-                        }
-                      }}
+                      value={"Image"}
+                      name="checkboxes"
                     />
                     <label className="custom-control-label" for="size1">
                       Image
@@ -320,6 +489,8 @@ function Shop() {
                       type="checkbox"
                       className="custom-control-input"
                       id="size2"
+                      name="checkboxes"
+                      value={"Video"}
                     />
                     <label className="custom-control-label" for="size2">
                       Video
@@ -330,6 +501,8 @@ function Shop() {
                       type="checkbox"
                       className="custom-control-input"
                       id="size3"
+                      name="checkboxes"
+                      value={"Audio"}
                     />
                     <label className="custom-control-label" for="size3">
                       Audio
@@ -340,6 +513,8 @@ function Shop() {
                       type="checkbox"
                       className="custom-control-input"
                       id="size4"
+                      name="checkboxes"
+                      value={"GIF"}
                     />
                     <label className="custom-control-label" for="size4">
                       GIF
@@ -350,12 +525,45 @@ function Shop() {
                       type="checkbox"
                       className="custom-control-input"
                       id="size5"
+                      name="checkboxes"
+                      value={"Documents"}
                     />
                     <label className="custom-control-label" for="size5">
                       Documents (.xlsx, .pdf, .docx etc)
                     </label>
                   </div>
                 </section>
+
+                <button
+                  className="btn btn-main"
+                  onClick={() => {
+                    let ans = [];
+                    let markedCheckbox =
+                      document.getElementsByName("checkboxes");
+                    for (let checkbox of markedCheckbox) {
+                      if (checkbox.checked) ans.push(checkbox.value);
+                    }
+                    if (!ans.length) {
+                      if (sorting === "default-sorting") {
+                        getProducts();
+                      } else if (sorting === "popularity") {
+                        popularSorting();
+                      } else if (sorting === "rating") {
+                        ratingSorting();
+                      } else if (sorting === "latest") {
+                        latestSorting();
+                      } else if (sorting === "low-to-high") {
+                        lowToHighSorting();
+                      } else if (sorting === "high-to-low") {
+                        highToLowSorting();
+                      }
+                    } else {
+                      getCategoryProducts(ans);
+                    }
+                  }}
+                >
+                  Filter
+                </button>
               </div>
 
               <section className="widget widget-popular mb-5">
