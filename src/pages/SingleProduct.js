@@ -1,17 +1,36 @@
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  deleteDoc,
+  orderBy,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { useEffect, useState, useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import UserContext from "../context/UserContext";
+
 import GoToTop from "../components/GoToTop";
 import Product from "../components/Product";
-import colors from "../colors";
+import activity from "../images/activity.gif";
 
 function SingleProduct() {
+  const { username, user } = useContext(UserContext);
+
   const [product, setProduct] = useState({});
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [images, setImages] = useState([]);
   const [count, setCount] = useState(0);
+  const [loader, setLoader] = useState(false);
+
   const [tag, setTags] = useState([]);
   const location = useLocation();
   const { id } = location.state;
+  const navigate = useNavigate();
 
   const getProduct = async () => {
     setProduct({});
@@ -22,11 +41,82 @@ function SingleProduct() {
     setTags(pro.data().tag);
   };
 
-  const getPopularProducts = async () => {};
+  const getRelatedProducts = async () => {
+    setRelatedProducts([]);
+    let relProd = [];
+    let qu2 = query(collection(getFirestore(), "products"));
+    const productsAll = await getDocs(qu2);
+    productsAll.docs.forEach((product) => {
+      relProd.push({ ...product.data(), id: product.id });
+    });
+    setRelatedProducts(relProd);
+  };
+
+  const getCart = async () => {
+    const pro = await getDoc(
+      doc(getFirestore(), "users", username, "cart", id)
+    );
+    if (pro.exists) {
+      setCount(pro.data()?.quantity ? pro.data().quantity : 0);
+    } else {
+      setCount(0);
+    }
+    setLoader(false);
+  };
+
+  const updateCart = async (val) => {
+    setLoader(true);
+    let cartproduct = await getDoc(
+      doc(getFirestore(), "users", username, "cart", id)
+    );
+    if (cartproduct.data() !== undefined) {
+      if (val === "add") {
+        setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
+          ...cartproduct.data(),
+          quantity: cartproduct.data().quantity + 1,
+        }).then(() => {
+          console.log("add done");
+          getCart();
+        });
+      } else {
+        if (cartproduct.data().quantity === 1) {
+          deleteDoc(doc(getFirestore(), "users", username, "cart", id)).then(
+            () => {
+              console.log("delete done");
+              getCart();
+            }
+          );
+        } else {
+          setDoc(
+            doc(collection(getFirestore(), "users", username, "cart"), id),
+            {
+              ...cartproduct.data(),
+              quantity: cartproduct.data().quantity - 1,
+            }
+          ).then(() => {
+            console.log("remove done");
+            getCart();
+          });
+        }
+      }
+    } else {
+      setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
+        productName: product.name,
+        quantity: 1,
+        price: product.cost,
+        preImg: images[0],
+      }).then(() => {
+        console.log("new product added");
+        getCart();
+      });
+    }
+  };
 
   useEffect(() => {
+    setCount(0);
     getProduct();
-    getPopularProducts([]);
+    getRelatedProducts();
+    getCart();
   }, []);
 
   return (
@@ -71,32 +161,42 @@ function SingleProduct() {
                   id="single-product-slider"
                 >
                   <div className="carousel-inner">
+                    <div className={"carousel-item active"}>
+                      <img src={images?.[0]} alt="" className="img-fluid" />
+                    </div>
                     {images.map((item, index) => {
                       return (
-                        <div
-                          className={`carousel-item ${
-                            index === 0 ? "active" : ""
-                          }`}
-                        >
-                          <img src={item} alt="" className="img-fluid" />
-                        </div>
+                        index !== 0 && (
+                          <div className={"carousel-item"}>
+                            <img src={item} alt="" className="img-fluid" />
+                          </div>
+                        )
                       );
                     })}
                   </div>
 
                   {images.length > 1 && (
                     <ol className="carousel-indicators">
+                      <li
+                        data-target="#single-product-slider"
+                        data-slide-to={0}
+                      >
+                        <img
+                          src={images?.[0]}
+                          alt=""
+                          className="img-fluid active"
+                        />
+                      </li>
                       {images.map((item, index) => {
                         return (
-                          <li
-                            data-target="#single-product-slider"
-                            data-slide-to={index}
-                            className={`${
-                              index === 0 ? "active" : "img-fluid"
-                            }`}
-                          >
-                            <img src={item} alt="" className="img-fluid" />
-                          </li>
+                          index !== 0 && (
+                            <li
+                              data-target="#single-product-slider"
+                              data-slide-to={index}
+                            >
+                              <img src={item} alt="" className="img-fluid" />
+                            </li>
+                          )
                         );
                       })}
                     </ol>
@@ -119,47 +219,72 @@ function SingleProduct() {
                   {product.description}
                 </p>
 
-                {count !== 0 && (
-                  <button
-                    type="button"
-                    style={{ marginRight: "0.5rem" }}
-                    className="cart-btn"
-                  >
-                    -
-                  </button>
-                )}
-                {!count && (
-                  <button
-                    style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
-                    type="button"
-                    className="cart-btn"
-                  >
-                    Add to Cart
-                  </button>
-                )}
-                {count !== 0 && (
-                  <button
-                    type="button"
-                    className="cart-btn"
-                    style={{ marginLeft: "0.5rem" }}
-                  >
-                    +
-                  </button>
+                {loader ? (
+                  <div>
+                    <img width={40} src={activity} alt="activity" />
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    {count !== 0 && (
+                      <button
+                        type="button"
+                        style={{ marginRight: "0.5rem" }}
+                        className="cart-btn"
+                        onClick={() => {
+                          updateCart("remove");
+                        }}
+                      >
+                        -
+                      </button>
+                    )}
+                    {!count ? (
+                      <button
+                        style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
+                        type="button"
+                        className="cart-btn"
+                        onClick={() => {
+                          if (user) {
+                            updateCart("add");
+                          } else {
+                            navigate("/login");
+                          }
+                        }}
+                      >
+                        Add to Cart
+                      </button>
+                    ) : (
+                      <div
+                        style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
+                      >
+                        {count}
+                      </div>
+                    )}
+                    {count !== 0 && (
+                      <button
+                        type="button"
+                        className="cart-btn"
+                        style={{ marginLeft: "0.5rem" }}
+                        onClick={() => {
+                          updateCart("add");
+                        }}
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
                 )}
 
                 <div className="products-meta mt-4">
                   <div className="product-category d-flex align-items-center">
-                    <span className="font-weight-bold text-capitalize product-meta-title">
+                    <span className="font-weight-bold text-capitalize">
                       Tags :
                     </span>
                     <div
                       style={{
                         display: "flex",
                         flexWrap: "wrap",
-                        gap: "20px",
-                        alignItems: "flex-start",
-                        position: "relative",
-                        left: "-3rem",
+                        gap: "1rem",
+                        marginLeft: "1rem",
                       }}
                     >
                       {tag.length > 0
@@ -236,6 +361,10 @@ function SingleProduct() {
                     <li className="d-flex">
                       <strong>Dimensions </strong>
                       <span>720 x 576 pixels</span>
+                    </li>
+                    <li className="d-flex">
+                      <strong>File Name </strong>
+                      <span></span>
                     </li>
 
                     <li className="d-flex">
@@ -378,28 +507,40 @@ function SingleProduct() {
           </div>
         </div>
       </section>
-
-      <section className="products related-products section">
+      <section className="section products-main">
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-lg-6">
+            <div className="col-lg-8">
               <div className="title text-center">
-                <h2>You may like this</h2>
+                <h2 className="mb-4 pb-3">You may like this</h2>
                 <p>The best Online sales to shop these weekend</p>
               </div>
             </div>
           </div>
-          <div className="row">
-            <Product
-              description={product.description}
-              name={product.name}
-              preImg={product?.preview_image ? product?.preview_image[0] : ""}
-              id={id}
-              price={product.cost}
-            />
+
+          <div
+            className="row"
+            style={{
+              display: "grid",
+              gap: "2rem",
+              gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+            }}
+          >
+            {relatedProducts.map((item) => {
+              return (
+                <Product
+                  key={item.id}
+                  name={item.name}
+                  price={item.cost}
+                  id={item.id}
+                  preImg={item.preview_image[0]}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
+
       <GoToTop />
     </div>
   );

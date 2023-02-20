@@ -341,10 +341,13 @@ function Shop() {
               <div className="content text-center">
                 <h1 className="mb-3">Shop</h1>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Reprehenderit sint doloribus obcaecati fuga dolorem quod dolor
-                  maxime non, facere nemo consequatur ratione laborum nesciunt,
-                  fugiat, possimus adipisci odit neque eos!
+                  Welcome to Digimart! We are excited to offer you a unique and
+                  secure shopping experience powered by blockchain technology.
+                  At our shop, you can browse through a wide selection of
+                  products from various categories, including Images, Videos,
+                  Documents, and more. Our inventory is updated regularly to
+                  ensure that you always have access to the latest products on
+                  the market.
                 </p>
 
                 <nav aria-label="breadcrumb">

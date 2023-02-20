@@ -1,7 +1,44 @@
 import { Link } from "react-router-dom";
 import GoToTop from "../components/GoToTop";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import UserContext from "../context/UserContext";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  query,
+  setDoc,
+} from "firebase/firestore";
+import activity from "../images/activity.gif";
 
 function Cart() {
+  const navigate = useNavigate();
+  // products:[{productid:id,quan:quan,price:price,preimg:preimg,name:name}],
+  const { username, user } = useContext(UserContext);
+  const [count, setCount] = useState(0);
+  const [loader, setLoader] = useState(-1);
+  const [products, setProducts] = useState([]);
+  const getCart = async () => {
+    let cart = [];
+    const product = await getDocs(
+      query(collection(getFirestore(), "users", username, "cart"))
+    );
+    product.forEach((item) => {
+      cart.push({ ...item.data(), id: item.id });
+    });
+    console.log(cart);
+    setProducts(cart);
+  };
+
+  useEffect(() => {
+    setProducts([]);
+    getCart();
+  }, []);
+
   return (
     <div className="checkout-container">
       <section className="page-header">
@@ -11,10 +48,12 @@ function Cart() {
             <div className="col-lg-6">
               <div className="content text-center">
                 <h1 className="mb-3">Cart</h1>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ut,
-                molestias. Dolorem voluptatem, facere molestias corporis
-                obcaecati esse, quia quis recusandae natus neque explicabo nihil
-                eveniet similique modi ducimus accusantium ad?
+                <p>
+                  Our shopping cart is powered by blockchain technology,
+                  providing you with a secure and transparent shopping
+                  experience. This ensures that your cart remains secure and
+                  that your items are always available for purchase.
+                </p>
                 <nav aria-label="breadcrumb">
                   <ol className="breadcrumb bg-transparent justify-content-center">
                     <li className="breadcrumb-item">
@@ -53,169 +92,89 @@ function Cart() {
                     </thead>
 
                     <tbody>
-                      <tr className="cart_item">
-                        <td
-                          className="product-thumbnail"
-                          data-title="Thumbnail"
-                        >
-                          <a href="/single-product">
-                            <img
-                              src="https://firebasestorage.googleapis.com/v0/b/digimart-69f1f.appspot.com/o/preview_images%2Fparrot.jpg?alt=media&token=8af0d227-6ce9-4cb9-9641-ebf9792403da"
-                              className="attachment-woocommerce_thumbnail size-woocommerce_thumbnail img-fluid"
-                              alt=""
-                            />
-                          </a>
-                        </td>
+                      {products.map((item, index) => {
+                        return (
+                          <tr className="cart_item">
+                            <td
+                              className="product-thumbnail"
+                              data-title="Thumbnail"
+                            >
+                              <Link
+                                to={"/single-product"}
+                                state={{ id: item.id }}
+                              >
+                                <img
+                                  src={item.preImg}
+                                  className="attachment-woocommerce_thumbnail size-woocommerce_thumbnail img-fluid"
+                                  alt={item.name}
+                                />
+                              </Link>
+                            </td>
 
-                        <td className="product-name" data-title="Product">
-                          <a href="#">Yellow Parrot</a>
-                        </td>
+                            <td className="product-name" data-title="Product">
+                              <Link
+                                to={"/single-product"}
+                                state={{ id: item.id }}
+                              >
+                                {item.productName}
+                              </Link>
+                            </td>
 
-                        <td className="product-price" data-title="Price">
-                          <span className="amount">
-                            <span className="currencySymbol">
-                              <pre wp-pre-tag-3=""></pre>
-                            </span>
-                            0.000075 Eth
-                          </span>
-                        </td>
-                        <td className="product-quantity" data-title="Quantity">
-                          <div className="quantity">
-                            <label className="sr-only">Quantity</label>
-                            <input
-                              type="number"
-                              id="qty"
-                              className="input-text qty text"
-                              step="1"
-                              min="1"
-                              title="Qty"
-                              size="4"
-                              value={"1"}
-                            />
-                          </div>
-                        </td>
-                        <td className="product-subtotal" data-title="Total">
-                          <span className="amount">
-                            <span className="currencySymbol">
-                              <pre wp-pre-tag-3=""></pre>
-                            </span>
-                            0.000075 Eth
-                          </span>
-                        </td>
-                        <td className="product-remove" data-title="Remove">
-                          <a
-                            href="#"
-                            className="remove"
-                            aria-label="Remove this item"
-                            data-product_id="30"
-                            data-product_sku=""
-                          >
-                            ×
-                          </a>
-                        </td>
-                      </tr>
-                      <tr className="cart_item">
-                        <td
-                          className="product-thumbnail"
-                          data-title="Thumbnail"
-                        >
-                          <a href="/single-product">
-                            <img
-                              src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                              className="attachment-woocommerce_thumbnail size-woocommerce_thumbnail img-fluid"
-                              alt=""
-                            />
-                          </a>
-                        </td>
-                        <td className="product-name" data-title="Product">
-                          <a href="#">Sunset</a>
-                        </td>
-                        <td className="product-price" data-title="Price">
-                          <span className="amount">
-                            <span className="currencySymbol">
-                              <pre wp-pre-tag-3=""></pre>
-                            </span>
-                            0.00016 Eth
-                          </span>
-                        </td>
-                        <td className="product-quantity" data-title="Quantity">
-                          <div className="quantity">
-                            <label className="sr-only">Quantity</label>
-                            <input
-                              type="number"
-                              id="quantity_5cc58182489a8"
-                              className="input-text qty text"
-                              step="1"
-                              min="1"
-                              value={"1"}
-                              name="#"
-                              title="Qty"
-                              size="4"
-                            />
-                          </div>
-                        </td>
-                        <td className="product-subtotal" data-title="Total">
-                          <span className="amount">
-                            <span className="currencySymbol">
-                              <pre wp-pre-tag-3=""></pre>
-                            </span>
-                            0.00016 Eth
-                          </span>
-                        </td>
-                        <td className="product-remove" data-title="Remove">
-                          <a
-                            href="#"
-                            className="remove"
-                            aria-label="Remove this item"
-                            data-product_id="30"
-                            data-product_sku=""
-                          >
-                            ×
-                          </a>
-                        </td>
-                      </tr>
+                            <td className="product-price" data-title="Price">
+                              {item.price} Eth
+                            </td>
+                            <td
+                              className="product-quantity"
+                              data-title="Quantity"
+                            >
+                              <div className="quantity">{item.quantity}</div>
+                            </td>
+                            <td className="product-subtotal" data-title="Total">
+                              {item.price * item.quantity} Eth
+                            </td>
+                            <td
+                              style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                              onClick={() => {
+                                setLoader(index);
+                                deleteDoc(
+                                  doc(
+                                    getFirestore(),
+                                    "users",
+                                    username,
+                                    "cart",
+                                    item.id
+                                  )
+                                ).then(() => {
+                                  setLoader(-1);
+                                  console.log("delete done");
+                                  getCart();
+                                });
+                              }}
+                            >
+                              {loader === products.indexOf(item) ? (
+                                <img width={15} src={activity} alt="activity" />
+                              ) : (
+                                "×"
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+
                       <tr>
                         <td colspan="6" className="actions">
                           <div className="coupon">
-                            {/* <input
-                              type="text"
-                              name="coupon_code"
-                              className="input-text form-control"
-                              id="coupon_code"
-                              value=""
-                              placeholder="Coupon code"
-                            />
-                            <button
-                              type="button"
-                              className="btn btn-black btn-small"
-                              name="apply_coupon"
-                              value="Apply coupon"
-                            >
-                              Apply coupon
-                            </button> */}
                             <span className="float-right mt-3 mt-lg-0">
                               <button
                                 type="button"
                                 className="btn btn-dark btn-small"
                                 name="update_cart"
                                 value="Update cart"
-                                disabled=""
                               >
                                 Update cart
                               </button>
                             </span>
                           </div>
-                          <input
-                            type="hidden"
-                            id="woocommerce-cart-nonce"
-                            name="woocommerce-cart-nonce"
-                            value="27da9ce3e8"
-                          />
-                          <input
-                            type="hidden"
-                            name="_wp_http_referer"
-                            value="/cart/"
-                          />
                         </td>
                       </tr>
                     </tbody>

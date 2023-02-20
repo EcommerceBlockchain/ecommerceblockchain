@@ -3,93 +3,79 @@ import { useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  query,
   setDoc,
 } from "firebase/firestore";
+import activity from "../images/activity.gif";
 
 function Product({ name, id, price, preImg }) {
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
   // products:[{productid:id,quan:quan,price:price,preimg:preimg,name:name}],
-  const { username } = useContext(UserContext);
+  const { username, user } = useContext(UserContext);
   const [count, setCount] = useState(0);
-  const [cart, setCart] = useState([]);
+  const [loader, setLoader] = useState(false);
 
-  const getCart = () => {
-    getDoc(doc(getFirestore(), "cart", username)).then((doc) => {
-      setCart(doc.data().products);
-      setCount(
-        doc.data().products[id]?.quantity !== undefined
-          ? doc.data().products[id]?.quantity
-          : 0
-      );
-    });
+  const getCart = async () => {
+    const pro = await getDoc(
+      doc(getFirestore(), "users", username, "cart", id)
+    );
+    if (pro.exists) {
+      setCount(pro.data()?.quantity ? pro.data().quantity : 0);
+    } else {
+      setCount(0);
+    }
+    setLoader(false);
   };
 
-  const updateCart = (val) => {
-    if (val == "add") {
-      if (cart.find((obj) => obj["productId"] === id) !== undefined) {
-        let cartDoc = [...cart];
-        for (const iterator of cartDoc) {
-          if (iterator.productId === id) {
-            iterator.quantity += 1;
-          }
-        }
-        setDoc(
-          doc(getFirestore(), "cart", username),
-          {
-            products: cartDoc,
-          },
-          { merge: true }
-        ).then(() => {
-          console.log("done in add ");
+  const updateCart = async (val) => {
+    setLoader(true);
+    let product = await getDoc(
+      doc(getFirestore(), "users", username, "cart", id)
+    );
+    if (product.data() !== undefined) {
+      if (val === "add") {
+        setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
+          ...product.data(),
+          quantity: product.data().quantity + 1,
+        }).then(() => {
+          console.log("add done");
+          getCart();
         });
       } else {
-        setCart((prev) => [
-          ...prev,
-          {
-            productId: id,
-            quantity: 1,
-            price: price,
-            name: name,
-            preImg: preImg,
-          },
-        ]);
-        setDoc(
-          doc(getFirestore(), "cart", username),
-          {
-            products: [
-              ...cart,
-              {
-                productId: id,
-                quantity: 1,
-                price: price,
-                name: name,
-                preImg: preImg,
-              },
-            ],
-          },
-          { merge: true }
-        ).then(() => {
-          console.log("done in add else");
-        });
-      }
-    } else {
-      let cartDoc = [...cart];
-      for (const iterator of cartDoc) {
-        if (iterator.productId === id) {
-          iterator.quantity -= 1;
+        if (product.data().quantity === 1) {
+          deleteDoc(doc(getFirestore(), "users", username, "cart", id)).then(
+            () => {
+              console.log("delete done");
+              getCart();
+            }
+          );
+        } else {
+          setDoc(
+            doc(collection(getFirestore(), "users", username, "cart"), id),
+            {
+              ...product.data(),
+              quantity: product.data().quantity - 1,
+            }
+          ).then(() => {
+            console.log("remove done");
+            getCart();
+          });
         }
       }
-      setDoc(
-        doc(getFirestore(), "cart", username),
-        {
-          products: cartDoc,
-        },
-        { merge: true }
-      ).then(() => {
-        console.log("done in remove");
+    } else {
+      setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
+        productName: name,
+        quantity: 1,
+        price: price,
+        preImg: preImg,
+      }).then(() => {
+        console.log("new product added");
+        getCart();
       });
     }
   };
@@ -111,7 +97,7 @@ function Product({ name, id, price, preImg }) {
           cursor: "pointer",
         }}
         onClick={() => {
-          naviagte("/single-product", { state: { id: id } });
+          navigate("/single-product", { state: { id: id } });
         }}
       >
         <div className="product-img">
@@ -126,52 +112,70 @@ function Product({ name, id, price, preImg }) {
           <span className="price">{price} Eth</span>
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {count !== 0 && (
-          <button
-            type="button"
-            style={{ marginRight: "0.5rem" }}
-            className="cart-btn"
-            onClick={() => {
-              updateCart("remove");
-            }}
-          >
-            -
-          </button>
-        )}
-        {!count ? (
-          <button
-            style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
-            type="button"
-            className="cart-btn"
-            onClick={() => {
-              updateCart("add");
-            }}
-          >
-            Add to Cart
-          </button>
-        ) : (
-          <div>{count}</div>
-        )}
-        {count !== 0 && (
-          <button
-            type="button"
-            className="cart-btn"
-            style={{ marginLeft: "0.5rem" }}
-            onClick={() => {
-              updateCart("add");
-            }}
-          >
-            +
-          </button>
-        )}
-      </div>
+      {loader ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <img width={40} src={activity} alt="activity" />
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {count !== 0 && (
+            <button
+              type="button"
+              style={{ marginRight: "0.5rem" }}
+              className="cart-btn"
+              onClick={() => {
+                updateCart("remove");
+              }}
+            >
+              -
+            </button>
+          )}
+          {!count ? (
+            <button
+              style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
+              type="button"
+              className="cart-btn"
+              onClick={() => {
+                if (user) {
+                  updateCart("add");
+                } else {
+                  navigate("/login");
+                }
+              }}
+            >
+              Add to Cart
+            </button>
+          ) : (
+            <div style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}>
+              {count}
+            </div>
+          )}
+          {count !== 0 && (
+            <button
+              type="button"
+              className="cart-btn"
+              style={{ marginLeft: "0.5rem" }}
+              onClick={() => {
+                updateCart("add");
+              }}
+            >
+              +
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

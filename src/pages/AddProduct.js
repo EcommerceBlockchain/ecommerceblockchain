@@ -118,13 +118,19 @@ function AddProduct() {
     }
   };
 
-  useEffect(() => {}, []);
-
   return (
     <div className="checkout-container">
       <section className="page-header">
         <div className="content text-center">
           <h1 className="mb-3">Add Product</h1>
+          <p>
+            Adding a new product to our ecommerce website powered by blockchain
+            technology is a breeze. Simply log in to your account, enter the
+            product details and images, set the price and category, and you're
+            all set. Our platform ensures that all transactions are secure and
+            transparent, giving you and your customers peace of mind while
+            shopping with us.
+          </p>
         </div>
       </section>
       <div className="section">

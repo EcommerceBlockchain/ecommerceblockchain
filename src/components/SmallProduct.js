@@ -10,6 +10,7 @@ function SmallProduct({ name, id, price, preImg }) {
       onClick={() => {
         naviagte("/single-product", { state: { id: id } });
       }}
+      style={{ cursor: "pointer" }}
     >
       <div
         className="featured-entry-thumb"
@@ -24,9 +25,7 @@ function SmallProduct({ name, id, price, preImg }) {
         />
       </div>
       <div className="media-body">
-        <h6 className="featured-entry-title mb-0">
-          <a href="#">{name}</a>
-        </h6>
+        <h6 className="featured-entry-title mb-0">{name}</h6>
         <span className="price">{price} Eth</span>
       </div>
     </div>

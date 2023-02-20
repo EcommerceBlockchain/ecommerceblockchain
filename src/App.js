@@ -28,6 +28,7 @@ import { getAuth } from "firebase/auth";
 import AddProduct from "./pages/AddProduct";
 import { onAuthStateChanged } from "firebase/auth";
 import UserState from "./context/UserState";
+import Search from "./pages/Search";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -56,6 +57,7 @@ function App() {
           <Header></Header>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/single-product/" element={<SingleProduct />} />
 

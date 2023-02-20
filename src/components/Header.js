@@ -2,13 +2,12 @@ import "jquery/dist/jquery.slim.min.js";
 import "popper.js/dist/umd/popper.min.js";
 import "bootstrap/dist/js/bootstrap.min.js";
 import { Link } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getApp, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { useContext, useEffect, useState } from "react";
-import firebaseConfig from "../config/firebaseConfig";
 import UserContext from "../context/UserContext";
 function Header() {
   const { user } = useContext(UserContext);
+  const [cartProducts, setCartProducts] = useState([]);
 
   return (
     <div className="fixed-top">
@@ -96,76 +95,6 @@ function Header() {
               </a>
             </li>
 
-            {user && (
-              <li className="dropdown cart-nav dropdown-slide list-inline-item">
-                <a
-                  href="#"
-                  className="dropdown-toggle cart-icon"
-                  data-toggle="dropdown"
-                  data-hover="dropdown"
-                >
-                  <i className="tf-ion-android-cart"></i>
-                </a>
-                <div className="dropdown-menu cart-dropdown">
-                  <div className="media">
-                    <a href="/single-product">
-                      <img
-                        className="media-object img- mr-3"
-                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                        alt="image"
-                      />
-                    </a>
-                    <div className="media-body">
-                      <h6>Sunset</h6>
-                      <div className="cart-price">
-                        <span>1 x</span>
-                        <span>0.00016 Eth</span>
-                      </div>
-                    </div>
-                    <a href="#" className="remove">
-                      <i className="tf-ion-close"></i>
-                    </a>
-                  </div>
-
-                  <div className="media">
-                    <a href="/single-product">
-                      <img
-                        className="media-object img-fluid mr-3"
-                        src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-                        alt="image"
-                      />
-                    </a>
-                    <div className="media-body">
-                      <h6>Sunset</h6>
-                      <div className="cart-price">
-                        <span>1 x</span>
-                        <span>0.00016 Eth</span>
-                      </div>
-                    </div>
-                    <a href="#" className="remove">
-                      <i className="tf-ion-close"></i>
-                    </a>
-                  </div>
-
-                  <div className="cart-summary">
-                    <span className="h6">Total</span>
-                    <span className="total-price h6">0.000235 Eth</span>
-
-                    <div className="text-center cart-buttons mt-3">
-                      <a
-                        href="#"
-                        className="btn btn-small btn-transparent btn-block"
-                      >
-                        View Cart
-                      </a>
-                      <a href="#" className="btn btn-small btn-main btn-block">
-                        Checkout
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            )}
             {user && (
               <li className="list-inline-item">
                 <a href="#">
