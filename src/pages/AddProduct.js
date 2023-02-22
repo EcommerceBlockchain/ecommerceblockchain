@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import GoToTop from "../components/GoToTop";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   addDoc,
@@ -121,16 +121,34 @@ function AddProduct() {
   return (
     <div className="checkout-container">
       <section className="page-header">
-        <div className="content text-center">
-          <h1 className="mb-3">Add Product</h1>
-          <p>
-            Adding a new product to our ecommerce website powered by blockchain
-            technology is a breeze. Simply log in to your account, enter the
-            product details and images, set the price and category, and you're
-            all set. Our platform ensures that all transactions are secure and
-            transparent, giving you and your customers peace of mind while
-            shopping with us.
-          </p>
+        <div className="overly"></div>
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-6">
+              <div className="content text-center">
+                <h1 className="mb-3">Add Product</h1>
+                <p>
+                  Adding a new product to our ecommerce website powered by
+                  blockchain technology is a breeze. Simply log in to your
+                  account, enter the product details and images, set the price
+                  and category, and you're all set. Our platform ensures that
+                  all transactions are secure and transparent, giving you and
+                  your customers peace of mind while shopping with us.
+                </p>
+
+                <nav aria-label="breadcrumb">
+                  <ol className="breadcrumb bg-transparent justify-content-center">
+                    <li className="breadcrumb-item">
+                      <Link to={{ pathname: "/" }}>Home</Link>
+                    </li>
+                    <li className="breadcrumb-item active" aria-current="page">
+                      Add Product
+                    </li>
+                  </ol>
+                </nav>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
       <div className="section">

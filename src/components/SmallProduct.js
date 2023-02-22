@@ -10,7 +10,7 @@ function SmallProduct({ name, id, price, preImg }) {
       onClick={() => {
         naviagte("/single-product", { state: { id: id } });
       }}
-      style={{ cursor: "pointer" }}
+      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
     >
       <div
         className="featured-entry-thumb"

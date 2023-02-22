@@ -17,9 +17,8 @@ import {
   getDoc,
   doc,
 } from "firebase/firestore";
-import UserContext from "../context/UserContext";
 
-function Login({ path }) {
+function Login() {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
@@ -49,7 +48,7 @@ function Login({ path }) {
               doc(getFirestore(), "cart", values.username)
             );
             console.log(cartdoc.data());
-            navigate(path ? path : "/", { replace: true });
+            navigate("/", { replace: true });
           })
           .catch((err) => {
             console.log(err);

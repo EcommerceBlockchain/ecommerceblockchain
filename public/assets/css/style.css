@@ -475,7 +475,7 @@ a.text-primary:hover {
 .page-header {
   background: #f3f3f3;
   background-size: cover;
-  padding: 60px 0px;
+  padding: 60px 0px 0px;
   position: relative;
   margin-top: 50px;
 }

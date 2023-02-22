@@ -8,7 +8,7 @@ import Cart from "../src/pages/Cart";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
 import ForgotPassword from "../src/pages/ForgotPassword";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { getApp, initializeApp } from "firebase/app";
 import firebaseConfig from "../src/config/firebaseConfig";
 import { useEffect, useState } from "react";
@@ -59,22 +59,16 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
             <Route path="/shop" element={<Shop />} />
-            <Route path="/single-product/" element={<SingleProduct />} />
+            <Route path="/single-product" element={<SingleProduct />} />
 
-            <Route
-              path="/checkout"
-              element={user ? <Checkout /> : <Login path={"/checkout"} />}
-            />
-            <Route
-              path="/cart"
-              element={user ? <Cart /> : <Login path={"/cart"} />}
-            />
+            <Route path="/checkout" element={user ? <Checkout /> : <Login />} />
+            <Route path="/cart" element={user ? <Cart /> : <Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route
               path="/addproduct"
-              element={user ? <AddProduct /> : <Login path={"/addproduct"} />}
+              element={user ? <AddProduct /> : <Login />}
             />
           </Routes>
           <Footer></Footer>
