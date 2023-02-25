@@ -500,6 +500,12 @@ a.text-primary:hover {
   object-fit: contain;
 }
 
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .search-wrap {
   position: relative;
   z-index: 1200;

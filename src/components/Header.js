@@ -90,9 +90,9 @@ function Header() {
             id="top-menu"
           >
             <li className="list-inline-item">
-              <a href="#" className="search_toggle" id="search-icon">
+              <Link to={"/search"} className="search_toggle" id="search-icon">
                 <i className="tf-ion-android-search"></i>
-              </a>
+              </Link>
             </li>
 
             {user && (

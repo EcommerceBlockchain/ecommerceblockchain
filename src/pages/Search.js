@@ -1,7 +1,64 @@
+import {
+  collection,
+  endAt,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  startAt,
+  where,
+} from "firebase/firestore";
 import React from "react";
+import { useEffect, useState } from "react";
+import * as LottiePlayer from "@lottiefiles/lottie-player";
+import colors from "../colors";
+import activity from "../images/activity.gif";
+
 import { Link } from "react-router-dom";
+import Product from "../components/Product";
 
 function Search() {
+  const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [press, setPress] = useState(false);
+  const [loader, setLoader] = useState(false);
+
+  const getProducts = async () => {
+    setProducts([]);
+    let array = [];
+    let qu = query(
+      collection(getFirestore(), "products"),
+      orderBy("name"),
+      startAt(search),
+      endAt(search + "~")
+    );
+    const productss = await getDocs(qu);
+    productss.docs.forEach((product) => {
+      array.push({ ...product.data(), id: product.id });
+    });
+    setProducts(array);
+    setLoader(false);
+  };
+  const getProductByTag = async (tag) => {
+    setProducts([]);
+    let array = [];
+    let qu = query(
+      collection(getFirestore(), "products"),
+      where("tag", "array-contains", tag)
+    );
+    const productss = await getDocs(qu);
+    productss.docs.forEach((product) => {
+      array.push({ ...product.data(), id: product.id });
+    });
+    setProducts(array);
+    setLoader(false);
+  };
+
+  useEffect(() => {
+    setSearch("");
+    setProducts([]);
+    setPress(false);
+  }, []);
   return (
     <div className="shop-container">
       <section className="page-header">
@@ -28,25 +85,145 @@ function Search() {
                     </li>
                   </ol>
                 </nav>
-                <div className="search"></div>
+                <div class="search-bar">
+                  <div
+                    style={{
+                      display: "flex",
+                      width: "100%",
+                      position: "absolute",
+                    }}
+                  >
+                    <input
+                      type="search"
+                      id="form1"
+                      class="form-control"
+                      style={{
+                        height: "50px",
+                        position: "relative",
+                        borderColor:
+                          search === "" && press ? colors.red : "lightgray",
+                      }}
+                      placeholder={"Search Anything..."}
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                      }}
+                    />
+                    {search === "" && press && (
+                      <p
+                        style={{
+                          color: colors.red,
+                          position: "absolute",
+                          top: "3rem",
+                          left: 0,
+                        }}
+                      >
+                        search field can't be empty!
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      class="btn btn-main"
+                      style={{
+                        width: "100px",
+                        height: "50px",
+                      }}
+                      onClick={() => {
+                        setPress(true);
+                        if (search) {
+                          setLoader(true);
+                          setPress(false);
+                          if (
+                            (search.charAt(0) === "#") &
+                            (search.length >= 2)
+                          ) {
+                            let st = search;
+
+                            getProductByTag(st.substring(1));
+                          } else {
+                            getProducts();
+                          }
+                        }
+                      }}
+                    >
+                      <i className="tf-ion-android-search"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <p style={{ marginTop: "2rem" }}>
+                  Example :- Nature, Wallpaper, Python, #sunset, #beautiful ...
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <section className="section">
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-        <h1>search</h1>
-      </section>
+      {/* https://assets3.lottiefiles.com/private_files/lf30_2c7wnifx.json */}
+      {loader ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <img height={60} src={activity} alt="activity" />
+        </div>
+      ) : (
+        <section className="section products-main">
+          {!products.length ? (
+            <div className="container">
+              <div className="row justify-content-center align-items-center">
+                <div>
+                  <h2>No products to display</h2>
+                  <p>Start search for your products.</p>
+                </div>
+                <div className="slider-caption">
+                  <lottie-player
+                    autoplay
+                    loop
+                    mode="normal"
+                    src=" https://assets3.lottiefiles.com/private_files/lf30_2c7wnifx.json"
+                  ></lottie-player>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="container">
+              <div className="row justify-content-center">
+                <div className="col-lg-8">
+                  <div className="title text-center">
+                    <p style={{ fontSize: "2rem" }}>
+                      Search results for "{search}"
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="row"
+                style={{
+                  display: "grid",
+                  gap: "2rem",
+                  gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
+                }}
+              >
+                {products.map((item) => {
+                  return (
+                    <Product
+                      key={item.id}
+                      name={item.name}
+                      price={item.cost}
+                      id={item.id}
+                      preImg={item.preview_image[0]}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 }
