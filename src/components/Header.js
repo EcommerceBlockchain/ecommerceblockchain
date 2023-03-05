@@ -48,6 +48,11 @@ function Header() {
                   Shop
                 </Link>
               </li>
+              <li className="nav-item dropdown dropdown-slide">
+                <Link className="nav-link" to={{ pathname: "/search" }}>
+                  Search
+                </Link>
+              </li>
 
               {user && (
                 <li className="nav-item dropdown dropdown-slide">

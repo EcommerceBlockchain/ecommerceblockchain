@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import GoToTop from "../components/GoToTop";
 import Product from "../components/Product";
 import SmallProduct from "../components/SmallProduct";
@@ -18,6 +18,7 @@ import spinner from "../images/spinner.gif";
 import ReactPaginate from "react-paginate";
 
 function Shop() {
+  const location = useLocation();
   const [products, setProducts] = useState([]);
   const [currentProducts, setCurrentProducts] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
@@ -328,7 +329,11 @@ function Shop() {
 
   useEffect(() => {
     setItemOffset(0);
-    getProducts();
+    if (location.state?.arr) {
+      getCategoryProducts(location.state.arr);
+    } else {
+      getProducts();
+    }
     getPopularProducts();
   }, []);
   return (

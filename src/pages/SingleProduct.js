@@ -290,7 +290,7 @@ function SingleProduct() {
                       {tag.length > 0
                         ? tag.map((item) => {
                             return (
-                              <Link to={"/"}>
+                              <Link to={"/search"} state={{ tag: item }}>
                                 <div
                                   style={{
                                     backgroundColor: "lightgrey",

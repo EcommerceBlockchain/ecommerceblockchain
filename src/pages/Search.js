@@ -14,12 +14,16 @@ import * as LottiePlayer from "@lottiefiles/lottie-player";
 import colors from "../colors";
 import activity from "../images/activity.gif";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Product from "../components/Product";
 
 function Search() {
+  const location = useLocation();
+
   const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(
+    location.state?.tag ? "#" + location.state?.tag : ""
+  );
   const [press, setPress] = useState(false);
   const [loader, setLoader] = useState(false);
 
@@ -55,9 +59,13 @@ function Search() {
   };
 
   useEffect(() => {
-    setSearch("");
     setProducts([]);
     setPress(false);
+    if (location.state?.tag) {
+      console.log(location.state.tag);
+      setLoader(true);
+      getProductByTag(location.state.tag);
+    }
   }, []);
   return (
     <div className="shop-container">
@@ -107,6 +115,7 @@ function Search() {
                       onChange={(e) => {
                         setSearch(e.target.value);
                       }}
+                      value={search}
                     />
                     {search === "" && press && (
                       <p

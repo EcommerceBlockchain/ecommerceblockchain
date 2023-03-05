@@ -30,19 +30,29 @@ function Footer() {
                 <h4 className="mb-4">Category</h4>
                 <ul className="pl-0 list-unstyled mb-0">
                   <li>
-                    <a href="#">Documents</a>
+                    <Link to={"/shop"} state={{ arr: ["Documents"] }}>
+                      Documents
+                    </Link>
                   </li>
                   <li>
-                    <a href="#">Images</a>
+                    <Link to={"/shop"} state={{ arr: ["Image"] }}>
+                      Image
+                    </Link>
                   </li>
                   <li>
-                    <a href="#">Video</a>
+                    <Link to={"/shop"} state={{ arr: ["Video"] }}>
+                      Video
+                    </Link>
                   </li>
                   <li>
-                    <a href="#">GIF</a>
+                    <Link to={"/shop"} state={{ arr: ["GIF"] }}>
+                      GIF
+                    </Link>
                   </li>
                   <li>
-                    <a href="#">Audio</a>
+                    <Link to={"/shop"} state={{ arr: ["Audio"] }}>
+                      Audio
+                    </Link>
                   </li>
                 </ul>
               </div>
