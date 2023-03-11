@@ -8,6 +8,7 @@
 		2.1. Navigation 
 		2.2. Menu 
 		2.3. Cart 
+
 	3. Banner
 		3.1 Slick Slider
 	4. Products
@@ -42,6 +43,10 @@ html,
 body {
   height: 100%;
   user-select: none;
+}
+
+#root {
+  height: 100%;
 }
 
 body {

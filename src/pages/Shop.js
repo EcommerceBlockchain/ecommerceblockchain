@@ -383,7 +383,8 @@ function Shop() {
                     <div className="heading d-flex justify-content-between mb-5">
                       <p className="result-count mb-0">
                         {" "}
-                        Showing {itemOffset + 1}–
+                        Showing{" "}
+                        {currentProducts.length === 0 ? 0 : itemOffset + 1}–
                         {itemOffset + 6 <= total ? itemOffset + 6 : total} of{" "}
                         {total} results{" "}
                       </p>

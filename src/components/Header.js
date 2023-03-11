@@ -1,13 +1,15 @@
 import "jquery/dist/jquery.slim.min.js";
 import "popper.js/dist/umd/popper.min.js";
 import "bootstrap/dist/js/bootstrap.min.js";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../context/UserContext";
 function Header() {
   const { user } = useContext(UserContext);
   const [cartProducts, setCartProducts] = useState([]);
+  const { pathname } = useLocation();
+  if (pathname === "/profile") return null;
 
   return (
     <div className="fixed-top">
@@ -102,9 +104,9 @@ function Header() {
 
             {user && (
               <li className="list-inline-item">
-                <a href="#">
+                <Link to={"/profile"}>
                   <i className="tf-ion-ios-person mr-3"></i>
-                </a>
+                </Link>
               </li>
             )}
           </ul>

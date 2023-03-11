@@ -8,30 +8,29 @@ import Cart from "../src/pages/Cart";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
 import ForgotPassword from "../src/pages/ForgotPassword";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Location,
+} from "react-router-dom";
 import { getApp, initializeApp } from "firebase/app";
 import firebaseConfig from "../src/config/firebaseConfig";
 import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-// import {
-//   getDocs,
-//   getDoc,
-//   doc,
-//   getFirestore,
-//   setDoc,
-//   addDoc,
-//   collection,
-// } from "firebase/firestore";
-// import { getDownloadURL, getStorage, ref } from "firebase/storage";
-// import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 import AddProduct from "./pages/AddProduct";
 import { onAuthStateChanged } from "firebase/auth";
 import UserState from "./context/UserState";
 import Search from "./pages/Search";
+import Profile from "../src/pages/Profile";
+
+import { ProSidebarProvider } from "react-pro-sidebar";
 
 function App() {
   const [user, setUser] = useState(null);
+
   useEffect(() => {
     async function getdata() {
       const auth = getAuth(getApp());
@@ -43,6 +42,7 @@ function App() {
         }
       });
     }
+
     getdata();
     initializeApp(firebaseConfig);
     window.addEventListener("contextmenu", (e) => {
@@ -52,27 +52,33 @@ function App() {
 
   return (
     <UserState>
-      <div className="App">
-        <BrowserRouter>
-          <Header></Header>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/single-product" element={<SingleProduct />} />
+      <div className="App" style={{ height: "100%" }}>
+        <ProSidebarProvider>
+          <BrowserRouter>
+            <Header></Header>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/single-product" element={<SingleProduct />} />
 
-            <Route path="/checkout" element={user ? <Checkout /> : <Login />} />
-            <Route path="/cart" element={user ? <Cart /> : <Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route
-              path="/addproduct"
-              element={user ? <AddProduct /> : <Login />}
-            />
-          </Routes>
-          <Footer></Footer>
-        </BrowserRouter>
+              <Route
+                path="/checkout"
+                element={user ? <Checkout /> : <Login />}
+              />
+              <Route path="/cart" element={user ? <Cart /> : <Login />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/addproduct"
+                element={user ? <AddProduct /> : <Login />}
+              />
+              <Route path="/profile" element={user ? <Profile /> : <Login />} />
+            </Routes>
+            <Footer />
+          </BrowserRouter>
+        </ProSidebarProvider>
       </div>
     </UserState>
   );

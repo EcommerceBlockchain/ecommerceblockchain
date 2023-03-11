@@ -12,6 +12,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
+import { ethers } from "ethers";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -57,6 +58,19 @@ function Home() {
     setBestSeller(bestseller);
   };
 
+  const addwallet = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    const balance = await provider.getBalance(accounts[0]);
+    const balanceInEther = ethers.utils.formatEther(balance);
+    console.log(accounts[0], balanceInEther);
+    const block = await provider.getBlockNumber();
+    console.log(block);
+    // provider.on("block", (block) => {
+    //   console.log(block);
+    // });
+  };
+
   useEffect(() => {
     getProducts();
   }, []);
@@ -78,7 +92,13 @@ function Home() {
                 <h1 className="mt-2 mb-5">
                   <span className="text-color">Digital </span>Products
                 </h1>
-                <Link className="btn btn-main" to={{ pathname: "/shop" }}>
+                <Link
+                  className="btn btn-main"
+                  to={{ pathname: "/shop" }}
+                  onClick={() => {
+                    addwallet();
+                  }}
+                >
                   Shop
                 </Link>
               </div>

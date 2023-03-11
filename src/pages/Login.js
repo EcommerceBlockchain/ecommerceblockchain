@@ -87,18 +87,6 @@ function Login() {
           style={{ marginTop: "5rem" }}
         >
           <strong>Success! </strong>Login successfull!
-          <button
-            type="button"
-            className="close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-            onClick={() => {
-              setError("");
-            }}
-          >
-            {" "}
-            &#10060;
-          </button>
         </div>
       )}
       <Formik

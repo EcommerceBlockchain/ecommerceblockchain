@@ -408,7 +408,7 @@ function SingleProduct() {
                           <h6>
                             Digimart{" "}
                             <span className="text-sm text-muted font-weight-normal ml-3">
-                              -Jan 1, 2023
+                              Jan 1, 2023
                             </span>
                           </h6>
                           <p>
@@ -447,7 +447,7 @@ function SingleProduct() {
                           <h6>
                             Digimart{" "}
                             <span className="text-sm text-muted font-weight-normal ml-3">
-                              -Jan 1, 2023
+                              Jan 1, 2023
                             </span>
                           </h6>
                           <p>
@@ -507,7 +507,7 @@ function SingleProduct() {
           </div>
         </div>
       </section>
-      <section className="section products-main">
+      {/* <section className="section products-main">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-8">
@@ -539,7 +539,7 @@ function SingleProduct() {
             })}
           </div>
         </div>
-      </section>
+      </section> */}
 
       <GoToTop />
     </div>

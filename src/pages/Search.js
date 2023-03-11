@@ -77,10 +77,12 @@ function Search() {
               <div className="content text-center">
                 <h1 className="mb-3">Search</h1>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Reprehenderit sint doloribus obcaecati fuga dolorem quod dolor
-                  maxime non, facere nemo consequatur ratione laborum nesciunt,
-                  fugiat, possimus adipisci odit neque eos!
+                  With our search bar, you can discover new digital products,
+                  compare prices, and read reviews from other users. Whether
+                  you're interested in digital media, software, or online
+                  courses, our search bar has got you covered. So start
+                  exploring the world of digital products today and find the
+                  perfect products to suit your needs.
                 </p>
 
                 <nav aria-label="breadcrumb">
