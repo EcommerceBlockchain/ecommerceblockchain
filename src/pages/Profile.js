@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Sidebar,
   Menu,
@@ -15,6 +15,13 @@ import { FaSignOutAlt, FaHamburger, FaBars } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import GetFileByCID from "../service/GetFileByCID";
+import Account from "../components/Account";
+import UserContext from "../context/UserContext";
+import { async } from "@firebase/util";
+import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import Products from "../components/Products";
+import Orders from "../components/Orders";
+import Transactions from "../components/Transactions";
 
 // hex to rgba converter
 
@@ -22,6 +29,16 @@ function Profile() {
   const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
   const navigate = useNavigate();
   const [menuselection, setMenuSelection] = useState(1);
+  const { username } = useContext(UserContext);
+  const [userData, setUserData] = useState({});
+
+  const getUserData = async () => {
+    const data = await getDoc(
+      doc(collection(getFirestore(), "users"), username)
+    );
+    console.log(data.data());
+    setUserData(data.data());
+  };
 
   const menuItemStyles = {
     root: {
@@ -44,11 +61,16 @@ function Profile() {
     }),
   };
 
+  useEffect(() => {
+    getUserData();
+  }, []);
+
   return (
     <div
       style={{
         height: "100%",
         overflowY: "hidden",
+        display: "flex",
       }}
     >
       <Sidebar
@@ -98,6 +120,7 @@ function Profile() {
                     active={menuselection === 1}
                     onClick={() => {
                       setMenuSelection(1);
+                      toggleSidebar();
                     }}
                   >
                     Account
@@ -106,6 +129,7 @@ function Profile() {
                     active={menuselection === 2}
                     onClick={() => {
                       setMenuSelection(2);
+                      toggleSidebar();
                     }}
                   >
                     Products
@@ -114,6 +138,7 @@ function Profile() {
                     active={menuselection === 3}
                     onClick={() => {
                       setMenuSelection(3);
+                      toggleSidebar();
                     }}
                   >
                     Orders
@@ -122,6 +147,7 @@ function Profile() {
                     active={menuselection === 4}
                     onClick={() => {
                       setMenuSelection(4);
+                      toggleSidebar();
                     }}
                   >
                     Transactions
@@ -155,7 +181,12 @@ function Profile() {
       </Sidebar>
 
       <main>
-        <div style={{ padding: "16px 24px", color: "#44596e" }}>
+        <div
+          style={{
+            padding: "16px 24px",
+            color: "#44596e",
+          }}
+        >
           <div style={{ marginBottom: "16px" }}>
             {broken && (
               <button
@@ -169,12 +200,16 @@ function Profile() {
                 }}
                 onClick={() => {
                   toggleSidebar();
-                  GetFileByCID();
                 }}
               >
                 <FaBars color={colors.primaryBlue} size={20} />
               </button>
             )}
+
+            {menuselection === 1 && <Account userData={userData} />}
+            {menuselection === 2 && <Products userData={userData} />}
+            {menuselection === 3 && <Orders userData={userData} />}
+            {menuselection === 4 && <Transactions userData={userData} />}
           </div>
         </div>
       </main>
