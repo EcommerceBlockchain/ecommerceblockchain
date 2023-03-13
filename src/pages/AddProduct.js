@@ -17,6 +17,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import colors from "../colors";
 import UserContext from "../context/UserContext";
+import GetFileByCID from "../service/GetFileByCID";
 
 function AddProduct() {
   const { user, username } = useContext(UserContext);
@@ -315,6 +316,7 @@ function AddProduct() {
                             multiple
                             accept=".jpeg,.png,.jpg,.webp,.gif"
                             onChange={(e) => {
+                              GetFileByCID(e.target.files[0]);
                               console.log(e.target.files);
                               Array.from(e.target.files).forEach((item) => {
                                 setimages((prev) => [

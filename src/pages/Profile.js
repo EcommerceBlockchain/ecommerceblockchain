@@ -14,6 +14,7 @@ import colors from "../colors";
 import { FaSignOutAlt, FaHamburger, FaBars } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import GetFileByCID from "../service/GetFileByCID";
 
 // hex to rgba converter
 
@@ -31,12 +32,8 @@ function Profile() {
     SubMenuExpandIcon: {
       color: "#b6b7b9",
     },
-    // subMenuContent: ({ level }) => ({
-    //   backgroundColor: level === 0 ? "red" : "transparent",
-    // }),
-    button: ({ level, active, disabled }) => {
-      // only apply styles on first level elements of the tree
 
+    button: ({ level, active, disabled }) => {
       return {
         backgroundColor: active ? "lightgray" : "white",
       };
@@ -170,7 +167,10 @@ function Profile() {
                   alignItems: "center",
                   padding: "10px",
                 }}
-                onClick={() => toggleSidebar()}
+                onClick={() => {
+                  toggleSidebar();
+                  GetFileByCID();
+                }}
               >
                 <FaBars color={colors.primaryBlue} size={20} />
               </button>
