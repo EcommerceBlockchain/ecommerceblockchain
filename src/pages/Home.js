@@ -13,6 +13,8 @@ import {
   limit,
 } from "firebase/firestore";
 import { ethers } from "ethers";
+import GetFileByCID from "../service/GetFileByPath";
+import GetFileByPath from "../service/GetFileByPath";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -60,7 +62,9 @@ function Home() {
 
   const addwallet = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
+
     const accounts = await provider.send("eth_requestAccounts", []);
+
     const balance = await provider.getBalance(accounts[0]);
     const balanceInEther = ethers.utils.formatEther(balance);
     console.log(accounts[0], balanceInEther);
@@ -141,7 +145,11 @@ function Home() {
                   name={item.name}
                   price={item.cost}
                   id={item.id}
-                  preImg={item.preview_image[0]}
+                  preImg={
+                    item.ipfsPath
+                      ? GetFileByPath(item.ipfsPath)
+                      : item.preview_image[0]
+                  }
                 />
               );
             })}

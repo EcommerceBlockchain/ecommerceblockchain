@@ -17,7 +17,7 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import colors from "../colors";
 import UserContext from "../context/UserContext";
-import GetFileByCID from "../service/GetFileByCID";
+import UploadFile from "../service/UploadFile";
 
 function AddProduct() {
   const { user, username } = useContext(UserContext);
@@ -25,6 +25,7 @@ function AddProduct() {
   const [tags, setTags] = useState([]);
   const [originalProductUrl, setOriginalProductUrl] = useState("");
   const [originalProductFileName, setOriginalProductFileName] = useState("");
+  const [file, setFile] = useState(null);
   const [category, setCategory] = useState("Select Category");
   const [formSub, setFormSub] = useState(false);
   const [ogfile, setogfile] = useState(false);
@@ -43,6 +44,9 @@ function AddProduct() {
       category !== "Select Category" &&
       images.length !== 0
     ) {
+      console.log("heelo in onpress");
+      let filepath = await UploadFile(file);
+      console.log("filepath", filepath);
       let preImgArr = [];
       const storage = getStorage();
       images.forEach((item) => {
@@ -92,6 +96,7 @@ function AddProduct() {
                 owner: username,
                 rating: 0,
                 quantity_sold: 0,
+                ipfsPath: filepath,
               }).then(async (document) => {
                 console.log("done", document.id);
                 getDoc(doc(getFirestore(), "users", username)).then(
@@ -316,7 +321,6 @@ function AddProduct() {
                             multiple
                             accept=".jpeg,.png,.jpg,.webp,.gif"
                             onChange={(e) => {
-                              GetFileByCID(e.target.files[0]);
                               console.log(e.target.files);
                               Array.from(e.target.files).forEach((item) => {
                                 setimages((prev) => [
@@ -481,6 +485,7 @@ function AddProduct() {
                           accept="image/*"
                           onChange={(e) => {
                             setogfile(true);
+                            setFile(e.target.files[0]);
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setOriginalProductUrl(
@@ -499,6 +504,8 @@ function AddProduct() {
                           accept="video/*"
                           onChange={(e) => {
                             setogfile(true);
+                            setFile(e.target.files[0]);
+
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setOriginalProductUrl(
@@ -517,6 +524,8 @@ function AddProduct() {
                           accept=".MPEG,.MP3,.FLAC,.WAV,.WMA,.AAC"
                           onChange={(e) => {
                             setogfile(true);
+                            setFile(e.target.files[0]);
+
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setOriginalProductUrl(
@@ -535,6 +544,8 @@ function AddProduct() {
                           accept=".gif"
                           onChange={(e) => {
                             setogfile(true);
+                            setFile(e.target.files[0]);
+
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setOriginalProductUrl(
@@ -553,6 +564,8 @@ function AddProduct() {
                           accept=".doc,.docm,.docx,.dot,.dotm,.dotx,.htm,.html,.mht,.mhtml,.odt,.pdf,.rtf,.txt,.wps,.xml,.xps,.xlsx,.csv,.xls,.pptx,.ppt"
                           onChange={(e) => {
                             setogfile(true);
+                            setFile(e.target.files[0]);
+
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setOriginalProductUrl(

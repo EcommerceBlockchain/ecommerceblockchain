@@ -69,7 +69,6 @@ function SignUp() {
         avg_rating: 0,
         balance: 0,
         bought: [],
-        contact: "",
         is_active: true,
         products: [],
         reward: 0,

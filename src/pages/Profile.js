@@ -14,7 +14,6 @@ import colors from "../colors";
 import { FaSignOutAlt, FaHamburger, FaBars } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import GetFileByCID from "../service/GetFileByCID";
 import Account from "../components/Account";
 import UserContext from "../context/UserContext";
 import { async } from "@firebase/util";
@@ -22,6 +21,7 @@ import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import Products from "../components/Products";
 import Orders from "../components/Orders";
 import Transactions from "../components/Transactions";
+import userlogo from "../images/user.png";
 
 // hex to rgba converter
 
@@ -180,30 +180,83 @@ function Profile() {
         </div>
       </Sidebar>
 
-      <main>
+      <main style={{ width: "100%" }}>
         <div
           style={{
             padding: "16px 24px",
             color: "#44596e",
+            height: "100%",
           }}
         >
           <div style={{ marginBottom: "16px" }}>
-            {broken && (
-              <button
-                className="sb-button"
+            {broken ? (
+              <div
                 style={{
-                  outline: "none",
-                  border: "none",
                   display: "flex",
+                  justifyContent: "space-between",
                   alignItems: "center",
-                  padding: "10px",
-                }}
-                onClick={() => {
-                  toggleSidebar();
                 }}
               >
-                <FaBars color={colors.primaryBlue} size={20} />
-              </button>
+                <button
+                  className="sb-button"
+                  style={{
+                    outline: "none",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "10px",
+                  }}
+                  onClick={() => {
+                    toggleSidebar();
+                  }}
+                >
+                  <FaBars color={colors.primaryBlue} size={20} />
+                </button>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <div>
+                    <img
+                      src={
+                        userData?.profileurl ? userData.profileurl : userlogo
+                      }
+                      width={40}
+                    />
+                  </div>
+                  <div>
+                    <p style={{ textAlign: "center", paddingLeft: "10px" }}>
+                      {username}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <h4>Account</h4>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <img
+                    src={userData?.profileurl ? userData.profileurl : userlogo}
+                    width={40}
+                  />
+                  <p style={{ paddingLeft: "10px" }}>{username}</p>
+                </div>
+              </div>
             )}
 
             {menuselection === 1 && <Account userData={userData} />}
