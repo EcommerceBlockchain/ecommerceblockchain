@@ -12,9 +12,10 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-import { ethers } from "ethers";
-import GetFileByCID from "../service/GetFileByPath";
+import { Contract, ethers } from "ethers";
 import GetFileByPath from "../service/GetFileByPath";
+import smartConracts from "../blockchain/smartContracts";
+import addproductabi from "../blockchain/abis/addProduct.json";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -62,17 +63,21 @@ function Home() {
 
   const addwallet = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-
     const accounts = await provider.send("eth_requestAccounts", []);
-
     const balance = await provider.getBalance(accounts[0]);
     const balanceInEther = ethers.utils.formatEther(balance);
-    console.log(accounts[0], balanceInEther);
-    const block = await provider.getBlockNumber();
-    console.log(block);
-    // provider.on("block", (block) => {
-    //   console.log(block);
-    // });
+    console.log(balanceInEther);
+    const signer = provider.getSigner();
+    const smcon = new ethers.Contract(
+      smartConracts.addProduct,
+      addproductabi,
+      provider
+    );
+    const daiWithSigner = smcon.connect(signer);
+    console.log(await smcon.getpath());
+    daiWithSigner.setPath("ajay").then(async (res) => {
+      console.log(await res.wait());
+    });
   };
 
   useEffect(() => {
