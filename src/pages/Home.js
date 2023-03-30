@@ -12,10 +12,10 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-import { Contract, ethers } from "ethers";
+import { ethers } from "ethers";
 import GetFileByPath from "../service/GetFileByPath";
 import smartConracts from "../blockchain/smartContracts";
-import addproductabi from "../blockchain/abis/addProduct.json";
+import addproductabi from "../blockchain/abis/ethTransfer.json";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -67,17 +67,58 @@ function Home() {
     const balance = await provider.getBalance(accounts[0]);
     const balanceInEther = ethers.utils.formatEther(balance);
     console.log(balanceInEther);
+
     const signer = provider.getSigner();
     const smcon = new ethers.Contract(
-      smartConracts.addProduct,
-      addproductabi,
+      "0xFFcf64a5B6c56FFCDF18B8a43De069da0fd8A352",
+      [
+        {
+          inputs: [
+            {
+              internalType: "address payable[]",
+              name: "_addrs",
+              type: "address[]",
+            },
+          ],
+          name: "sendEth",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+      ],
       provider
     );
+
+    // let add = ethers.utils.getAddress(
+    //   "0x672ABc226d35de46CA395D1bC18D1Ba6017Bad4B"
+    // );
+    // console.log(add);
+    // try {
+    //   const tx = await signer.sendTransaction({
+    //     to: add,
+    //     value: ethers.utils.parseEther("10"),
+    //   });
+    //   console.log("tx", await tx.wait());
+    // } catch (err) {
+    //   console.log(err);
+    // }
     const daiWithSigner = smcon.connect(signer);
-    console.log(await smcon.getpath());
-    daiWithSigner.setPath("ajay").then(async (res) => {
-      console.log(await res.wait());
-    });
+
+    daiWithSigner
+      .sendEth(
+        [
+          "0x2837c8b7F946C3C2Cc25367a78036D0f7795138F",
+          "0xDF34a388B0b200DBa2005D55CDA3b90C51C5c6Ef",
+        ],
+        {
+          value: ethers.utils.parseEther("10"),
+        }
+      )
+      .then(async (res) => {
+        console.log(await res.wait());
+      });
+
+    // console.log(contr);
   };
 
   useEffect(() => {
