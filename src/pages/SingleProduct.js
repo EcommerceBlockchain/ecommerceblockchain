@@ -24,10 +24,12 @@ function SingleProduct() {
   const [product, setProduct] = useState({});
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [images, setImages] = useState([]);
+  const [ownerName, setOwnerName] = useState("");
   const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false);
 
   const [tag, setTags] = useState([]);
+
   const location = useLocation();
   const { id } = location.state;
   const navigate = useNavigate();
@@ -35,6 +37,12 @@ function SingleProduct() {
   const getProduct = async () => {
     setProduct({});
     const pro = await getDoc(doc(getFirestore(), "products", id));
+
+    console.log(pro.data().owner, "yayyaya");
+    const getOwner = await getDoc(
+      doc(getFirestore(), "users", pro.data().owner)
+    );
+    setOwnerName(getOwner.data().username);
     console.log(pro.data());
     setProduct(pro.data());
     setImages(pro.data().preview_image);
@@ -355,7 +363,7 @@ function SingleProduct() {
                     <li className="d-flex">
                       <strong>Owner</strong>
                       <span>
-                        <Link to={"/"}>{product.owner}</Link>
+                        <Link to={"/"}>{ownerName}</Link>
                       </span>
                     </li>
                     <li className="d-flex">

@@ -18,6 +18,9 @@ import { Formik } from "formik";
 import colors from "../colors";
 import UserContext from "../context/UserContext";
 import UploadFile from "../service/UploadFile";
+import { ethers } from "ethers";
+import smartConracts from "../blockchain/smartContracts";
+import addproductabi from "../blockchain/abis/addProduct.json";
 
 function AddProduct() {
   const { user, username } = useContext(UserContext);
@@ -45,82 +48,99 @@ function AddProduct() {
       images.length !== 0
     ) {
       console.log("heelo in onpress");
-      let filepath = await UploadFile(file);
-      console.log("filepath", filepath);
-      let preImgArr = [];
-      const storage = getStorage();
-      images.forEach((item) => {
-        const storageRef = ref(storage, `preview_images/${item.name}`);
-        fetch(item.url)
-          .then((res) => {
-            return res.blob();
-          })
-          .then((blob) => {
-            uploadBytes(storageRef, blob).then((snapshot) => {
-              console.log("Uploaded a blob or file!", snapshot.ref.fullPath);
-              const pathReference = ref(storage, snapshot.ref.fullPath);
-              getDownloadURL(pathReference).then((url) => {
-                console.log(url);
-                preImgArr.push(url);
-              });
-            });
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      });
-      await fetch(originalProductUrl)
-        .then((res) => {
-          return res.blob();
-        })
-        .then((blob) => {
-          const storageRef = ref(
-            storage,
-            `original_files/${originalProductFileName}`
-          );
-          uploadBytes(storageRef, blob).then((snapshot) => {
-            console.log("Uploaded a blob or file!", snapshot.ref.fullPath);
-            const pathReference = ref(storage, snapshot.ref.fullPath);
-            getDownloadURL(pathReference).then(async (url) => {
-              await addDoc(collection(getFirestore(), "products"), {
-                category: category,
-                cost: parseFloat(values.price),
-                description: values.productDescription,
-                file: url,
-                is_active: true,
-                name: values.productName,
-                preview_image: preImgArr,
-                reviews: [],
-                tag: tags,
-                timestamp: Timestamp.fromDate(new Date()),
-                owner: username,
-                rating: 0,
-                quantity_sold: 0,
-                ipfsPath: filepath,
-              }).then(async (document) => {
-                console.log("done", document.id);
-                getDoc(doc(getFirestore(), "users", username)).then(
-                  (userdoc) => {
-                    setDoc(
-                      doc(getFirestore(), "users", username),
-                      {
-                        ...userdoc.data(),
-                        products: [...userdoc.data().products, document.id],
-                      },
-                      { merge: true }
-                    ).then(() => {
-                      console.log("done updation");
-                    });
-                  }
+      UploadFile(file).then((path) => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const smcon = new ethers.Contract(
+          smartConracts.addProduct,
+          addproductabi,
+          provider
+        );
+        const signContact = smcon.connect(signer);
+
+        addDoc(collection(getFirestore(), "products"), {}).then((response) => {
+          signContact.setPath(response.id, path).then(async (res) => {
+            console.log(res);
+            let preImgArr = [];
+            const storage = getStorage();
+
+            let counter = 0;
+
+            const storeimage = (counter, preImages) => {
+              if (counter == images.length) {
+                console.log(preImages);
+                setDoc(
+                  doc(getFirestore(), "products", response.id),
+                  {
+                    category: category,
+                    cost: parseFloat(values.price),
+                    description: values.productDescription,
+                    is_active: true,
+                    name: values.productName,
+                    preview_image: preImages,
+                    reviews: [],
+                    tag: tags,
+                    timestamp: Timestamp.fromDate(new Date()),
+                    owner: username,
+                    rating: 0,
+                    quantity_sold: 0,
+                  },
+                  { merge: true }
+                ).then((document) => {
+                  getDoc(doc(getFirestore(), "users", username)).then(
+                    (userdoc) => {
+                      setDoc(
+                        doc(getFirestore(), "users", username),
+                        {
+                          ...userdoc.data(),
+                          products: [...userdoc.data().products, response.id],
+                        },
+                        { merge: true }
+                      ).then(() => {
+                        console.log("done updation");
+                      });
+                    }
+                  );
+                  navigate("/", { replace: true });
+                });
+              } else {
+                const storageRef = ref(
+                  storage,
+                  `preview_images/${images[counter].name}`
                 );
-                navigate("/", { replace: true });
-              });
-            });
+                fetch(images[counter].url)
+                  .then((res) => {
+                    return res.blob();
+                  })
+                  .then((blob) => {
+                    uploadBytes(storageRef, blob).then((snapshot) => {
+                      console.log(
+                        "Uploaded a blob or file!",
+                        snapshot.ref.fullPath
+                      );
+                      const pathReference = ref(storage, snapshot.ref.fullPath);
+                      getDownloadURL(pathReference)
+                        .then((url) => {
+                          console.log(url);
+                          preImages.push(url);
+                          console.log("images array", preImages);
+                        })
+                        .then(() => {
+                          counter += 1;
+                          storeimage(counter, preImages);
+                        });
+                    });
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
+              }
+            };
+
+            storeimage(counter, preImgArr);
           });
-        })
-        .catch((error) => {
-          console.error(error);
         });
+      });
     }
   };
 

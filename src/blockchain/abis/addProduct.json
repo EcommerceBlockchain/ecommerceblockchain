@@ -1,19 +1,30 @@
 [
   {
-    "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
         "internalType": "string",
-        "name": "newpath",
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "path",
         "type": "string"
       }
     ],
-    "name": "Returnpath",
-    "type": "event"
+    "name": "setPath",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      }
+    ],
     "name": "getPath",
     "outputs": [
       {
@@ -23,19 +34,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "newValue",
-        "type": "string"
-      }
-    ],
-    "name": "setPath",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

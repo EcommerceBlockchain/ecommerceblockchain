@@ -29,8 +29,10 @@ function Profile() {
   const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
   const navigate = useNavigate();
   const [menuselection, setMenuSelection] = useState(1);
-  const { username } = useContext(UserContext);
+  const { username, userdata } = useContext(UserContext);
   const [userData, setUserData] = useState({});
+
+  console.log("bddddddddddddddjdbdbdjdd", userdata);
 
   const getUserData = async () => {
     const data = await getDoc(

@@ -3,18 +3,20 @@ import UserContext from "./UserContext";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "../config/firebaseConfig";
-import getUsernameByEmail from "../service/getUsernameByEmail";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 function UserState(props) {
   const [user, setUser] = useState(null);
   const [username, setUserName] = useState("  ");
+  const [userdata, setUserData] = useState({});
   const auth = getAuth(initializeApp(firebaseConfig));
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       setUser(user);
-      const data = await getUsernameByEmail(user.email);
-      setUserName(data);
+      const data = await getDoc(doc(getFirestore(), "users", user.uid));
+      setUserName(data.data().username);
+      setUserData(data.data());
     } else {
       setUser(null);
       setUserName("  ");
@@ -22,7 +24,7 @@ function UserState(props) {
   });
 
   return (
-    <UserContext.Provider value={{ user, username }}>
+    <UserContext.Provider value={{ user, username, userdata }}>
       {props.children}
     </UserContext.Provider>
   );
