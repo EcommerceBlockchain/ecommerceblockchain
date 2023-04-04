@@ -44,10 +44,7 @@ function Login() {
           .then(async (user) => {
             console.log("signin done", user.user.uid);
             setError("success");
-            let cartdoc = await getDoc(
-              doc(getFirestore(), "cart", values.username)
-            );
-            console.log(cartdoc.data());
+
             navigate("/", { replace: true });
           })
           .catch((err) => {

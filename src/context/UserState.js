@@ -13,13 +13,12 @@ function UserState(props) {
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      setUser(user);
       const data = await getDoc(doc(getFirestore(), "users", user.uid));
       setUserName(data.data().username);
       setUserData(data.data());
     } else {
-      setUser(null);
       setUserName("  ");
+      setUserData(null);
     }
   });
 

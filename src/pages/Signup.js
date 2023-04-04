@@ -5,6 +5,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { email, name, password, username } from "../config/validationSchema";
 import colors from "../colors";
+import { ethers } from "ethers";
 
 import {
   getFirestore,
@@ -14,6 +15,7 @@ import {
   getDocs,
   query,
   where,
+  addDoc,
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
@@ -60,22 +62,25 @@ function SignUp() {
       console.log("error happen");
     } else {
       setError("success");
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const accounts = await provider.send("eth_requestAccounts", []);
+      let bal = await provider.getBalance(accounts[0]);
+
       await createUserWithEmailAndPassword(auth, values.email, values.password);
 
-      await setDoc(doc(collection(firestore, "users"), values.username), {
+      await addDoc(collection(firestore, "users"), {
         username: values.username,
         email: values.email,
         name: values.name,
         avg_rating: 0,
-        balance: 0,
         bought: [],
         is_active: true,
         products: [],
         reward: 0,
         transaction: [],
-      });
-      await setDoc(doc(collection(firestore, "cart"), values.username), {
-        products: [],
+        cart: [],
+        walletAddress: [accounts[0]],
       });
 
       navigate("/", { replace: true });
@@ -168,27 +173,7 @@ function SignUp() {
           </button>
         </div>
       )}
-      {error === "success" && (
-        <div
-          className="alert alert-success alert-dismissible fade show fixed-top"
-          role="alert"
-          style={{ marginTop: "5rem" }}
-        >
-          <strong>Succeess!</strong> Account created successfully!
-          <button
-            type="button"
-            className="close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-            onClick={() => {
-              setError("");
-            }}
-          >
-            {" "}
-            &#10060;
-          </button>
-        </div>
-      )}
+
       <Formik
         initialValues={{
           email: "",

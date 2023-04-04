@@ -23,7 +23,7 @@ import smartConracts from "../blockchain/smartContracts";
 import addproductabi from "../blockchain/abis/addProduct.json";
 
 function AddProduct() {
-  const { user, username } = useContext(UserContext);
+  const { userdata } = useContext(UserContext);
   const [images, setimages] = useState([]);
   const [tags, setTags] = useState([]);
   const [originalProductUrl, setOriginalProductUrl] = useState("");
@@ -81,16 +81,16 @@ function AddProduct() {
                     reviews: [],
                     tag: tags,
                     timestamp: Timestamp.fromDate(new Date()),
-                    owner: username,
+                    owner: userdata.username,
                     rating: 0,
                     quantity_sold: 0,
                   },
                   { merge: true }
                 ).then((document) => {
-                  getDoc(doc(getFirestore(), "users", username)).then(
+                  getDoc(doc(getFirestore(), "users", userdata.username)).then(
                     (userdoc) => {
                       setDoc(
-                        doc(getFirestore(), "users", username),
+                        doc(getFirestore(), "users", userdata.username),
                         {
                           ...userdoc.data(),
                           products: [...userdoc.data().products, response.id],

@@ -29,18 +29,9 @@ function Profile() {
   const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
   const navigate = useNavigate();
   const [menuselection, setMenuSelection] = useState(1);
-  const { username, userdata } = useContext(UserContext);
-  const [userData, setUserData] = useState({});
+  const { userdata } = useContext(UserContext);
 
   console.log("bddddddddddddddjdbdbdjdd", userdata);
-
-  const getUserData = async () => {
-    const data = await getDoc(
-      doc(collection(getFirestore(), "users"), username)
-    );
-    console.log(data.data());
-    setUserData(data.data());
-  };
 
   const menuItemStyles = {
     root: {
@@ -63,9 +54,7 @@ function Profile() {
     }),
   };
 
-  useEffect(() => {
-    getUserData();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <div
@@ -224,14 +213,14 @@ function Profile() {
                   <div>
                     <img
                       src={
-                        userData?.profileurl ? userData.profileurl : userlogo
+                        userdata?.profileurl ? userdata.profileurl : userlogo
                       }
                       width={40}
                     />
                   </div>
                   <div>
                     <p style={{ textAlign: "center", paddingLeft: "10px" }}>
-                      {username}
+                      {userdata.username}
                     </p>
                   </div>
                 </div>
@@ -253,18 +242,18 @@ function Profile() {
                   }}
                 >
                   <img
-                    src={userData?.profileurl ? userData.profileurl : userlogo}
+                    src={userdata?.profileurl ? userdata.profileurl : userlogo}
                     width={40}
                   />
-                  <p style={{ paddingLeft: "10px" }}>{username}</p>
+                  <p style={{ paddingLeft: "10px" }}>{userdata.username}</p>
                 </div>
               </div>
             )}
 
-            {menuselection === 1 && <Account userData={userData} />}
-            {menuselection === 2 && <Products userData={userData} />}
-            {menuselection === 3 && <Orders userData={userData} />}
-            {menuselection === 4 && <Transactions userData={userData} />}
+            {menuselection === 1 && <Account userData={userdata} />}
+            {menuselection === 2 && <Products userData={userdata} />}
+            {menuselection === 3 && <Orders userData={userdata} />}
+            {menuselection === 4 && <Transactions userData={userdata} />}
           </div>
         </div>
       </main>

@@ -6,8 +6,7 @@ import { getAuth } from "firebase/auth";
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../context/UserContext";
 function Header() {
-  const { user } = useContext(UserContext);
-  const [cartProducts, setCartProducts] = useState([]);
+  const { userdata } = useContext(UserContext);
   const { pathname } = useLocation();
   if (pathname === "/profile") return null;
 
@@ -56,7 +55,7 @@ function Header() {
                 </Link>
               </li>
 
-              {user && (
+              {userdata && (
                 <li className="nav-item dropdown dropdown-slide">
                   <Link className="nav-link" to={{ pathname: "/cart" }}>
                     Cart
@@ -64,7 +63,7 @@ function Header() {
                 </li>
               )}
 
-              {!user ? (
+              {!userdata ? (
                 <li className="nav-item dropdown dropdown-slide">
                   <Link className="nav-link" to={{ pathname: "/login" }}>
                     Login
@@ -102,7 +101,7 @@ function Header() {
               </Link>
             </li>
 
-            {user && (
+            {userdata && (
               <li className="list-inline-item">
                 <Link to={"/profile"}>
                   <i className="tf-ion-ios-person mr-3"></i>

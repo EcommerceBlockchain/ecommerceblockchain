@@ -17,16 +17,19 @@ import UserContext from "../context/UserContext";
 import GoToTop from "../components/GoToTop";
 import Product from "../components/Product";
 import activity from "../images/activity.gif";
+import { getAuth } from "firebase/auth";
 
 function SingleProduct() {
-  const { username, user } = useContext(UserContext);
+  const userid = getAuth()?.currentUser?.uid;
+  const { userdata } = useContext(UserContext);
 
   const [product, setProduct] = useState({});
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [images, setImages] = useState([]);
   const [ownerName, setOwnerName] = useState("");
-  const [count, setCount] = useState(0);
   const [loader, setLoader] = useState(false);
+  const [added, setAdded] = useState(false);
+  const [cartArray, setCartArray] = useState([]);
 
   const [tag, setTags] = useState([]);
 
@@ -59,69 +62,50 @@ function SingleProduct() {
     });
     setRelatedProducts(relProd);
   };
-
   const getCart = async () => {
-    const pro = await getDoc(
-      doc(getFirestore(), "users", username, "cart", id)
-    );
-    if (pro.exists) {
-      setCount(pro.data()?.quantity ? pro.data().quantity : 0);
+    const pro = await getDoc(doc(getFirestore(), "users", userid));
+    setCartArray(pro.data().cart);
+    console.log("pro", pro.data().cart);
+    if (pro.data().cart.includes(id)) {
+      setAdded(true);
     } else {
-      setCount(0);
+      setAdded(false);
     }
     setLoader(false);
   };
+  const updateCart = (val, array) => {
+    console.log(array);
 
-  const updateCart = async (val) => {
     setLoader(true);
-    let cartproduct = await getDoc(
-      doc(getFirestore(), "users", username, "cart", id)
-    );
-    if (cartproduct.data() !== undefined) {
-      if (val === "add") {
-        setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
-          ...cartproduct.data(),
-          quantity: cartproduct.data().quantity + 1,
-        }).then(() => {
-          console.log("add done");
-          getCart();
-        });
-      } else {
-        if (cartproduct.data().quantity === 1) {
-          deleteDoc(doc(getFirestore(), "users", username, "cart", id)).then(
-            () => {
-              console.log("delete done");
-              getCart();
-            }
-          );
-        } else {
-          setDoc(
-            doc(collection(getFirestore(), "users", username, "cart"), id),
-            {
-              ...cartproduct.data(),
-              quantity: cartproduct.data().quantity - 1,
-            }
-          ).then(() => {
-            console.log("remove done");
-            getCart();
-          });
-        }
-      }
+
+    if (val === "add") {
+      setDoc(
+        doc(getFirestore(), "users", userid),
+        {
+          cart: [...array],
+        },
+        { merge: true }
+      ).then(() => {
+        console.log("add done");
+        getCart();
+      });
     } else {
-      setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
-        productName: product.name,
-        quantity: 1,
-        price: product.cost,
-        preImg: images[0],
-      }).then(() => {
-        console.log("new product added");
+      setDoc(
+        doc(getFirestore(), "users", userid),
+        {
+          cart: [...array],
+        },
+        { merge: true }
+      ).then(() => {
+        console.log("remove done");
         getCart();
       });
     }
   };
 
   useEffect(() => {
-    setCount(0);
+    setAdded(false);
+    setCartArray([]);
     getProduct();
     getRelatedProducts();
     getCart();
@@ -228,31 +212,33 @@ function SingleProduct() {
                 </p>
 
                 {loader ? (
-                  <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
                     <img width={40} src={activity} alt="activity" />
                   </div>
                 ) : (
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    {count !== 0 && (
-                      <button
-                        type="button"
-                        style={{ marginRight: "0.5rem" }}
-                        className="cart-btn"
-                        onClick={() => {
-                          updateCart("remove");
-                        }}
-                      >
-                        -
-                      </button>
-                    )}
-                    {!count ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {!added ? (
                       <button
                         style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
                         type="button"
                         className="cart-btn"
                         onClick={() => {
-                          if (user) {
-                            updateCart("add");
+                          if (userdata) {
+                            let uparr = cartArray.concat(id);
+                            console.log(uparr, "upparr");
+                            updateCart("add", uparr);
                           } else {
                             navigate("/login");
                           }
@@ -261,27 +247,26 @@ function SingleProduct() {
                         Add to Cart
                       </button>
                     ) : (
-                      <div
-                        style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
-                      >
-                        {count}
-                      </div>
-                    )}
-                    {count !== 0 && (
                       <button
+                        style={{
+                          marginRight: "0.5rem",
+                          marginLeft: "0.5rem",
+                          backgroundColor: "crimson",
+                        }}
                         type="button"
                         className="cart-btn"
-                        style={{ marginLeft: "0.5rem" }}
                         onClick={() => {
-                          updateCart("add");
+                          let uparr = cartArray.filter((val) => {
+                            return val !== id;
+                          });
+                          updateCart("remove", uparr);
                         }}
                       >
-                        +
+                        Remove
                       </button>
                     )}
                   </div>
                 )}
-
                 <div className="products-meta mt-4">
                   <div className="product-category d-flex align-items-center">
                     <span className="font-weight-bold text-capitalize">

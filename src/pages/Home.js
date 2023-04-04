@@ -66,40 +66,34 @@ function Home() {
   };
 
   const addwallet = async () => {
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // // const accounts = await provider.send("eth_requestAccounts", []);
+    // // const signer = provider.getSigner();
+    // const smcon = new ethers.Contract(
+    //   smartConracts.addProduct,
+    //   addproductabi,
+    //   provider
+    // );
+
+    // smcon.getPath("k1oRXcky3h5u6wFSjptR").then((res) => {
+    //   console.log(res);
+    // });
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const accounts = await provider.send("eth_requestAccounts", []);
-    // const signer = provider.getSigner();
-    const smcon = new ethers.Contract(
-      smartConracts.addProduct,
-      addproductabi,
-      provider
-    );
-
-    smcon.getPath("k1oRXcky3h5u6wFSjptR").then((res) => {
-      console.log(res);
-    });
-  };
-
-  const changedoc = async () => {
-    const user = getAuth().currentUser.uid;
-    getDocs(query(collection(getFirestore(), "products"))).then((res) => {
-      res.docs.forEach((item) => {
-        console.log(item.data());
-        setDoc(
-          doc(getFirestore(), "products", item.id),
-          {
-            ...item.data(),
-            owner: user,
-          },
-          { merge: true }
-        );
-      });
+    const accounts = await provider.send("eth_requestAccounts", []);
+    let bal = await provider.getBalance(accounts[0]);
+    setDoc(
+      doc(getFirestore(), "users", getAuth().currentUser.uid),
+      {
+        walletAddress: accounts[0],
+      },
+      { merge: true }
+    ).then(() => {
+      console.log("done update");
     });
   };
 
   useEffect(() => {
     getProducts();
-    changedoc();
   }, []);
 
   return (

@@ -12,76 +12,63 @@ import {
   setDoc,
 } from "firebase/firestore";
 import activity from "../images/activity.gif";
+import { getAuth } from "firebase/auth";
 
 function Product({ name, id, price, preImg }) {
   const navigate = useNavigate();
   // products:[{productid:id,quan:quan,price:price,preimg:preimg,name:name}],
-  const { username, user } = useContext(UserContext);
-  const [count, setCount] = useState(0);
+  const { userdata } = useContext(UserContext);
+  const [added, setAdded] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [cartArray, setCartArray] = useState([]);
+
+  const userid = getAuth()?.currentUser?.uid;
 
   const getCart = async () => {
-    const pro = await getDoc(
-      doc(getFirestore(), "users", username, "cart", id)
-    );
-    if (pro.exists) {
-      setCount(pro.data()?.quantity ? pro.data().quantity : 0);
+    const pro = await getDoc(doc(getFirestore(), "users", userid));
+    setCartArray(pro.data().cart);
+    console.log("pro", pro.data().cart);
+    if (pro.data().cart.includes(id)) {
+      setAdded(true);
     } else {
-      setCount(0);
+      setAdded(false);
     }
     setLoader(false);
   };
 
-  const updateCart = async (val) => {
+  const updateCart = (val, array) => {
+    console.log(array);
+
     setLoader(true);
-    let product = await getDoc(
-      doc(getFirestore(), "users", username, "cart", id)
-    );
-    if (product.data() !== undefined) {
-      if (val === "add") {
-        setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
-          ...product.data(),
-          quantity: product.data().quantity + 1,
-        }).then(() => {
-          console.log("add done");
-          getCart();
-        });
-      } else {
-        if (product.data().quantity === 1) {
-          deleteDoc(doc(getFirestore(), "users", username, "cart", id)).then(
-            () => {
-              console.log("delete done");
-              getCart();
-            }
-          );
-        } else {
-          setDoc(
-            doc(collection(getFirestore(), "users", username, "cart"), id),
-            {
-              ...product.data(),
-              quantity: product.data().quantity - 1,
-            }
-          ).then(() => {
-            console.log("remove done");
-            getCart();
-          });
-        }
-      }
+
+    if (val === "add") {
+      setDoc(
+        doc(getFirestore(), "users", userid),
+        {
+          cart: [...array],
+        },
+        { merge: true }
+      ).then(() => {
+        console.log("add done");
+        getCart();
+      });
     } else {
-      setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
-        productName: name,
-        quantity: 1,
-        price: price,
-        preImg: preImg,
-      }).then(() => {
-        console.log("new product added");
+      setDoc(
+        doc(getFirestore(), "users", userid),
+        {
+          cart: [...array],
+        },
+        { merge: true }
+      ).then(() => {
+        console.log("remove done");
         getCart();
       });
     }
   };
 
   useEffect(() => {
-    setCount(0);
+    setAdded(false);
+    setCartArray([]);
     getCart();
   }, []);
 
@@ -130,26 +117,16 @@ function Product({ name, id, price, preImg }) {
             alignItems: "center",
           }}
         >
-          {count !== 0 && (
-            <button
-              type="button"
-              style={{ marginRight: "0.5rem" }}
-              className="cart-btn"
-              onClick={() => {
-                updateCart("remove");
-              }}
-            >
-              -
-            </button>
-          )}
-          {!count ? (
+          {!added ? (
             <button
               style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
               type="button"
               className="cart-btn"
               onClick={() => {
-                if (user) {
-                  updateCart("add");
+                if (userdata) {
+                  let uparr = cartArray.concat(id);
+                  console.log(uparr, "upparr");
+                  updateCart("add", uparr);
                 } else {
                   navigate("/login");
                 }
@@ -158,20 +135,22 @@ function Product({ name, id, price, preImg }) {
               Add to Cart
             </button>
           ) : (
-            <div style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}>
-              {count}
-            </div>
-          )}
-          {count !== 0 && (
             <button
+              style={{
+                marginRight: "0.5rem",
+                marginLeft: "0.5rem",
+                backgroundColor: "crimson",
+              }}
               type="button"
               className="cart-btn"
-              style={{ marginLeft: "0.5rem" }}
               onClick={() => {
-                updateCart("add");
+                let uparr = cartArray.filter((val) => {
+                  return val !== id;
+                });
+                updateCart("remove", uparr);
               }}
             >
-              +
+              Remove
             </button>
           )}
         </div>

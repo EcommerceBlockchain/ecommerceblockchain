@@ -19,7 +19,7 @@ import activity from "../images/activity.gif";
 
 function Cart() {
   const navigate = useNavigate();
-  const { username, user } = useContext(UserContext);
+  const { userdata } = useContext(UserContext);
   const [subTotal, setSubTotal] = useState(0);
   const [loader, setLoader] = useState(-1);
   const [loading, setLoading] = useState(-1);
@@ -28,7 +28,7 @@ function Cart() {
     let cart = [];
     let sum = 0;
     const product = await getDocs(
-      query(collection(getFirestore(), "users", username, "cart"))
+      query(collection(getFirestore(), "users", userdata.username, "cart"))
     );
     product.forEach((item) => {
       cart.push({ ...item.data(), id: item.id });
@@ -41,22 +41,28 @@ function Cart() {
 
   const updateCart = async (val, id) => {
     let product = await getDoc(
-      doc(getFirestore(), "users", username, "cart", id)
+      doc(getFirestore(), "users", userdata.username, "cart", id)
     );
     if (val === "add") {
-      setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
-        ...product.data(),
-        quantity: product.data().quantity + 1,
-      }).then(() => {
+      setDoc(
+        doc(collection(getFirestore(), "users", userdata.username, "cart"), id),
+        {
+          ...product.data(),
+          quantity: product.data().quantity + 1,
+        }
+      ).then(() => {
         setLoading(-1);
         console.log("add done");
         getCart();
       });
     } else {
-      setDoc(doc(collection(getFirestore(), "users", username, "cart"), id), {
-        ...product.data(),
-        quantity: product.data().quantity - 1,
-      }).then(() => {
+      setDoc(
+        doc(collection(getFirestore(), "users", userdata.username, "cart"), id),
+        {
+          ...product.data(),
+          quantity: product.data().quantity - 1,
+        }
+      ).then(() => {
         setLoading(-1);
         console.log("add done");
         getCart();
@@ -249,7 +255,7 @@ function Cart() {
                                     doc(
                                       getFirestore(),
                                       "users",
-                                      username,
+                                      userdata.username,
                                       "cart",
                                       item.id
                                     )
