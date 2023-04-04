@@ -62,29 +62,39 @@ function SignUp() {
       console.log("error happen");
     } else {
       setError("success");
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        let bal = await provider.getBalance(accounts[0]);
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      let bal = await provider.getBalance(accounts[0]);
+        createUserWithEmailAndPassword(
+          auth,
+          values.email,
+          values.password
+        ).then((res) => {
+          setDoc(doc(firestore, "users", res.user.uid), {
+            username: values.username,
+            email: values.email,
+            name: values.name,
+            avg_rating: 0,
+            bought: [],
+            is_active: true,
+            products: [],
+            reward: 0,
+            transaction: [],
+            cart: [],
+            walletAddress: [accounts[0]],
+          }).then(() => {
+            console.log("signup done");
+          });
 
-      await createUserWithEmailAndPassword(auth, values.email, values.password);
-
-      await addDoc(collection(firestore, "users"), {
-        username: values.username,
-        email: values.email,
-        name: values.name,
-        avg_rating: 0,
-        bought: [],
-        is_active: true,
-        products: [],
-        reward: 0,
-        transaction: [],
-        cart: [],
-        walletAddress: [accounts[0]],
-      });
-
-      navigate("/", { replace: true });
-      console.log("success login");
+          navigate("/", { replace: true });
+          console.log("success login");
+        });
+      } catch (err) {
+        console.log("error", err);
+        setError("error");
+      }
     }
   };
 
@@ -97,6 +107,26 @@ function SignUp() {
           style={{ marginTop: "5rem" }}
         >
           <strong>Error!</strong> This email is already taken!
+          <button
+            type="button"
+            className="close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+            onClick={() => {
+              setError("");
+            }}
+          >
+            &#10060;
+          </button>
+        </div>
+      )}
+      {error === "error" && (
+        <div
+          className="alert alert-danger alert-dismissible fade show fixed-top"
+          role="alert"
+          style={{ marginTop: "5rem" }}
+        >
+          <strong>Error!</strong> Some error occured please try again!
           <button
             type="button"
             className="close"
@@ -171,6 +201,15 @@ function SignUp() {
             {" "}
             &#10060;
           </button>
+        </div>
+      )}
+      {error === "success" && (
+        <div
+          className="alert alert-success alert-dismissible fade show fixed-top"
+          role="alert"
+          style={{ marginTop: "5rem" }}
+        >
+          <strong>Success! </strong>Signup successfull!
         </div>
       )}
 

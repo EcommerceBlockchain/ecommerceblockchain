@@ -42,7 +42,7 @@ function Login() {
           values.password
         )
           .then(async (user) => {
-            console.log("signin done", user.user.uid);
+            console.log("signin done", user.uid);
             setError("success");
 
             navigate("/", { replace: true });
