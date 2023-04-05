@@ -15,7 +15,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 
 import GoToTop from "../components/GoToTop";
-import Product from "../components/Product";
 import activity from "../images/activity.gif";
 import { getAuth } from "firebase/auth";
 
@@ -29,7 +28,6 @@ function SingleProduct() {
   const [ownerName, setOwnerName] = useState("");
   const [loader, setLoader] = useState(false);
   const [added, setAdded] = useState(false);
-  const [cartArray, setCartArray] = useState([]);
 
   const [tag, setTags] = useState([]);
 
@@ -63,41 +61,38 @@ function SingleProduct() {
     setRelatedProducts(relProd);
   };
   const getCart = async () => {
-    const pro = await getDoc(doc(getFirestore(), "users", userid));
-    setCartArray(pro.data().cart);
-    console.log("pro", pro.data().cart);
-    if (pro.data().cart.includes(id)) {
-      setAdded(true);
-    } else {
-      setAdded(false);
-    }
+    setAdded(false);
+    getDocs(query(collection(getFirestore(), "users", userid, "cart"))).then(
+      (res) => {
+        for (let index = 0; index < res.docs.length; index++) {
+          const element = res.docs[index];
+          if (element.data().id === id) {
+            setAdded(true);
+            break;
+          } else {
+            setAdded(false);
+          }
+        }
+      }
+    );
     setLoader(false);
   };
-  const updateCart = (val, array) => {
-    console.log(array);
-
+  const updateCart = (val) => {
     setLoader(true);
 
     if (val === "add") {
-      setDoc(
-        doc(getFirestore(), "users", userid),
-        {
-          cart: [...array],
-        },
-        { merge: true }
-      ).then(() => {
-        console.log("add done");
+      setDoc(doc(getFirestore(), "users", userid, "cart", id), {
+        name: product.name,
+        cost: product.cost,
+        preImg: product.preview_image[0],
+        id: id,
+      }).then(() => {
+        console.log("product added");
         getCart();
       });
     } else {
-      setDoc(
-        doc(getFirestore(), "users", userid),
-        {
-          cart: [...array],
-        },
-        { merge: true }
-      ).then(() => {
-        console.log("remove done");
+      deleteDoc(doc(getFirestore(), "users", userid, "cart", id)).then(() => {
+        console.log("delete done");
         getCart();
       });
     }
@@ -105,7 +100,6 @@ function SingleProduct() {
 
   useEffect(() => {
     setAdded(false);
-    setCartArray([]);
     getProduct();
     getRelatedProducts();
     getCart();
@@ -215,8 +209,6 @@ function SingleProduct() {
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
                     }}
                   >
                     <img width={40} src={activity} alt="activity" />
@@ -225,8 +217,6 @@ function SingleProduct() {
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
                     }}
                   >
                     {!added ? (
@@ -236,9 +226,7 @@ function SingleProduct() {
                         className="cart-btn"
                         onClick={() => {
                           if (userdata) {
-                            let uparr = cartArray.concat(id);
-                            console.log(uparr, "upparr");
-                            updateCart("add", uparr);
+                            updateCart("add");
                           } else {
                             navigate("/login");
                           }
@@ -256,10 +244,7 @@ function SingleProduct() {
                         type="button"
                         className="cart-btn"
                         onClick={() => {
-                          let uparr = cartArray.filter((val) => {
-                            return val !== id;
-                          });
-                          updateCart("remove", uparr);
+                          updateCart("remove");
                         }}
                       >
                         Remove

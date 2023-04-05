@@ -33,11 +33,7 @@ function Home() {
     let array = [];
     let newarrival = [];
     let bestseller = [];
-    let qu = query(
-      collection(getFirestore(), "products"),
-      orderBy("timestamp", "desc")
-      // limit(8)
-    );
+    let qu = query(collection(getFirestore(), "products"), limit(8));
     const products = await getDocs(qu);
     products.docs.forEach((product) => {
       array.push({ ...product.data(), id: product.id });

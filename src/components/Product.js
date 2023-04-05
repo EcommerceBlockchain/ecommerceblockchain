@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 import {
+  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -16,51 +17,47 @@ import { getAuth } from "firebase/auth";
 
 function Product({ name, id, price, preImg }) {
   const navigate = useNavigate();
-  // products:[{productid:id,quan:quan,price:price,preimg:preimg,name:name}],
+  // products:[{id:id,preimg:preimg,name:name}],
   const { userdata } = useContext(UserContext);
   const [added, setAdded] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [cartArray, setCartArray] = useState([]);
 
   const userid = getAuth()?.currentUser?.uid;
 
   const getCart = async () => {
-    const pro = await getDoc(doc(getFirestore(), "users", userid));
-    setCartArray(pro.data().cart);
-    console.log("pro", pro.data().cart);
-    if (pro.data().cart.includes(id)) {
-      setAdded(true);
-    } else {
-      setAdded(false);
-    }
+    setAdded(false);
+    getDocs(query(collection(getFirestore(), "users", userid, "cart"))).then(
+      (res) => {
+        for (let index = 0; index < res.docs.length; index++) {
+          const element = res.docs[index];
+          if (element.data().id === id) {
+            setAdded(true);
+            break;
+          } else {
+            setAdded(false);
+          }
+        }
+      }
+    );
     setLoader(false);
   };
 
-  const updateCart = (val, array) => {
-    console.log(array);
-
+  const updateCart = (val) => {
     setLoader(true);
 
     if (val === "add") {
-      setDoc(
-        doc(getFirestore(), "users", userid),
-        {
-          cart: [...array],
-        },
-        { merge: true }
-      ).then(() => {
-        console.log("add done");
+      setDoc(doc(getFirestore(), "users", userid, "cart", id), {
+        name: name,
+        cost: price,
+        preImg: preImg,
+        id: id,
+      }).then(() => {
+        console.log("product added");
         getCart();
       });
     } else {
-      setDoc(
-        doc(getFirestore(), "users", userid),
-        {
-          cart: [...array],
-        },
-        { merge: true }
-      ).then(() => {
-        console.log("remove done");
+      deleteDoc(doc(getFirestore(), "users", userid, "cart", id)).then(() => {
+        console.log("delete done");
         getCart();
       });
     }
@@ -68,7 +65,6 @@ function Product({ name, id, price, preImg }) {
 
   useEffect(() => {
     setAdded(false);
-    setCartArray([]);
     getCart();
   }, []);
 
@@ -124,9 +120,7 @@ function Product({ name, id, price, preImg }) {
               className="cart-btn"
               onClick={() => {
                 if (userdata) {
-                  let uparr = cartArray.concat(id);
-                  console.log(uparr, "upparr");
-                  updateCart("add", uparr);
+                  updateCart("add");
                 } else {
                   navigate("/login");
                 }
@@ -144,10 +138,7 @@ function Product({ name, id, price, preImg }) {
               type="button"
               className="cart-btn"
               onClick={() => {
-                let uparr = cartArray.filter((val) => {
-                  return val !== id;
-                });
-                updateCart("remove", uparr);
+                updateCart("remove");
               }}
             >
               Remove

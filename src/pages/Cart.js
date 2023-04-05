@@ -16,58 +16,31 @@ import {
   setDoc,
 } from "firebase/firestore";
 import activity from "../images/activity.gif";
+import { getAuth } from "firebase/auth";
 
 function Cart() {
   const navigate = useNavigate();
   const { userdata } = useContext(UserContext);
   const [subTotal, setSubTotal] = useState(0);
   const [loader, setLoader] = useState(-1);
-  const [loading, setLoading] = useState(-1);
   const [products, setProducts] = useState([]);
-  const getCart = async () => {
-    let cart = [];
-    let sum = 0;
-    const product = await getDocs(
-      query(collection(getFirestore(), "users", userdata.username, "cart"))
-    );
-    product.forEach((item) => {
-      cart.push({ ...item.data(), id: item.id });
-      sum = sum + item.data().quantity * item.data().price;
-    });
-    console.log(cart);
-    setProducts(cart);
-    setSubTotal(sum);
-  };
 
-  const updateCart = async (val, id) => {
-    let product = await getDoc(
-      doc(getFirestore(), "users", userdata.username, "cart", id)
+  const uid = getAuth().currentUser.uid;
+
+  const getCart = async () => {
+    setSubTotal(0);
+    let cart = [];
+
+    getDocs(query(collection(getFirestore(), "users", uid, "cart"))).then(
+      (res) => {
+        res.docs.forEach((item) => {
+          console.log(item.data());
+          cart.push(item.data());
+          setSubTotal((prev) => prev + item.data().cost);
+        });
+      }
     );
-    if (val === "add") {
-      setDoc(
-        doc(collection(getFirestore(), "users", userdata.username, "cart"), id),
-        {
-          ...product.data(),
-          quantity: product.data().quantity + 1,
-        }
-      ).then(() => {
-        setLoading(-1);
-        console.log("add done");
-        getCart();
-      });
-    } else {
-      setDoc(
-        doc(collection(getFirestore(), "users", userdata.username, "cart"), id),
-        {
-          ...product.data(),
-          quantity: product.data().quantity - 1,
-        }
-      ).then(() => {
-        setLoading(-1);
-        console.log("add done");
-        getCart();
-      });
-    }
+    setProducts(cart);
   };
 
   useEffect(() => {
@@ -140,8 +113,6 @@ function Cart() {
                           <th className="product-thumbnail"> </th>
                           <th className="product-name">Product</th>
                           <th className="product-price">Price</th>
-                          <th className="product-quantity">Quantity</th>
-                          <th className="product-subtotal">Total</th>
                           <th className="product-remove"> </th>
                         </tr>
                       </thead>
@@ -171,78 +142,15 @@ function Cart() {
                                   to={"/single-product"}
                                   state={{ id: item.id }}
                                 >
-                                  {item.productName}
+                                  {item.name}
                                 </Link>
                               </td>
 
-                              <td className="product-price" data-title="Price">
-                                {item.price} Eth
-                              </td>
-                              <td
-                                className="product-quantity"
-                                data-title="Quantity"
-                              >
-                                <div className="quantity">
-                                  {loading === index ? (
-                                    <img
-                                      width={20}
-                                      src={activity}
-                                      alt="activity"
-                                    />
-                                  ) : (
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <button
-                                        disabled={item.quantity === 1}
-                                        type="button"
-                                        style={{
-                                          marginRight: "0.5rem",
-                                          cursor:
-                                            item.quantity === 1
-                                              ? "not-allowed"
-                                              : "pointer",
-                                        }}
-                                        className="cart-btn"
-                                        onClick={() => {
-                                          setLoading(index);
-                                          updateCart("remove", item.id);
-                                        }}
-                                      >
-                                        -
-                                      </button>
-                                      <div
-                                        style={{
-                                          marginRight: "0.5rem",
-                                          marginLeft: "0.5rem",
-                                        }}
-                                      >
-                                        {item.quantity}
-                                      </div>
-
-                                      <button
-                                        type="button"
-                                        className="cart-btn"
-                                        style={{ marginLeft: "0.5rem" }}
-                                        onClick={() => {
-                                          setLoading(index);
-                                          updateCart("add", item.id);
-                                        }}
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              </td>
                               <td
                                 className="product-subtotal"
                                 data-title="Total"
                               >
-                                {item.price * item.quantity} Eth
+                                {item.cost} Eth
                               </td>
                               <td
                                 style={{
@@ -255,13 +163,13 @@ function Cart() {
                                     doc(
                                       getFirestore(),
                                       "users",
-                                      userdata.username,
+                                      uid,
                                       "cart",
                                       item.id
                                     )
                                   ).then(() => {
-                                    setLoader(-1);
                                     console.log("delete done");
+                                    setLoader(-1);
                                     getCart();
                                   });
                                 }}

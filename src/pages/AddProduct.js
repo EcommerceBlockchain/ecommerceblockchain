@@ -21,6 +21,7 @@ import UploadFile from "../service/UploadFile";
 import { ethers } from "ethers";
 import smartConracts from "../blockchain/smartContracts";
 import addproductabi from "../blockchain/abis/addProduct.json";
+import { getAuth } from "firebase/auth";
 
 function AddProduct() {
   const { userdata } = useContext(UserContext);
@@ -38,6 +39,8 @@ function AddProduct() {
     productDescription: description,
     price: price,
   });
+
+  const uid = getAuth().currentUser.uid;
 
   const onPress = async (values) => {
     setFormSub(true);
@@ -81,26 +84,24 @@ function AddProduct() {
                     reviews: [],
                     tag: tags,
                     timestamp: Timestamp.fromDate(new Date()),
-                    owner: userdata.username,
+                    owner: uid,
                     rating: 0,
                     quantity_sold: 0,
                   },
                   { merge: true }
                 ).then((document) => {
-                  getDoc(doc(getFirestore(), "users", userdata.username)).then(
-                    (userdoc) => {
-                      setDoc(
-                        doc(getFirestore(), "users", userdata.username),
-                        {
-                          ...userdoc.data(),
-                          products: [...userdoc.data().products, response.id],
-                        },
-                        { merge: true }
-                      ).then(() => {
-                        console.log("done updation");
-                      });
-                    }
-                  );
+                  getDoc(doc(getFirestore(), "users", uid)).then((userdoc) => {
+                    setDoc(
+                      doc(getFirestore(), "users", uid),
+                      {
+                        ...userdoc.data(),
+                        products: [...userdoc.data().products, response.id],
+                      },
+                      { merge: true }
+                    ).then(() => {
+                      console.log("done updation");
+                    });
+                  });
                   navigate("/", { replace: true });
                 });
               } else {

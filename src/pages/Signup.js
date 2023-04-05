@@ -82,7 +82,6 @@ function SignUp() {
             products: [],
             reward: 0,
             transaction: [],
-            cart: [],
             walletAddress: [accounts[0]],
           }).then(() => {
             console.log("signup done");
