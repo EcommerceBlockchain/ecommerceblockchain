@@ -698,9 +698,6 @@ function AddProduct() {
                         <h5 className="result-count mb-2">
                           Product Price (in Eth){" "}
                         </h5>
-                        <p>
-                          We will charge 20% percent from your selling price.
-                        </p>
                       </div>
                       <input
                         placeholder="Enter price here"

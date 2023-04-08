@@ -61,32 +61,7 @@ function Home() {
     setBestSeller(bestseller);
   };
 
-  const addwallet = async () => {
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // // const accounts = await provider.send("eth_requestAccounts", []);
-    // // const signer = provider.getSigner();
-    // const smcon = new ethers.Contract(
-    //   smartConracts.addProduct,
-    //   addproductabi,
-    //   provider
-    // );
-
-    // smcon.getPath("k1oRXcky3h5u6wFSjptR").then((res) => {
-    //   console.log(res);
-    // });
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send("eth_requestAccounts", []);
-    let bal = await provider.getBalance(accounts[0]);
-    setDoc(
-      doc(getFirestore(), "users", getAuth().currentUser.uid),
-      {
-        walletAddress: accounts[0],
-      },
-      { merge: true }
-    ).then(() => {
-      console.log("done update");
-    });
-  };
+  const addwallet = async () => {};
 
   useEffect(() => {
     getProducts();
@@ -159,6 +134,7 @@ function Home() {
                   price={item.cost}
                   id={item.id}
                   preImg={item.preview_image[0]}
+                  owner={item.owner}
                 />
               );
             })}

@@ -15,7 +15,7 @@ import {
 import activity from "../images/activity.gif";
 import { getAuth } from "firebase/auth";
 
-function Product({ name, id, price, preImg }) {
+function Product({ name, id, price, preImg, owner }) {
   const navigate = useNavigate();
   // products:[{id:id,preimg:preimg,name:name}],
   const { userdata } = useContext(UserContext);
@@ -51,6 +51,7 @@ function Product({ name, id, price, preImg }) {
         cost: price,
         preImg: preImg,
         id: id,
+        owner: owner,
       }).then(() => {
         console.log("product added");
         getCart();

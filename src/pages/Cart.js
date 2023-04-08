@@ -6,6 +6,8 @@ import UserContext from "../context/UserContext";
 import * as LottiePlayer from "@lottiefiles/lottie-player";
 
 import {
+  Timestamp,
+  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -17,6 +19,9 @@ import {
 } from "firebase/firestore";
 import activity from "../images/activity.gif";
 import { getAuth } from "firebase/auth";
+import { ethers } from "ethers";
+import smartContracts from "../blockchain/smartContracts";
+import ethtransferabi from "../blockchain/abis/ethTransfer.json";
 
 function Cart() {
   const navigate = useNavigate();
@@ -24,23 +29,105 @@ function Cart() {
   const [subTotal, setSubTotal] = useState(0);
   const [loader, setLoader] = useState(-1);
   const [products, setProducts] = useState([]);
+  const [productOwners, setProductsOwners] = useState([]);
+  const [OwnersWithPrice, setOwnersWithPrice] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [productIds, setProductIds] = useState([]);
 
   const uid = getAuth().currentUser.uid;
 
   const getCart = async () => {
-    setSubTotal(0);
+    setProductIds([]);
+    let pro = {};
+    let sum = 0;
+    setProductsOwners([]);
     let cart = [];
 
-    getDocs(query(collection(getFirestore(), "users", uid, "cart"))).then(
-      (res) => {
+    getDocs(query(collection(getFirestore(), "users", uid, "cart")))
+      .then((res) => {
         res.docs.forEach((item) => {
+          setProductIds((prev) => [...prev, item.id]);
           console.log(item.data());
           cart.push(item.data());
-          setSubTotal((prev) => prev + item.data().cost);
+          sum += item.data().cost;
+
+          getDoc(doc(getFirestore(), "users", item.data().owner)).then(
+            (res) => {
+              pro[res.data().walletAddress] =
+                item.data().cost + (pro[res.data().walletAddress] || 0);
+            }
+          );
         });
-      }
-    );
+      })
+      .then(() => {
+        setSubTotal(sum);
+        setOwnersWithPrice(pro);
+      });
     setProducts(cart);
+  };
+
+  const checkout = async () => {
+    let price = [];
+    let fromAdd = "";
+    let isTransactionSuccessfull = false;
+    setLoading(true);
+    Object.values(OwnersWithPrice).forEach((item) => {
+      price.push(ethers.utils.parseEther(item.toString()));
+    });
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      fromAdd = await signer.getAddress();
+      const smcon = new ethers.Contract(
+        smartContracts.ethTransfer,
+        ethtransferabi,
+        provider
+      );
+      const signContact = smcon.connect(signer);
+      const transaction = await signContact.sendAmountsToAddresses(
+        [...price, ethers.utils.parseEther((subTotal * 0.05).toString())],
+        [
+          ...Object.keys(OwnersWithPrice),
+          "0xdCe3c8aa5364B0C161b607beE16BB765cF4A7597",
+        ],
+        {
+          value: ethers.utils.parseEther(
+            (subTotal + subTotal * 0.05).toString()
+          ),
+        }
+      );
+      transaction
+        .wait()
+        .then((res) => {
+          console.log(res);
+          isTransactionSuccessfull = true;
+        })
+        .catch((err) => {
+          console.log("errrr", err);
+          isTransactionSuccessfull = false;
+        })
+        .finally((res) => {
+          addDoc(collection(getFirestore(), "transactions"), {
+            products: productIds,
+            status: isTransactionSuccessfull ? "Success" : "Failed",
+            amount: subTotal + subTotal * 0.05,
+            timestamp: Timestamp.fromDate(new Date()),
+            from: fromAdd,
+            to: [
+              ...Object.keys(OwnersWithPrice),
+              "0xdCe3c8aa5364B0C161b607beE16BB765cF4A7597",
+            ],
+            tokenUsed: 0,
+          }).then(() => {
+            console.log("done");
+            setLoading(false);
+          });
+        });
+    } catch (err) {
+      setLoading(false);
+      console.log("err", err);
+    }
   };
 
   useEffect(() => {
@@ -205,20 +292,39 @@ function Cart() {
                         <h5>Token Used</h5>
                         <span>0</span>
                       </li>
+                      <li className="d-flex justify-content-between pb-2 mb-3">
+                        <h5>Fees (5%)</h5>
+                        <span>{subTotal * 0.05} Eth</span>
+                      </li>
                       <li className="d-flex justify-content-between pb-2">
                         <h5>Total</h5>
-                        <span>{subTotal} Eth</span>
+                        <span>{subTotal + subTotal * 0.05} Eth</span>
                       </li>
                     </ul>
-                    <button
-                      className="btn btn-main btn-small"
-                      disabled={subTotal === 0}
+                    <div
                       style={{
-                        cursor: subTotal === 0 ? "not-allowed" : "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      Proceed to checkout
-                    </button>
+                      {loading ? (
+                        <img width={30} src={activity} alt="activity" />
+                      ) : (
+                        <button
+                          onClick={() => {
+                            checkout();
+                          }}
+                          className="btn btn-main btn-small"
+                          disabled={subTotal === 0}
+                          style={{
+                            cursor: subTotal === 0 ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          Proceed to checkout
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

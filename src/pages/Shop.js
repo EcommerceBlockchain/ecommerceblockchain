@@ -451,6 +451,7 @@ function Shop() {
                         price={item.cost}
                         id={item.id}
                         preImg={item.preview_image[0]}
+                        owner={item.owner}
                       />
                     );
                   })

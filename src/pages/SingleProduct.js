@@ -86,6 +86,7 @@ function SingleProduct() {
         cost: product.cost,
         preImg: product.preview_image[0],
         id: id,
+        owner: product.owner,
       }).then(() => {
         console.log("product added");
         getCart();

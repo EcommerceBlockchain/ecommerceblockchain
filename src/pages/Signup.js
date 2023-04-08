@@ -65,6 +65,7 @@ function SignUp() {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
+
         let bal = await provider.getBalance(accounts[0]);
 
         createUserWithEmailAndPassword(
@@ -82,7 +83,7 @@ function SignUp() {
             products: [],
             reward: 0,
             transaction: [],
-            walletAddress: [accounts[0]],
+            walletAddress: accounts[0],
           }).then(() => {
             console.log("signup done");
           });
