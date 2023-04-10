@@ -25,5 +25,5 @@ export const email = Yup.string()
   .label("Email");
 
 export const price = Yup.number()
-  .min(0.000000000000000001, "Price should be greater than 0")
+  .min(0.0001, "Price should be greater than 0.0001")
   .required("Price is required");

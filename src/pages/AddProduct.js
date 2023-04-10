@@ -27,9 +27,9 @@ function AddProduct() {
   const { userdata } = useContext(UserContext);
   const [images, setimages] = useState([]);
   const [tags, setTags] = useState([]);
-  const [originalProductUrl, setOriginalProductUrl] = useState("");
   const [originalProductFileName, setOriginalProductFileName] = useState("");
   const [file, setFile] = useState(null);
+  const [fileSize, setFileSize] = useState(0);
   const [category, setCategory] = useState("Select Category");
   const [formSub, setFormSub] = useState(false);
   const [ogfile, setogfile] = useState(false);
@@ -45,7 +45,6 @@ function AddProduct() {
   const onPress = async (values) => {
     setFormSub(true);
     if (
-      originalProductUrl &&
       originalProductFileName &&
       category !== "Select Category" &&
       images.length !== 0
@@ -53,7 +52,7 @@ function AddProduct() {
       console.log("heelo in onpress");
       UploadFile(file).then((path) => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
+        const signer = provider.getSigner(userdata.activeAddress);
         const smcon = new ethers.Contract(
           smartConracts.addProduct,
           addproductabi,
@@ -87,6 +86,7 @@ function AddProduct() {
                     owner: uid,
                     rating: 0,
                     quantity_sold: 0,
+                    fileSize: fileSize,
                   },
                   { merge: true }
                 ).then((document) => {
@@ -501,7 +501,7 @@ function AddProduct() {
                       </div>
                       {category === "Image" && (
                         <input
-                          disabled={originalProductUrl ? true : false}
+                          disabled={originalProductFileName ? true : false}
                           type="file"
                           accept="image/*"
                           onChange={(e) => {
@@ -509,9 +509,7 @@ function AddProduct() {
                             setFile(e.target.files[0]);
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
-                            setOriginalProductUrl(
-                              URL.createObjectURL(e.target.files[0])
-                            );
+                            setFileSize(e.target.files[0].size);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -520,7 +518,7 @@ function AddProduct() {
                       )}
                       {category === "Video" && (
                         <input
-                          disabled={originalProductUrl ? true : false}
+                          disabled={originalProductFileName ? true : false}
                           type="file"
                           accept="video/*"
                           onChange={(e) => {
@@ -529,9 +527,7 @@ function AddProduct() {
 
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
-                            setOriginalProductUrl(
-                              URL.createObjectURL(e.target.files[0])
-                            );
+                            setFileSize(e.target.files[0].size);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -540,7 +536,7 @@ function AddProduct() {
                       )}
                       {category === "Audio" && (
                         <input
-                          disabled={originalProductUrl ? true : false}
+                          disabled={originalProductFileName ? true : false}
                           type="file"
                           accept=".MPEG,.MP3,.FLAC,.WAV,.WMA,.AAC"
                           onChange={(e) => {
@@ -549,9 +545,7 @@ function AddProduct() {
 
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
-                            setOriginalProductUrl(
-                              URL.createObjectURL(e.target.files[0])
-                            );
+                            setFileSize(e.target.files[0].size);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -560,7 +554,7 @@ function AddProduct() {
                       )}
                       {category === "GIF" && (
                         <input
-                          disabled={originalProductUrl ? true : false}
+                          disabled={originalProductFileName ? true : false}
                           type="file"
                           accept=".gif"
                           onChange={(e) => {
@@ -569,9 +563,7 @@ function AddProduct() {
 
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
-                            setOriginalProductUrl(
-                              URL.createObjectURL(e.target.files[0])
-                            );
+                            setFileSize(e.target.files[0].size);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -580,7 +572,7 @@ function AddProduct() {
                       )}
                       {category === "Documents" && (
                         <input
-                          disabled={originalProductUrl ? true : false}
+                          disabled={originalProductFileName ? true : false}
                           type="file"
                           accept=".doc,.docm,.docx,.dot,.dotm,.dotx,.htm,.html,.mht,.mhtml,.odt,.pdf,.rtf,.txt,.wps,.xml,.xps,.xlsx,.csv,.xls,.pptx,.ppt"
                           onChange={(e) => {
@@ -589,9 +581,7 @@ function AddProduct() {
 
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
-                            setOriginalProductUrl(
-                              URL.createObjectURL(e.target.files[0])
-                            );
+                            setFileSize(e.target.files[0].size);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -618,7 +608,7 @@ function AddProduct() {
                           >
                             <img
                               src={
-                                !originalProductUrl
+                                !originalProductFileName
                                   ? "https://cdn-icons-png.flaticon.com/512/1091/1091916.png"
                                   : "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/1200px-Eo_circle_green_checkmark.svg.png"
                               }
@@ -631,10 +621,10 @@ function AddProduct() {
                               alt="plus"
                             />
 
-                            {!originalProductUrl && <p>Add File</p>}
+                            {!originalProductFileName && <p>Add File</p>}
                           </div>
                         </label>
-                        {!originalProductUrl && formSub && (
+                        {!originalProductFileName && formSub && (
                           <p
                             style={{
                               fontSize: 14,
@@ -656,7 +646,7 @@ function AddProduct() {
                             Please select category
                           </p>
                         )}
-                        {originalProductUrl && (
+                        {originalProductFileName && (
                           <div
                             style={{
                               position: "absolute",
@@ -673,8 +663,8 @@ function AddProduct() {
                               cursor: "pointer",
                             }}
                             onClick={() => {
-                              setOriginalProductUrl("");
                               setOriginalProductFileName("");
+                              setFileSize(0);
                             }}
                           >
                             <i className="tf-ion-close"></i>
@@ -700,6 +690,7 @@ function AddProduct() {
                         </h5>
                       </div>
                       <input
+                        maxLength={11}
                         placeholder="Enter price here"
                         type="text"
                         className="form-control"

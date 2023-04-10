@@ -77,8 +77,7 @@ function Cart() {
 
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      fromAdd = await signer.getAddress();
+      const signer = provider.getSigner(userdata.activeAddress);
       const smcon = new ethers.Contract(
         smartContracts.ethTransfer,
         ethtransferabi,
@@ -86,14 +85,14 @@ function Cart() {
       );
       const signContact = smcon.connect(signer);
       const transaction = await signContact.sendAmountsToAddresses(
-        [...price, ethers.utils.parseEther((subTotal * 0.05).toString())],
+        [...price, ethers.utils.parseEther((subTotal * 0.05).toFixed(10))],
         [
           ...Object.keys(OwnersWithPrice),
           "0xdCe3c8aa5364B0C161b607beE16BB765cF4A7597",
         ],
         {
           value: ethers.utils.parseEther(
-            (subTotal + subTotal * 0.05).toString()
+            (subTotal + parseFloat((subTotal * 0.05).toFixed(10))).toString()
           ),
         }
       );
@@ -107,19 +106,34 @@ function Cart() {
           console.log("errrr", err);
           isTransactionSuccessfull = false;
         })
-        .finally((res) => {
+        .finally(() => {
           addDoc(collection(getFirestore(), "transactions"), {
             products: productIds,
             status: isTransactionSuccessfull ? "Success" : "Failed",
-            amount: subTotal + subTotal * 0.05,
+            amount: subTotal + parseFloat((subTotal * 0.05).toFixed(10)),
             timestamp: Timestamp.fromDate(new Date()),
-            from: fromAdd,
+            from: userdata.activeAddress,
             to: [
               ...Object.keys(OwnersWithPrice),
               "0xdCe3c8aa5364B0C161b607beE16BB765cF4A7597",
             ],
             tokenUsed: 0,
-          }).then(() => {
+          }).then((response) => {
+            getDoc(
+              doc(getFirestore(), "users", getAuth().currentUser.uid)
+            ).then((res) => {
+              setDoc(
+                doc(getFirestore(), "users", getAuth().currentUser.uid),
+                {
+                  transaction: [...res.data().transaction, response.id],
+                  bought: [...res.data().bought, ...productIds],
+                },
+                { merge: true }
+              ).then(() => {
+                console.log("document id added");
+              });
+            });
+
             console.log("done");
             setLoading(false);
           });
@@ -294,11 +308,16 @@ function Cart() {
                       </li>
                       <li className="d-flex justify-content-between pb-2 mb-3">
                         <h5>Fees (5%)</h5>
-                        <span>{subTotal * 0.05} Eth</span>
+                        <span>
+                          {parseFloat((subTotal * 0.05).toFixed(10))} Eth
+                        </span>
                       </li>
                       <li className="d-flex justify-content-between pb-2">
                         <h5>Total</h5>
-                        <span>{subTotal + subTotal * 0.05} Eth</span>
+                        <span>
+                          {subTotal + parseFloat((subTotal * 0.05).toFixed(10))}{" "}
+                          Eth
+                        </span>
                       </li>
                     </ul>
                     <div

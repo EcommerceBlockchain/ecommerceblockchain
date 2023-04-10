@@ -70,9 +70,6 @@ function Footer() {
                   <li>
                     <Link to={"/shop"}>Our Shop</Link>
                   </li>
-                  <li>
-                    <a href="#">Contact Us</a>
-                  </li>
                 </ul>
               </div>
             </div>
