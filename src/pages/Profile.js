@@ -30,17 +30,17 @@ function Profile() {
   const navigate = useNavigate();
   const [menuselection, setMenuSelection] = useState(1);
   const { userdata } = useContext(UserContext);
-  const [userProfileData,setUserProfileData] = useState({});
+  const [userProfileData, setUserProfileData] = useState({});
   const location = useLocation();
 
-  async function getData(){
-    if(location.state==userdata.email){
+  async function getData() {
+    if (location.state == userdata.email) {
       setUserProfileData(userdata);
-    }else{
-      let data = await getDoc(doc(getFirestore(),"users",location.state));
+    } else {
+      let data = await getDoc(doc(getFirestore(), "users", location.state));
       setUserProfileData(data.data());
     }
-    console.log("user data : ",userProfileData);
+    console.log("user data : ", userProfileData);
   }
 
   useEffect(() => {
@@ -225,7 +225,9 @@ function Profile() {
                   <div>
                     <img
                       src={
-                        userProfileData?.profileurl ? userProfileData.profileurl : userlogo
+                        userProfileData?.profileurl
+                          ? userProfileData.profileurl
+                          : userlogo
                       }
                       width={40}
                     />
@@ -254,18 +256,32 @@ function Profile() {
                   }}
                 >
                   <img
-                    src={userProfileData?.profileurl ? userProfileData.profileurl : userlogo}
+                    src={
+                      userProfileData?.profileurl
+                        ? userProfileData.profileurl
+                        : userlogo
+                    }
                     width={40}
                   />
-                  <p style={{ paddingLeft: "10px" }}>{userProfileData.username}</p>
+                  <p style={{ paddingLeft: "10px", margin: 0 }}>
+                    {userProfileData.username}
+                  </p>
                 </div>
               </div>
             )}
 
-            {menuselection === 1 && <Account userData={userProfileData} />}
-            {menuselection === 2 && <Products userData={userProfileData} />}
-            {menuselection === 3 && <Orders userData={userProfileData} />}
-            {menuselection === 4 && <Transactions userData={userProfileData} />}
+            {menuselection === 1 && (
+              <Account userProfileData={userProfileData} />
+            )}
+            {menuselection === 2 && (
+              <Products userProfileData={userProfileData} />
+            )}
+            {menuselection === 3 && (
+              <Orders userProfileData={userProfileData} />
+            )}
+            {menuselection === 4 && (
+              <Transactions userProfileData={userProfileData} />
+            )}
           </div>
         </div>
       </main>

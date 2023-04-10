@@ -1,10 +1,10 @@
 import React from "react";
 
-function Orders({ userData }) {
+function Orders({ userProfileData }) {
   return (
     <div>
       <p>Orders</p>
-      {userData.bought.map((item) => {
+      {userProfileData.bought.map((item) => {
         return <h5>{item}</h5>;
       })}
     </div>
