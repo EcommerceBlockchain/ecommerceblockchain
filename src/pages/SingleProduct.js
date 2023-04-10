@@ -43,6 +43,7 @@ function SingleProduct() {
     const getOwner = await getDoc(
       doc(getFirestore(), "users", pro.data().owner)
     );
+    console.log(getOwner.data())
     setOwnerName(getOwner.data().username);
     console.log(pro.data());
     setProduct(pro.data());
@@ -334,7 +335,7 @@ function SingleProduct() {
                     <li className="d-flex">
                       <strong>Owner</strong>
                       <span>
-                        <Link to={"/"}>{ownerName}</Link>
+                        <Link to={"/profile"} state={product.owner}>{ownerName}</Link>
                       </span>
                     </li>
                     <li className="d-flex">

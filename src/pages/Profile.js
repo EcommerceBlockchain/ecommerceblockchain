@@ -12,7 +12,7 @@ import { getAuth } from "firebase/auth";
 import colors from "../colors";
 
 import { FaSignOutAlt, FaHamburger, FaBars } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import Account from "../components/Account";
 import UserContext from "../context/UserContext";
@@ -30,8 +30,22 @@ function Profile() {
   const navigate = useNavigate();
   const [menuselection, setMenuSelection] = useState(1);
   const { userdata } = useContext(UserContext);
+  const [userProfileData,setUserProfileData] = useState({});
+  const location = useLocation();
 
-  console.log("bddddddddddddddjdbdbdjdd", userdata);
+  async function getData(){
+    if(location.state==userdata.email){
+      setUserProfileData(userdata);
+    }else{
+      let data = await getDoc(doc(getFirestore(),"users",location.state));
+      setUserProfileData(data.data());
+    }
+    console.log("user data : ",userProfileData);
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   const menuItemStyles = {
     root: {
@@ -53,8 +67,6 @@ function Profile() {
       color: active ? colors.primaryBlue : "black",
     }),
   };
-
-  useEffect(() => {}, []);
 
   return (
     <div
@@ -213,14 +225,14 @@ function Profile() {
                   <div>
                     <img
                       src={
-                        userdata?.profileurl ? userdata.profileurl : userlogo
+                        userProfileData?.profileurl ? userProfileData.profileurl : userlogo
                       }
                       width={40}
                     />
                   </div>
                   <div>
                     <p style={{ textAlign: "center", paddingLeft: "10px" }}>
-                      {userdata.username}
+                      {userProfileData.username}
                     </p>
                   </div>
                 </div>
@@ -242,18 +254,18 @@ function Profile() {
                   }}
                 >
                   <img
-                    src={userdata?.profileurl ? userdata.profileurl : userlogo}
+                    src={userProfileData?.profileurl ? userProfileData.profileurl : userlogo}
                     width={40}
                   />
-                  <p style={{ paddingLeft: "10px" }}>{userdata.username}</p>
+                  <p style={{ paddingLeft: "10px" }}>{userProfileData.username}</p>
                 </div>
               </div>
             )}
 
-            {menuselection === 1 && <Account userData={userdata} />}
-            {menuselection === 2 && <Products userData={userdata} />}
-            {menuselection === 3 && <Orders userData={userdata} />}
-            {menuselection === 4 && <Transactions userData={userdata} />}
+            {menuselection === 1 && <Account userData={userProfileData} />}
+            {menuselection === 2 && <Products userData={userProfileData} />}
+            {menuselection === 3 && <Orders userData={userProfileData} />}
+            {menuselection === 4 && <Transactions userData={userProfileData} />}
           </div>
         </div>
       </main>

@@ -1,8 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import UserContext from "../context/UserContext";
 import colors from "../colors";
+import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 
 function Account({ userData }) {
   // const [yourname, setYourName] = useState(userData.name ? userData.name : "");
+
+  // function validateData(){
+  //   console.log("validating data")
+  //   console.log(user)
+  //   console.log(userData)
+  //   if(!userData){
+  //     userData = user;
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   validateData()
+  // },[])
+
   return (
     <div>
       <div className="row" style={{ marginLeft: "-2rem" }}>
@@ -80,6 +96,40 @@ function Account({ userData }) {
             </div>
           </div>
         </div> */}
+      </div>
+
+      <div className="card-body">
+        <h5 className="mb-4">General information</h5>
+        <div className="row">
+          <div className="mb-3 col-md-6">
+            <div id="firstName"><label className="form-label">User Name</label><input required=""
+              placeholder="Enter your user name" type="text" className="form-control" value={userData.name} /></div>
+          </div>
+          <div className="mb-3 col-md-6">
+            <div id="emal"><label className="form-label">Email</label><input required="" placeholder="name@company.com"
+              type="email" className="form-control" value={userData.email} /></div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="mb-3 col-md-6">
+            <div id="phone"><label className="form-label">Phone</label><input required="" placeholder="+12-345 678 910"
+              type="number" className="form-control" /></div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="mb-3 col-sm-4">
+            <div id="city"><label className="form-label">City</label><input required="" placeholder="City" type="text"
+              className="form-control" /></div>
+          </div>
+          <div className="mb-3 col-sm-4">
+
+          </div>
+          <div className="col-sm-4">
+            <div id="zip"><label className="form-label">ZIP</label><input required="" placeholder="ZIP" type="tel"
+              className="form-control" /></div>
+          </div>
+        </div>
+        <div className="mt-3"><button type="submit" className="btn btn-primary">Save All</button></div>
       </div>
     </div>
   );

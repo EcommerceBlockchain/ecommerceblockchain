@@ -42,6 +42,7 @@
 html,
 body {
   height: 100%;
+  overflow-y: auto;
   user-select: none;
 }
 
@@ -2271,3 +2272,20 @@ table.shop_table_responsive {
   opacity: 1 !important;
 }
 /*# sourceMappingURL=maps/style.css.map */
+
+.my-products{
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.my-products .products-container{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 10%;
+  gap: 2.5rem;
+}
+
+
