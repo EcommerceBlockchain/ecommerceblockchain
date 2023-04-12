@@ -4,19 +4,26 @@ import colors from "../colors";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
 import { ethers } from "ethers";
-function Account({ userProfileData }) {
+function Account({userProfileData,isCurrentUser}) {
+  const [activeAddress,setActiveAddress] = useState("")
+  const [showWalletAddesses,setShowWalletAddesses] = useState(true);
+  const [name,setName] = useState("");
   const connectWallet = async () => {
     console.log("wallet");
   };
 
-  const getbalance = async () => {
+  const getBalance = async (address) => {
+    console.log("address : ",address)
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-    let bal = await provider.getBalance(userProfileData.activeAddress);
+    setActiveAddress(address)
+    let bal = await provider.getBalance(activeAddress);
+    setName(userProfileData.name)
   };
 
   useEffect(() => {
-    getbalance();
+    getBalance(userProfileData.activeAddress);
+    setName(userProfileData.name)
+    console.log(userProfileData.walletAddress)
   }, []);
 
   return (
@@ -51,11 +58,15 @@ function Account({ userProfileData }) {
           <div className="mb-3 col-md-6">
             <div id="phone">
               <label className="form-label">Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={userProfileData.name}
-              />
+                <input
+                  disabled={!isCurrentUser}
+                  type="text"
+                  className="form-control"
+                  onChange={(e) => {
+                          setName(e.target.value);
+                  }}
+                  value={name}
+                />
             </div>
           </div>
 
@@ -66,12 +77,9 @@ function Account({ userProfileData }) {
                 disabled
                 type="text"
                 className="form-control"
-                value={userProfileData.activeAddress}
+                value={activeAddress}
               />
               <FaEdit
-                onClick={() => {
-                  connectWallet();
-                }}
                 size={20}
                 style={{
                   position: "absolute",
@@ -79,16 +87,29 @@ function Account({ userProfileData }) {
                   right: 20,
                   cursor: "pointer",
                 }}
+                onClick={() => setShowWalletAddesses(true)}
               />
+              {showWalletAddesses && <div className="wallet-address-container" style={{position:"absolute",width:"100%",backgroundColor:"white",padding:"10px",bottom:0,left:0,transform:"translate(0,100%)",textAlign:"left",boxShadow:"0 0 5px 1px rgba(0,0,0,0.2)"}}>
+                {
+                  userProfileData?.walletAddress?.map((address) => (
+                    <p onClick={()=>getBalance(address)} style={address===userProfileData.activeAddress ? {} : {backgroundColor:"lightgrey"}}>{address}</p>
+                  ))
+                }
+                <p onClick={() => {
+                  connectWallet();
+                }}>
+                  Add New Wallet Address
+                </p>
+              </div>}
             </div>
           </div>
         </div>
 
-        <div className="mt-3">
+        {isCurrentUser && <div className="mt-3">
           <button type="submit" className="btn btn-primary">
             Save All
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );

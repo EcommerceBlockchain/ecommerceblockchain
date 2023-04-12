@@ -32,10 +32,12 @@ function Profile() {
   const { userdata } = useContext(UserContext);
   const [userProfileData, setUserProfileData] = useState({});
   const location = useLocation();
+  const [isCurrentUser,setIsCurrentUser] = useState(false);
 
   async function getData() {
     if (location.state == userdata.email) {
       setUserProfileData(userdata);
+      setIsCurrentUser(true);
     } else {
       let data = await getDoc(doc(getFirestore(), "users", location.state));
       setUserProfileData(data.data());
@@ -137,7 +139,7 @@ function Profile() {
                   >
                     Products
                   </MenuItem>
-                  <MenuItem
+                  {isCurrentUser && <MenuItem
                     active={menuselection === 3}
                     onClick={() => {
                       setMenuSelection(3);
@@ -145,8 +147,8 @@ function Profile() {
                     }}
                   >
                     Orders
-                  </MenuItem>
-                  <MenuItem
+                  </MenuItem>}
+                  {isCurrentUser && <MenuItem
                     active={menuselection === 4}
                     onClick={() => {
                       setMenuSelection(4);
@@ -154,7 +156,7 @@ function Profile() {
                     }}
                   >
                     Transactions
-                  </MenuItem>
+                  </MenuItem>}
                 </Menu>
               </div>
               <div>
@@ -271,10 +273,10 @@ function Profile() {
             )}
 
             {menuselection === 1 && (
-              <Account userProfileData={userProfileData} />
+              <Account userProfileData={userProfileData} isCurrentUser={isCurrentUser} />
             )}
             {menuselection === 2 && (
-              <Products userProfileData={userProfileData} />
+              <Products userProfileData={userProfileData} isCurrentUser={isCurrentUser} />
             )}
             {menuselection === 3 && (
               <Orders userProfileData={userProfileData} />

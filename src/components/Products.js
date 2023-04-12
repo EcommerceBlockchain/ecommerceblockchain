@@ -35,6 +35,7 @@ function Products({ userProfileData }) {
                 id={currentProduct.id}
                 price={currentProduct.price}
                 preImg={currentProduct.preview_image}
+                owner={currentProduct.owner}
               ></Product>
             );
         })}

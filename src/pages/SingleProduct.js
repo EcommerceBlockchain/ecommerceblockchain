@@ -37,6 +37,7 @@ function SingleProduct() {
 
   const getProduct = async () => {
     setProduct({});
+    console.log(id)
     const pro = await getDoc(doc(getFirestore(), "products", id));
 
     console.log(pro.data().owner, "yayyaya");

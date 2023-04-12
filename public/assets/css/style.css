@@ -2288,4 +2288,6 @@ table.shop_table_responsive {
   gap: 2.5rem;
 }
 
-
+.wallet-address-container > p{
+  margin-bottom: 5px;
+}
