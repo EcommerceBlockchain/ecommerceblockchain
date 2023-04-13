@@ -1,49 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
-import Product from "../components/Product";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import React from "react";
+import { useEffect, useState } from "react";
 
-function Products({ userProfileData,isCurrentUser }) {
-  const [productsData, setProductsData] = useState([]);
+function Products({ userProfileData }) {
+  const [products, setProducts] = useState([]);
 
-  async function getData() {
-    if(productsData.length==userProfileData?.products?.length) return
-    let newData = []
-    userProfileData?.products?.map(async (currentProduct,key)=>{
-      if(currentProduct){
-        let data = await getDoc(
-          doc(getFirestore(), "products", currentProduct)
-        );
-        if(data){
-          newData.push(data.data());
-        }
-      }
-    })
-    setProductsData(newData);
-    console.log("Products : ", productsData);
-  }
+  console.log(userProfileData.products);
+
+  const getdata = async () => {
+    setProducts([]);
+    userProfileData?.products?.forEach((element, index) => {
+      getDoc(doc(getFirestore(), "products", element)).then((res) => {
+        setProducts((prev) => [
+          ...new Set([...prev, { ...res.data(), id: element }]),
+        ]);
+      });
+    });
+  };
 
   useEffect(() => {
-    getData();
-  }, [productsData]);
+    setProducts([]);
+    getdata();
+  }, []);
 
   return (
-    <div className="my-products">
-      <div>
-        <p className={isCurrentUser?'':"user-products-title"}>{isCurrentUser?"My Products":"Products"}</p>
-      </div>
-      <div className="products-container">
-        {productsData.map((currentProduct,key) => {
-            return (
-              <Product
-                name={currentProduct.name}
-                id={currentProduct.id}
-                price={currentProduct.price}
-                preImg={currentProduct.preview_image}
-                owner={currentProduct.owner}
-              ></Product>
-            );
-        })}
-      </div>
+    <div>
+      <p>Products</p>
+      {products.map((item) => {
+        return (
+          <div>
+            {item.name}
+            {item.cost}
+            {item.preview_image[0]}
+          </div>
+        );
+      })}
     </div>
   );
 }

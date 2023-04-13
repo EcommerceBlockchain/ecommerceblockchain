@@ -103,7 +103,7 @@ function Header() {
 
             {userdata && (
               <li className="list-inline-item">
-                <Link to={"/profile"} state={userdata.email}>
+                <Link to={"/profile"}>
                   <i className="tf-ion-ios-person mr-3"></i>
                 </Link>
               </li>

@@ -22,7 +22,6 @@ import Products from "../components/Products";
 import Orders from "../components/Orders";
 import Transactions from "../components/Transactions";
 import userlogo from "../images/user.png";
-import Header from "../components/Header"
 
 // hex to rgba converter
 
@@ -30,27 +29,21 @@ function Profile() {
   const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
   const navigate = useNavigate();
   const [menuselection, setMenuSelection] = useState(1);
-  const { userdata } = useContext(UserContext);
   const [userProfileData, setUserProfileData] = useState("");
-  const location = useLocation();
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
 
-  async function getData() {
-    if (userProfileData != "") return;
-    if (location.state == userdata.email) {
-      console.log(userdata)
-      setUserProfileData({ ...userdata });
-      setIsCurrentUser(true);
-      console.log("user data : ", userProfileData);
-    } else {
-      let data = await getDoc(doc(getFirestore(), "users", location.state));
-      setUserProfileData(data.data());
-    }
+  function getData() {
+    if (userProfileData !== "") return;
+
+    getDoc(doc(getFirestore(), "users", getAuth().currentUser.uid)).then(
+      (res) => {
+        setUserProfileData({ ...res.data() });
+      }
+    );
+    console.log("user data : ", userProfileData);
   }
 
   useEffect(() => {
     getData();
-    console.log(userProfileData)
   }, [userProfileData]);
 
   const menuItemStyles = {
@@ -75,163 +68,211 @@ function Profile() {
   };
 
   return (
-  <>
-    <div
-      style={{
-        height: isCurrentUser?"100%":"auto",
-        overflowY: "hidden",
-        display: "flex",
-      }}
-    >
-      {isCurrentUser && <Sidebar
-        customBreakPoint="800px"
-        transitionDuration={500}
-        rootStyles={{
-          zIndex: 100,
-          boxShadow: "0px 0px 15px 5px rgba(0,0,0,0.1)",
+    <>
+      <div
+        style={{
+          overflowY: "hidden",
+          display: "flex",
           height: "100%",
-          backgroundColor: "white",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            backgroundColor: "white",
+        <Sidebar
+          customBreakPoint="800px"
+          transitionDuration={500}
+          rootStyles={{
+            zIndex: 100,
+            boxShadow: "0px 0px 15px 5px rgba(0,0,0,0.1)",
             height: "100%",
+            backgroundColor: "white",
           }}
         >
-          <div style={{ marginBottom: "24px", marginTop: "16px" }}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Link to={"/"}>
-                <h1 style={{ color: colors.primaryBlue, paddingLeft: "20px" }}>
-                  Digimart
-                </h1>
-              </Link>
-            </div>
-          </div>
           <div
             style={{
-              marginBottom: "32px",
               display: "flex",
-              height: "80%",
+              flexDirection: "column",
+              backgroundColor: "white",
+              height: "100%",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                flexDirection: "column",
-              }}
-            >
-              <div>
-                <Menu menuItemStyles={menuItemStyles}>
-                  <MenuItem
-                    active={menuselection === 1}
-                    onClick={() => {
-                      setMenuSelection(1);
-                      toggleSidebar();
-                    }}
+            <div style={{ marginBottom: "24px", marginTop: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Link to={"/"}>
+                  <h1
+                    style={{ color: colors.primaryBlue, paddingLeft: "20px" }}
                   >
-                    Account
-                  </MenuItem>
-                  <MenuItem
-                    active={menuselection === 2}
-                    onClick={() => {
-                      setMenuSelection(2);
-                      toggleSidebar();
-                    }}
-                  >
-                    Products
-                  </MenuItem>
-                  <MenuItem
-                    active={menuselection === 3}
-                    onClick={() => {
-                      setMenuSelection(3);
-                      toggleSidebar();
-                    }}
-                  >
-                    Orders
-                  </MenuItem>
-                  <MenuItem
-                    active={menuselection === 4}
-                    onClick={() => {
-                      setMenuSelection(4);
-                      toggleSidebar();
-                    }}
-                  >
-                    Transactions
-                  </MenuItem>
-                </Menu>
-              </div>
-              <div>
-                <div
-                  style={{
-                    borderBottom: "1px solid lightgrey",
-                    width: "100%",
-                    marginTop: "10px",
-                  }}
-                ></div>
-
-                <Menu menuItemStyles={menuItemStyles}>
-                  <MenuItem
-                    icon={<FaSignOutAlt size={15} color={colors.primaryBlue} />}
-                    onClick={() => {
-                      getAuth().signOut();
-                      navigate("/", { replace: true });
-                    }}
-                  >
-                    Logout
-                  </MenuItem>
-                </Menu>
+                    Digimart
+                  </h1>
+                </Link>
               </div>
             </div>
-          </div>
-        </div>
-      </Sidebar>
-      }
-
-      <main style={{ width: "100%",marginTop: isCurrentUser?0:"10%",paddingLeft: isCurrentUser?0:"20px",height:"fit-content" }}>
-        <div
-          style={{
-            padding: isCurrentUser ? "16px 24px" : "25px",
-            color: "#44596e",
-            height: "100%",
-            overflow: "hidden auto"
-          }}
-        >
-          <div style={{ marginBottom: "16px", height: "100%" }}>
-            {broken ? (
+            <div
+              style={{
+                marginBottom: "32px",
+                display: "flex",
+                height: "80%",
+              }}
+            >
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  alignItems: "center",
+                  flexDirection: "column",
                 }}
               >
-                <button
-                  className="sb-button"
-                  style={{
-                    outline: "none",
-                    border: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "10px",
-                  }}
-                  onClick={() => {
-                    toggleSidebar();
-                  }}
-                >
-                  <FaBars color={colors.primaryBlue} size={20} />
-                </button>
+                <div>
+                  <Menu menuItemStyles={menuItemStyles}>
+                    <MenuItem
+                      active={menuselection === 1}
+                      onClick={() => {
+                        setMenuSelection(1);
+                        toggleSidebar();
+                      }}
+                    >
+                      Account
+                    </MenuItem>
+                    <MenuItem
+                      active={menuselection === 2}
+                      onClick={() => {
+                        setMenuSelection(2);
+                        toggleSidebar();
+                      }}
+                    >
+                      Products
+                    </MenuItem>
+                    <MenuItem
+                      active={menuselection === 3}
+                      onClick={() => {
+                        setMenuSelection(3);
+                        toggleSidebar();
+                      }}
+                    >
+                      Orders
+                    </MenuItem>
+                    <MenuItem
+                      active={menuselection === 4}
+                      onClick={() => {
+                        setMenuSelection(4);
+                        toggleSidebar();
+                      }}
+                    >
+                      Transactions
+                    </MenuItem>
+                  </Menu>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      borderBottom: "1px solid lightgrey",
+                      width: "100%",
+                      marginTop: "10px",
+                    }}
+                  ></div>
+
+                  <Menu menuItemStyles={menuItemStyles}>
+                    <MenuItem
+                      icon={
+                        <FaSignOutAlt size={15} color={colors.primaryBlue} />
+                      }
+                      onClick={() => {
+                        getAuth().signOut();
+                        navigate("/", { replace: true });
+                      }}
+                    >
+                      Logout
+                    </MenuItem>
+                  </Menu>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Sidebar>
+
+        <main
+          style={{
+            width: "100%",
+
+            height: "fit-content",
+          }}
+        >
+          <div
+            style={{
+              padding: "16px 24px",
+              color: "#44596e",
+              height: "100%",
+              overflow: "hidden auto",
+            }}
+          >
+            <div style={{ marginBottom: "16px", height: "100%" }}>
+              {broken ? (
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "space-between",
                     alignItems: "center",
                   }}
                 >
-                  <div>
+                  <button
+                    className="sb-button"
+                    style={{
+                      outline: "none",
+                      border: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "10px",
+                    }}
+                    onClick={() => {
+                      toggleSidebar();
+                    }}
+                  >
+                    <FaBars color={colors.primaryBlue} size={20} />
+                  </button>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div>
+                      <img
+                        src={
+                          userProfileData?.profileurl
+                            ? userProfileData.profileurl
+                            : userlogo
+                        }
+                        width={40}
+                      />
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          textAlign: "center",
+                          paddingLeft: "10px",
+                          margin: 0,
+                        }}
+                      >
+                        {userProfileData.username}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <h4>Account</h4>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
                     <img
                       src={
                         userProfileData?.profileurl
@@ -240,68 +281,41 @@ function Profile() {
                       }
                       width={40}
                     />
-                  </div>
-                  <div>
-                    <p style={{ textAlign: "center", paddingLeft: "10px" }}>
-                      {userProfileData.username}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className={!isCurrentUser ? "profile-header" : ""}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: isCurrentUser ? "center" : "flex-start",
-                  flexDirection: isCurrentUser ? "row" : "column"
-                }}
-              >
-                <h4>Account</h4>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <img
-                    src={
-                      userProfileData?.profileurl
-                        ? userProfileData.profileurl
-                        : userlogo
-                    }
-                    width={isCurrentUser ? 40 : 80}
-                  />
-                  <div style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                    <p style={{ paddingLeft: "10px", margin: 0, fontWeight: isCurrentUser ? "300" : "600" }}>
-                      {userProfileData?.username}
-                    </p>
-                    {!isCurrentUser && <p style={{ paddingLeft: "10px", margin: 0 }}>
-                      {userProfileData?.email}
-                    </p>}
+                    <div
+                      style={{
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <p
+                        style={{
+                          paddingLeft: "10px",
+                          margin: 0,
+                          fontWeight: "300",
+                        }}
+                      >
+                        {userProfileData?.username}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {menuselection === 1 && (
-              <Account userProfileData={userProfileData} isCurrentUser={isCurrentUser} />
-            )}
-            {menuselection === 2 && (
-              <Products userProfileData={userProfileData} isCurrentUser={isCurrentUser} />
-            )}
-            {menuselection === 3 && (
-              <Orders userProfileData={userProfileData} isCurrentUser={isCurrentUser} />
-            )}
-            {menuselection === 4 && (
-              <Transactions userProfileData={userProfileData} />
-            )}
+              {menuselection === 1 && <Account />}
+              {menuselection === 2 && (
+                <Products userProfileData={userProfileData} />
+              )}
+              {menuselection === 3 && (
+                <Orders userProfileData={userProfileData} />
+              )}
+              {menuselection === 4 && <Transactions />}
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
-  </>
+        </main>
+      </div>
+    </>
   );
 }
 

@@ -8,6 +8,7 @@ import Cart from "../src/pages/Cart";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
 import ForgotPassword from "../src/pages/ForgotPassword";
+import UserProfile from "../src/pages/UserProfile";
 import {
   BrowserRouter,
   Routes,
@@ -75,7 +76,7 @@ function App() {
                 element={user ? <AddProduct /> : <Login />}
               />
               <Route path="/profile" element={user ? <Profile /> : <Login />} />
-              <Route path="/userprofile" element={[<Header />,<Profile />]} />
+              <Route path="/userprofile" element={<UserProfile />} />
             </Routes>
             <Footer />
           </BrowserRouter>

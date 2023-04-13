@@ -12,8 +12,7 @@ function UserState(props) {
   const [userdata, setUserData] = useState({});
   const auth = getAuth(initializeApp(firebaseConfig));
 
-
-  useEffect(()=>{
+  useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const data = await getDoc(doc(getFirestore(), "users", user.uid));
@@ -24,7 +23,7 @@ function UserState(props) {
         setUserData(null);
       }
     });
-  },[])
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, username, userdata }}>

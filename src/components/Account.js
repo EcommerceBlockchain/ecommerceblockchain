@@ -4,33 +4,35 @@ import colors from "../colors";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
 import { ethers } from "ethers";
-import  Products  from "./Products"
-function Account({userProfileData,isCurrentUser}) {
-  const [activeAddress,setActiveAddress] = useState("")
-  const [showWalletAddesses,setShowWalletAddesses] = useState(false);
-  const [name,setName] = useState("");
+import { getAuth } from "firebase/auth";
+function Account() {
+  const [activeAddress, setActiveAddress] = useState("");
+  const [showWalletAddesses, setShowWalletAddesses] = useState(false);
+  const [name, setName] = useState("");
+  const [userProfileData, setUserProfileData] = useState({});
 
   const connectWallet = async () => {
-    console.log("wallet");
-    const {ethereum} = window;
-    const accounts = await ethereum.request({method: 'eth_accounts'});
-    ethereum.enable()
-    console.log(accounts)
+    console.log("address : ", activeAddress);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    // const ans = await provider.send("wallet_disconnect", []);
+    console.log(accounts);
   };
 
-  const getBalance = async (address) => {
-    console.log("address : ",address)
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    setActiveAddress(address)
-    let bal = await provider.getBalance(activeAddress);
-    let newAccount = await provider.send("eth_requestAccounts",[]);
-  };
+  function getData() {
+    getDoc(doc(getFirestore(), "users", getAuth().currentUser.uid)).then(
+      (res) => {
+        setUserProfileData({ ...res.data() });
+        setName(res.data().name);
+        setActiveAddress(res.data().activeAddress);
+      }
+    );
+    console.log("user data : ", userProfileData);
+  }
 
   useEffect(() => {
-    getBalance(userProfileData?.activeAddress);
-    setName(userProfileData?.name)
-    console.log(userProfileData?.walletAddress)
-  }, [userProfileData]);
+    getData();
+  }, []);
 
   return (
     <div>
@@ -44,7 +46,7 @@ function Account({userProfileData,isCurrentUser}) {
                 disabled
                 type="text"
                 className="form-control"
-                value={userProfileData?.username}
+                value={userProfileData.username}
               />
             </div>
           </div>
@@ -55,7 +57,7 @@ function Account({userProfileData,isCurrentUser}) {
                 disabled
                 type="email"
                 className="form-control"
-                value={userProfileData?.email}
+                value={userProfileData.email}
               />
             </div>
           </div>
@@ -64,15 +66,14 @@ function Account({userProfileData,isCurrentUser}) {
           <div className="mb-3 col-md-6">
             <div id="phone">
               <label className="form-label">Name</label>
-                <input
-                  disabled={!isCurrentUser}
-                  type="text"
-                  className="form-control"
-                  onChange={(e) => {
-                          setName(e.target.value);
-                  }}
-                  value={name}
-                />
+              <input
+                type="text"
+                className="form-control"
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+                value={name}
+              />
             </div>
           </div>
 
@@ -95,29 +96,54 @@ function Account({userProfileData,isCurrentUser}) {
                 }}
                 onClick={() => setShowWalletAddesses(!showWalletAddesses)}
               />
-              {showWalletAddesses && <div className="wallet-address-container" style={{position:"absolute",width:"100%",backgroundColor:"white",padding:"10px",bottom:0,left:0,transform:"translate(0,100%)",textAlign:"left",boxShadow:"0 0 5px 1px rgba(0,0,0,0.2)"}}>
-                {
-                  userProfileData?.walletAddress?.map((address,key) => (
-                    <p onClick={()=>getBalance(address)} style={address===userProfileData.activeAddress ? {} : {backgroundColor:"lightgrey"}}>{address}</p>
-                  ))
-                }
-                <p onClick={() => {
-                  connectWallet();
-                }}>
-                  Add New Wallet Address
-                </p>
-              </div>}
+              {showWalletAddesses && (
+                <div
+                  className="wallet-address-container"
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    backgroundColor: "white",
+                    padding: "10px",
+                    bottom: 0,
+                    left: 0,
+                    transform: "translate(0,100%)",
+                    textAlign: "left",
+                    boxShadow: "0 0 5px 1px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  {userProfileData?.walletAddress?.map((address) => (
+                    <p
+                      onClick={() => setActiveAddress(address)}
+                      style={{
+                        cursor: "pointer",
+                        color:
+                          address === activeAddress
+                            ? colors.primaryBlue
+                            : "black",
+                      }}
+                    >
+                      {address}
+                    </p>
+                  ))}
+                  <p
+                    onClick={() => {
+                      connectWallet();
+                    }}
+                  >
+                    Add New Wallet Address
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {isCurrentUser && <div className="mt-3">
+        <div className="mt-3">
           <button type="submit" className="btn btn-primary">
             Save All
           </button>
-        </div>}
+        </div>
       </div>
-      {!isCurrentUser && <Products userProfileData={userProfileData} isCurrentUser={isCurrentUser} />}
     </div>
   );
 }
