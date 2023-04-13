@@ -4,12 +4,18 @@ import colors from "../colors";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
 import { ethers } from "ethers";
+import  Products  from "./Products"
 function Account({userProfileData,isCurrentUser}) {
   const [activeAddress,setActiveAddress] = useState("")
-  const [showWalletAddesses,setShowWalletAddesses] = useState(true);
+  const [showWalletAddesses,setShowWalletAddesses] = useState(false);
   const [name,setName] = useState("");
+
   const connectWallet = async () => {
     console.log("wallet");
+    const {ethereum} = window;
+    const accounts = await ethereum.request({method: 'eth_accounts'});
+    ethereum.enable()
+    console.log(accounts)
   };
 
   const getBalance = async (address) => {
@@ -17,14 +23,14 @@ function Account({userProfileData,isCurrentUser}) {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     setActiveAddress(address)
     let bal = await provider.getBalance(activeAddress);
-    setName(userProfileData.name)
+    let newAccount = await provider.send("eth_requestAccounts",[]);
   };
 
   useEffect(() => {
-    getBalance(userProfileData.activeAddress);
-    setName(userProfileData.name)
-    console.log(userProfileData.walletAddress)
-  }, []);
+    getBalance(userProfileData?.activeAddress);
+    setName(userProfileData?.name)
+    console.log(userProfileData?.walletAddress)
+  }, [userProfileData]);
 
   return (
     <div>
@@ -38,7 +44,7 @@ function Account({userProfileData,isCurrentUser}) {
                 disabled
                 type="text"
                 className="form-control"
-                value={userProfileData.username}
+                value={userProfileData?.username}
               />
             </div>
           </div>
@@ -49,7 +55,7 @@ function Account({userProfileData,isCurrentUser}) {
                 disabled
                 type="email"
                 className="form-control"
-                value={userProfileData.email}
+                value={userProfileData?.email}
               />
             </div>
           </div>
@@ -87,11 +93,11 @@ function Account({userProfileData,isCurrentUser}) {
                   right: 20,
                   cursor: "pointer",
                 }}
-                onClick={() => setShowWalletAddesses(true)}
+                onClick={() => setShowWalletAddesses(!showWalletAddesses)}
               />
               {showWalletAddesses && <div className="wallet-address-container" style={{position:"absolute",width:"100%",backgroundColor:"white",padding:"10px",bottom:0,left:0,transform:"translate(0,100%)",textAlign:"left",boxShadow:"0 0 5px 1px rgba(0,0,0,0.2)"}}>
                 {
-                  userProfileData?.walletAddress?.map((address) => (
+                  userProfileData?.walletAddress?.map((address,key) => (
                     <p onClick={()=>getBalance(address)} style={address===userProfileData.activeAddress ? {} : {backgroundColor:"lightgrey"}}>{address}</p>
                   ))
                 }
@@ -111,6 +117,7 @@ function Account({userProfileData,isCurrentUser}) {
           </button>
         </div>}
       </div>
+      {!isCurrentUser && <Products userProfileData={userProfileData} isCurrentUser={isCurrentUser} />}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "../config/firebaseConfig";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { useEffect } from "react";
 
 function UserState(props) {
   const [user, setUser] = useState(null);
@@ -11,16 +12,19 @@ function UserState(props) {
   const [userdata, setUserData] = useState({});
   const auth = getAuth(initializeApp(firebaseConfig));
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const data = await getDoc(doc(getFirestore(), "users", user.uid));
-      setUserName(data.data().username);
-      setUserData(data.data());
-    } else {
-      setUserName("  ");
-      setUserData(null);
-    }
-  });
+
+  useEffect(()=>{
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const data = await getDoc(doc(getFirestore(), "users", user.uid));
+        setUserName(data.data().username);
+        setUserData(data.data());
+      } else {
+        setUserName("  ");
+        setUserData(null);
+      }
+    });
+  },[])
 
   return (
     <UserContext.Provider value={{ user, username, userdata }}>

@@ -22,6 +22,7 @@ import Products from "../components/Products";
 import Orders from "../components/Orders";
 import Transactions from "../components/Transactions";
 import userlogo from "../images/user.png";
+import Header from "../components/Header"
 
 // hex to rgba converter
 
@@ -30,24 +31,27 @@ function Profile() {
   const navigate = useNavigate();
   const [menuselection, setMenuSelection] = useState(1);
   const { userdata } = useContext(UserContext);
-  const [userProfileData, setUserProfileData] = useState({});
+  const [userProfileData, setUserProfileData] = useState("");
   const location = useLocation();
-  const [isCurrentUser,setIsCurrentUser] = useState(false);
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
 
   async function getData() {
+    if (userProfileData != "") return;
     if (location.state == userdata.email) {
-      setUserProfileData(userdata);
+      console.log(userdata)
+      setUserProfileData({ ...userdata });
       setIsCurrentUser(true);
+      console.log("user data : ", userProfileData);
     } else {
       let data = await getDoc(doc(getFirestore(), "users", location.state));
       setUserProfileData(data.data());
     }
-    console.log("user data : ", userProfileData);
   }
 
   useEffect(() => {
     getData();
-  }, []);
+    console.log(userProfileData)
+  }, [userProfileData]);
 
   const menuItemStyles = {
     root: {
@@ -71,14 +75,15 @@ function Profile() {
   };
 
   return (
+  <>
     <div
       style={{
-        height: "100%",
+        height: isCurrentUser?"100%":"auto",
         overflowY: "hidden",
         display: "flex",
       }}
     >
-      <Sidebar
+      {isCurrentUser && <Sidebar
         customBreakPoint="800px"
         transitionDuration={500}
         rootStyles={{
@@ -139,7 +144,7 @@ function Profile() {
                   >
                     Products
                   </MenuItem>
-                  {isCurrentUser && <MenuItem
+                  <MenuItem
                     active={menuselection === 3}
                     onClick={() => {
                       setMenuSelection(3);
@@ -147,8 +152,8 @@ function Profile() {
                     }}
                   >
                     Orders
-                  </MenuItem>}
-                  {isCurrentUser && <MenuItem
+                  </MenuItem>
+                  <MenuItem
                     active={menuselection === 4}
                     onClick={() => {
                       setMenuSelection(4);
@@ -156,7 +161,7 @@ function Profile() {
                     }}
                   >
                     Transactions
-                  </MenuItem>}
+                  </MenuItem>
                 </Menu>
               </div>
               <div>
@@ -184,16 +189,18 @@ function Profile() {
           </div>
         </div>
       </Sidebar>
+      }
 
-      <main style={{ width: "100%" }}>
+      <main style={{ width: "100%",marginTop: isCurrentUser?0:"10%",paddingLeft: isCurrentUser?0:"20px",height:"fit-content" }}>
         <div
           style={{
-            padding: "16px 24px",
+            padding: isCurrentUser ? "16px 24px" : "25px",
             color: "#44596e",
             height: "100%",
+            overflow: "hidden auto"
           }}
         >
-          <div style={{ marginBottom: "16px" }}>
+          <div style={{ marginBottom: "16px", height: "100%" }}>
             {broken ? (
               <div
                 style={{
@@ -242,11 +249,12 @@ function Profile() {
                 </div>
               </div>
             ) : (
-              <div
+              <div className={!isCurrentUser ? "profile-header" : ""}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  alignItems: "center",
+                  alignItems: isCurrentUser ? "center" : "flex-start",
+                  flexDirection: isCurrentUser ? "row" : "column"
                 }}
               >
                 <h4>Account</h4>
@@ -263,11 +271,16 @@ function Profile() {
                         ? userProfileData.profileurl
                         : userlogo
                     }
-                    width={40}
+                    width={isCurrentUser ? 40 : 80}
                   />
-                  <p style={{ paddingLeft: "10px", margin: 0 }}>
-                    {userProfileData.username}
-                  </p>
+                  <div style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <p style={{ paddingLeft: "10px", margin: 0, fontWeight: isCurrentUser ? "300" : "600" }}>
+                      {userProfileData?.username}
+                    </p>
+                    {!isCurrentUser && <p style={{ paddingLeft: "10px", margin: 0 }}>
+                      {userProfileData?.email}
+                    </p>}
+                  </div>
                 </div>
               </div>
             )}
@@ -279,7 +292,7 @@ function Profile() {
               <Products userProfileData={userProfileData} isCurrentUser={isCurrentUser} />
             )}
             {menuselection === 3 && (
-              <Orders userProfileData={userProfileData} />
+              <Orders userProfileData={userProfileData} isCurrentUser={isCurrentUser} />
             )}
             {menuselection === 4 && (
               <Transactions userProfileData={userProfileData} />
@@ -288,6 +301,7 @@ function Profile() {
         </div>
       </main>
     </div>
+  </>
   );
 }
 

@@ -336,7 +336,7 @@ function SingleProduct() {
                     <li className="d-flex">
                       <strong>Owner</strong>
                       <span>
-                        <Link to={"/profile"} state={product.owner}>{ownerName}</Link>
+                        <Link to={"/userprofile"} state={product.owner}>{ownerName}</Link>
                       </span>
                     </li>
                     <li className="d-flex">

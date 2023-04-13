@@ -75,6 +75,7 @@ function App() {
                 element={user ? <AddProduct /> : <Login />}
               />
               <Route path="/profile" element={user ? <Profile /> : <Login />} />
+              <Route path="/userprofile" element={[<Header />,<Profile />]} />
             </Routes>
             <Footer />
           </BrowserRouter>

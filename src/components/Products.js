@@ -2,33 +2,37 @@ import React, { useState, useEffect } from "react";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import Product from "../components/Product";
 
-function Products({ userProfileData }) {
+function Products({ userProfileData,isCurrentUser }) {
   const [productsData, setProductsData] = useState([]);
 
   async function getData() {
-    let dataArray = [];
-    for (let i = 0; i < userProfileData.products.length; i++) {
-      let data = await getDoc(
-        doc(getFirestore(), "products", userProfileData.products[i])
-      );
-      dataArray.push(data.data());
-    }
-    setProductsData(dataArray);
+    if(productsData.length==userProfileData?.products?.length) return
+    let newData = []
+    userProfileData?.products?.map(async (currentProduct,key)=>{
+      if(currentProduct){
+        let data = await getDoc(
+          doc(getFirestore(), "products", currentProduct)
+        );
+        if(data){
+          newData.push(data.data());
+        }
+      }
+    })
+    setProductsData(newData);
     console.log("Products : ", productsData);
   }
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [productsData]);
 
   return (
     <div className="my-products">
       <div>
-        <p>My Products</p>
+        <p className={isCurrentUser?'':"user-products-title"}>{isCurrentUser?"My Products":"Products"}</p>
       </div>
       <div className="products-container">
-        {productsData.map((currentProduct) => {
-          if (currentProduct)
+        {productsData.map((currentProduct,key) => {
             return (
               <Product
                 name={currentProduct.name}
