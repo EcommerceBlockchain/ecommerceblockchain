@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import UserContext from "../context/UserContext";
 import colors from "../colors";
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  setDoc,
+} from "firebase/firestore";
 import { FaEdit } from "react-icons/fa";
 import { ethers } from "ethers";
 import { getAuth } from "firebase/auth";
@@ -30,6 +36,18 @@ function Account() {
     console.log("user data : ", userProfileData);
   }
 
+  const savedata = () => {
+    setDoc(
+      doc(getFirestore(), "users", getAuth().currentUser.uid),
+      { ...userProfileData, name: name },
+      { merge: true }
+    ).then(() => {
+      console.log("done");
+    });
+
+    console.log("hello");
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -43,6 +61,7 @@ function Account() {
             <div id="firstName">
               <label className="form-label">User Name</label>
               <input
+                style={{ cursor: "not-allowed" }}
                 disabled
                 type="text"
                 className="form-control"
@@ -54,6 +73,7 @@ function Account() {
             <div id="email">
               <label className="form-label">Email</label>
               <input
+                style={{ cursor: "not-allowed" }}
                 disabled
                 type="email"
                 className="form-control"
@@ -139,7 +159,7 @@ function Account() {
         </div>
 
         <div className="mt-3">
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-primary" onClick={savedata}>
             Save All
           </button>
         </div>
