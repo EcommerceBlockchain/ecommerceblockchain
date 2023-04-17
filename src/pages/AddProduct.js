@@ -30,6 +30,7 @@ function AddProduct() {
   const [originalProductFileName, setOriginalProductFileName] = useState("");
   const [file, setFile] = useState(null);
   const [fileSize, setFileSize] = useState(0);
+  const [extension, setExtension] = useState("");
   const [category, setCategory] = useState("Select Category");
   const [formSub, setFormSub] = useState(false);
   const [ogfile, setogfile] = useState(false);
@@ -50,98 +51,113 @@ function AddProduct() {
       images.length !== 0
     ) {
       console.log("heelo in onpress");
-      UploadFile(file).then((path) => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner(userdata.activeAddress);
-        const smcon = new ethers.Contract(
-          smartConracts.addProduct,
-          addproductabi,
-          provider
-        );
-        const signContact = smcon.connect(signer);
+      UploadFile(file)
+        .then((path) => {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner(userdata.activeAddress);
+          const smcon = new ethers.Contract(
+            smartConracts.addProduct,
+            addproductabi,
+            provider
+          );
+          const signContact = smcon.connect(signer);
 
-        addDoc(collection(getFirestore(), "products"), {}).then((response) => {
-          signContact.setPath(response.id, path).then(async (res) => {
-            console.log(res);
-            let preImgArr = [];
-            const storage = getStorage();
+          addDoc(collection(getFirestore(), "products"), {}).then(
+            (response) => {
+              signContact.setPath(response.id, path).then(async (res) => {
+                console.log(res);
+                let preImgArr = [];
+                const storage = getStorage();
 
-            let counter = 0;
+                let counter = 0;
 
-            const storeimage = (counter, preImages) => {
-              if (counter == images.length) {
-                console.log(preImages);
-                setDoc(
-                  doc(getFirestore(), "products", response.id),
-                  {
-                    category: category,
-                    cost: parseFloat(values.price),
-                    description: values.productDescription,
-                    is_active: true,
-                    name: values.productName,
-                    preview_image: preImages,
-                    reviews: [],
-                    tag: tags,
-                    timestamp: Timestamp.fromDate(new Date()),
-                    owner: uid,
-                    rating: 0,
-                    quantity_sold: 0,
-                    fileSize: fileSize,
-                  },
-                  { merge: true }
-                ).then((document) => {
-                  getDoc(doc(getFirestore(), "users", uid)).then((userdoc) => {
+                const storeimage = (counter, preImages) => {
+                  if (counter == images.length) {
+                    console.log(preImages);
                     setDoc(
-                      doc(getFirestore(), "users", uid),
+                      doc(getFirestore(), "products", response.id),
                       {
-                        ...userdoc.data(),
-                        products: [...userdoc.data().products, response.id],
+                        category: category,
+                        cost: parseFloat(values.price),
+                        description: values.productDescription,
+                        is_active: true,
+                        name: values.productName,
+                        preview_image: preImages,
+                        reviews: [],
+                        tag: tags,
+                        timestamp: Timestamp.fromDate(new Date()),
+                        owner: uid,
+                        rating: 0,
+                        quantity_sold: 0,
+                        fileSize: fileSize,
+                        extension: extension,
                       },
                       { merge: true }
-                    ).then(() => {
-                      console.log("done updation");
-                    });
-                  });
-                  navigate("/", { replace: true });
-                });
-              } else {
-                const storageRef = ref(
-                  storage,
-                  `preview_images/${images[counter].name}`
-                );
-                fetch(images[counter].url)
-                  .then((res) => {
-                    return res.blob();
-                  })
-                  .then((blob) => {
-                    uploadBytes(storageRef, blob).then((snapshot) => {
-                      console.log(
-                        "Uploaded a blob or file!",
-                        snapshot.ref.fullPath
+                    ).then((document) => {
+                      getDoc(doc(getFirestore(), "users", uid)).then(
+                        (userdoc) => {
+                          setDoc(
+                            doc(getFirestore(), "users", uid),
+                            {
+                              ...userdoc.data(),
+                              products: [
+                                ...userdoc.data().products,
+                                response.id,
+                              ],
+                            },
+                            { merge: true }
+                          ).then(() => {
+                            console.log("done updation");
+                          });
+                        }
                       );
-                      const pathReference = ref(storage, snapshot.ref.fullPath);
-                      getDownloadURL(pathReference)
-                        .then((url) => {
-                          console.log(url);
-                          preImages.push(url);
-                          console.log("images array", preImages);
-                        })
-                        .then(() => {
-                          counter += 1;
-                          storeimage(counter, preImages);
-                        });
+                      navigate("/", { replace: true });
                     });
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                  });
-              }
-            };
+                  } else {
+                    const storageRef = ref(
+                      storage,
+                      `preview_images/${images[counter].name}`
+                    );
+                    fetch(images[counter].url)
+                      .then((res) => {
+                        return res.blob();
+                      })
+                      .then((blob) => {
+                        uploadBytes(storageRef, blob).then((snapshot) => {
+                          console.log(
+                            "Uploaded a blob or file!",
+                            snapshot.ref.fullPath
+                          );
+                          const pathReference = ref(
+                            storage,
+                            snapshot.ref.fullPath
+                          );
+                          getDownloadURL(pathReference)
+                            .then((url) => {
+                              console.log(url);
+                              preImages.push(url);
+                              console.log("images array", preImages);
+                            })
+                            .then(() => {
+                              counter += 1;
+                              storeimage(counter, preImages);
+                            });
+                        });
+                      })
+                      .catch((error) => {
+                        console.error(error);
+                      });
+                  }
+                };
 
-            storeimage(counter, preImgArr);
-          });
+                storeimage(counter, preImgArr);
+              });
+            }
+          );
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      });
     }
   };
 
@@ -344,6 +360,7 @@ function AddProduct() {
                             onChange={(e) => {
                               console.log(e.target.files);
                               Array.from(e.target.files).forEach((item) => {
+                                console.log("type", item.type);
                                 setimages((prev) => [
                                   ...prev,
                                   {
@@ -510,6 +527,7 @@ function AddProduct() {
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setFileSize(e.target.files[0].size);
+                            setExtension(e.target.files[0].type.split("/")[1]);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -528,6 +546,7 @@ function AddProduct() {
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setFileSize(e.target.files[0].size);
+                            setExtension(e.target.files[0].type.split("/")[1]);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -546,6 +565,7 @@ function AddProduct() {
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setFileSize(e.target.files[0].size);
+                            setExtension(e.target.files[0].type.split("/")[1]);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -564,6 +584,7 @@ function AddProduct() {
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setFileSize(e.target.files[0].size);
+                            setExtension(e.target.files[0].type.split("/")[1]);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -582,6 +603,7 @@ function AddProduct() {
                             console.log(e.target.files);
                             setOriginalProductFileName(e.target.files[0].name);
                             setFileSize(e.target.files[0].size);
+                            setExtension(e.target.files[0].type.split("/")[1]);
                           }}
                           name="uploadfile"
                           id="img-2"
@@ -665,6 +687,7 @@ function AddProduct() {
                             onClick={() => {
                               setOriginalProductFileName("");
                               setFileSize(0);
+                              setExtension("");
                             }}
                           >
                             <i className="tf-ion-close"></i>

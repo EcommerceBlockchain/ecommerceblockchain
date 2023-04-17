@@ -21,6 +21,7 @@ import Products from "../components/Products";
 import Orders from "../components/Orders";
 import Transactions from "../components/Transactions";
 import userlogo from "../images/user.png";
+import ProfileProducts from "../components/ProfileProducts";
 
 // hex to rgba converter
 
@@ -70,7 +71,6 @@ function Profile() {
     <>
       <div
         style={{
-          overflowY: "hidden",
           display: "flex",
           height: "100%",
         }}
@@ -78,12 +78,25 @@ function Profile() {
         <Sidebar
           customBreakPoint="800px"
           transitionDuration={500}
-          rootStyles={{
-            zIndex: 100,
-            boxShadow: "0px 0px 15px 5px rgba(0,0,0,0.1)",
-            height: "100%",
-            backgroundColor: "white",
-          }}
+          rootStyles={
+            broken
+              ? {
+                  zIndex: 100,
+                  boxShadow: "0px 0px 15px 5px rgba(0,0,0,0.1)",
+                  height: "100%",
+                  backgroundColor: "white",
+                }
+              : {
+                  zIndex: 100,
+                  boxShadow: "0px 0px 15px 5px rgba(0,0,0,0.1)",
+                  height: "100%",
+                  position: "fixed",
+                  top: 0,
+                  left: 0,
+                  width: "200px",
+                  backgroundColor: "white",
+                }
+          }
         >
           <div
             style={{
@@ -189,7 +202,7 @@ function Profile() {
         <main
           style={{
             width: "100%",
-
+            marginLeft: broken ? 0 : "250px",
             height: "fit-content",
           }}
         >
@@ -304,7 +317,10 @@ function Profile() {
 
               {menuselection === 1 && <Account />}
               {menuselection === 2 && (
-                <Products userProfileData={userProfileData} isCurrentUser={true} />
+                <ProfileProducts
+                  userProfileData={userProfileData}
+                  isCurrentUser={true}
+                />
               )}
               {menuselection === 3 && (
                 <Orders userProfileData={userProfileData} />

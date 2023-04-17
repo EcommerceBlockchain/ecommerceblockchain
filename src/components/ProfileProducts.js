@@ -1,59 +1,31 @@
-import { getAuth } from "firebase/auth";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import React from "react";
 import { useEffect, useState } from "react";
+import Product from "./Product";
 import { Link } from "react-router-dom";
-import { FaDownload } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import colors from "../colors";
-import { ethers } from "ethers";
-import smartContracts from "../blockchain/smartContracts";
-import addproductabi from "../blockchain/abis/addProduct.json";
-import GetFileByPath from "../service/GetFileByPath";
 
-function Orders({ userProfileData }) {
+function ProfileProducts({ userProfileData, isCurrentUser }) {
   const [products, setProducts] = useState([]);
-  const [downloadurls, setDownloadurls] = useState([]);
 
   const getdata = () => {
     setProducts([]);
-    setDownloadurls([]);
-    userProfileData?.bought?.forEach(async (element, index) => {
+
+    if (products.length == userProfileData?.products?.length) return;
+
+    userProfileData?.products?.forEach((element, index) => {
       getDoc(doc(getFirestore(), "products", element)).then((res) => {
         setProducts((prev) => [...prev, { ...res.data(), id: element }]);
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const smcon = new ethers.Contract(
-          smartContracts.addProduct,
-          addproductabi,
-          provider
-        );
-
-        smcon.getPath(element).then((res) => {
-          setDownloadurls((prev) => [...prev, GetFileByPath(res)]);
-        });
       });
     });
   };
 
-  function downloadFile(file, name, extension) {
-    console.log(file, name);
-
-    fetch(file)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = name + "." + extension;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      });
-  }
+  const deleteProduct = () => {};
 
   useEffect(() => {
-    setProducts([]);
     getdata();
-  }, []);
+  }, [userProfileData]);
 
   return (
     <div>
@@ -65,7 +37,8 @@ function Orders({ userProfileData }) {
               <th class="border-bottom">Thumbnail</th>
               <th class="border-bottom">Name</th>
               <th class="border-bottom">Price</th>
-              <th class="border-bottom">Download</th>
+              <th class="border-bottom">Edit</th>
+              <th class="border-bottom">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -91,18 +64,24 @@ function Orders({ userProfileData }) {
                   </td>
 
                   <td>
-                    <button
-                      class="btn"
-                      onClick={() =>
-                        downloadFile(
-                          downloadurls[index],
-                          item.name,
-                          item.extension
-                        )
-                      }
-                    >
-                      <FaDownload color={colors.primaryBlue} size={15} />
+                    <button class="btn">
+                      <FaEdit size={15} color={colors.yellow} />
                     </button>
+                  </td>
+                  <td>
+                    {item.is_active ? (
+                      <button class="btn" onClick={deleteProduct}>
+                        <span class="fw-normal" style={{ color: colors.red }}>
+                          Deactivate
+                        </span>
+                      </button>
+                    ) : (
+                      <button class="btn" onClick={deleteProduct}>
+                        <span class="fw-normal" style={{ color: colors.green }}>
+                          Activate
+                        </span>
+                      </button>
+                    )}
                   </td>
                 </tr>
               );
@@ -114,4 +93,4 @@ function Orders({ userProfileData }) {
   );
 }
 
-export default Orders;
+export default ProfileProducts;

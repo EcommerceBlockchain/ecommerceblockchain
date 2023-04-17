@@ -84,7 +84,7 @@ function SignUp() {
             reward: 0,
             transaction: [],
             walletAddress: accounts,
-            activeAddress: "",
+            activeAddress: accounts[0],
           }).then(() => {
             console.log("signup done");
           });

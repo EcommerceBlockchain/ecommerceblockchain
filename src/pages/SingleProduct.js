@@ -17,6 +17,7 @@ import UserContext from "../context/UserContext";
 import GoToTop from "../components/GoToTop";
 import activity from "../images/activity.gif";
 import { getAuth } from "firebase/auth";
+import colors from "../colors";
 
 function SingleProduct() {
   const userid = getAuth()?.currentUser?.uid;
@@ -37,14 +38,14 @@ function SingleProduct() {
 
   const getProduct = async () => {
     setProduct({});
-    console.log(id)
+    console.log(id);
     const pro = await getDoc(doc(getFirestore(), "products", id));
 
     console.log(pro.data().owner, "yayyaya");
     const getOwner = await getDoc(
       doc(getFirestore(), "users", pro.data().owner)
     );
-    console.log(getOwner.data())
+    console.log(getOwner.data());
     setOwnerName(getOwner.data().username);
     console.log(pro.data());
     setProduct(pro.data());
@@ -222,7 +223,21 @@ function SingleProduct() {
                       display: "flex",
                     }}
                   >
-                    {!added ? (
+                    {userdata?.bought?.includes(id) ? (
+                      <button
+                        style={{
+                          marginRight: "0.5rem",
+                          marginLeft: "0.5rem",
+                          backgroundColor: colors.green,
+                          cursor: "not-allowed",
+                        }}
+                        type="button"
+                        className="cart-btn"
+                        disabled
+                      >
+                        Bought
+                      </button>
+                    ) : !added ? (
                       <button
                         style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
                         type="button"
@@ -336,7 +351,16 @@ function SingleProduct() {
                     <li className="d-flex">
                       <strong>Owner</strong>
                       <span>
-                        <Link to={product?.owner==userdata.uid?"/profile":"/userprofile"} state={product.owner}>{ownerName}</Link>
+                        <Link
+                          to={
+                            product?.owner == userdata.uid
+                              ? "/profile"
+                              : "/userprofile"
+                          }
+                          state={product.owner}
+                        >
+                          {ownerName}
+                        </Link>
                       </span>
                     </li>
                     <li className="d-flex">
@@ -350,7 +374,12 @@ function SingleProduct() {
 
                     <li className="d-flex">
                       <strong>Size</strong>
-                      <span>1.5 MB</span>
+                      <span>
+                        {product?.fileSize
+                          ? (product?.fileSize / 1024 / 1024).toFixed(2)
+                          : ""}{" "}
+                        MB
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -360,90 +389,95 @@ function SingleProduct() {
                   role="tabpanel"
                   aria-labelledby="nav-contact-tab"
                 >
-                  <div className="row" style={{justifyContent:"space-between"}}>
-                    {
-                      product?.reviews?.length==0?
-                      <p className="col-lg-6" style={{textAlign:"center"}}>No reviews yet</p>
-                      :<div className="col-lg-6">
-                      <div className="media review-block mb-4">
-                        <img
-                          src="assets/images/avater-1.jpg"
-                          alt="reviewimg"
-                          className="img-fluid mr-4"
-                        />
-                        <div className="media-body">
-                          <div className="product-review">
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
+                  <div
+                    className="row"
+                    style={{ justifyContent: "space-between" }}
+                  >
+                    {product?.reviews?.length == 0 ? (
+                      <p className="col-lg-6" style={{ textAlign: "center" }}>
+                        No reviews yet
+                      </p>
+                    ) : (
+                      <div className="col-lg-6">
+                        <div className="media review-block mb-4">
+                          <img
+                            src="assets/images/avater-1.jpg"
+                            alt="reviewimg"
+                            className="img-fluid mr-4"
+                          />
+                          <div className="media-body">
+                            <div className="product-review">
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                            </div>
+                            <h6>
+                              Digimart{" "}
+                              <span className="text-sm text-muted font-weight-normal ml-3">
+                                Jan 1, 2023
+                              </span>
+                            </h6>
+                            <p>
+                              Lorem ipsum dolor sit amet, consectetur
+                              adipisicing elit. Ipsum suscipit consequuntur in,
+                              perspiciatis laudantium ipsa fugit. Iure esse
+                              saepe error dolore quod.
+                            </p>
                           </div>
-                          <h6>
-                            Digimart{" "}
-                            <span className="text-sm text-muted font-weight-normal ml-3">
-                              Jan 1, 2023
-                            </span>
-                          </h6>
-                          <p>
-                            Lorem ipsum dolor sit amet, consectetur adipisicing
-                            elit. Ipsum suscipit consequuntur in, perspiciatis
-                            laudantium ipsa fugit. Iure esse saepe error dolore
-                            quod.
-                          </p>
                         </div>
-                      </div>
 
-                      <div className="media review-block">
-                        <img
-                          src="assets/images/avater-2.jpg"
-                          alt="reviewimg"
-                          className="img-fluid mr-4"
-                        />
-                        <div className="media-body">
-                          <div className="product-review">
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star"></i>
-                            </span>
-                            <span>
-                              <i className="tf-ion-android-star-outline"></i>
-                            </span>
+                        <div className="media review-block">
+                          <img
+                            src="assets/images/avater-2.jpg"
+                            alt="reviewimg"
+                            className="img-fluid mr-4"
+                          />
+                          <div className="media-body">
+                            <div className="product-review">
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star"></i>
+                              </span>
+                              <span>
+                                <i className="tf-ion-android-star-outline"></i>
+                              </span>
+                            </div>
+                            <h6>
+                              Digimart{" "}
+                              <span className="text-sm text-muted font-weight-normal ml-3">
+                                Jan 1, 2023
+                              </span>
+                            </h6>
+                            <p>
+                              Lorem ipsum dolor sit amet, consectetur
+                              adipisicing elit. Ipsum suscipit consequuntur in,
+                              perspiciatis laudantium ipsa fugit. Iure esse
+                              saepe error dolore quod.
+                            </p>
                           </div>
-                          <h6>
-                            Digimart{" "}
-                            <span className="text-sm text-muted font-weight-normal ml-3">
-                              Jan 1, 2023
-                            </span>
-                          </h6>
-                          <p>
-                            Lorem ipsum dolor sit amet, consectetur adipisicing
-                            elit. Ipsum suscipit consequuntur in, perspiciatis
-                            laudantium ipsa fugit. Iure esse saepe error dolore
-                            quod.
-                          </p>
                         </div>
                       </div>
-                    </div>
-                    }
+                    )}
 
                     <div className="col-lg-5">
                       <div className="review-comment mt-5 mt-lg-0">

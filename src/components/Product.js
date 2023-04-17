@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import activity from "../images/activity.gif";
 import { getAuth } from "firebase/auth";
+import colors from "../colors";
 
 function Product({ name, id, price, preImg, owner }) {
   const navigate = useNavigate();
@@ -114,7 +115,21 @@ function Product({ name, id, price, preImg, owner }) {
             alignItems: "center",
           }}
         >
-          {!added ? (
+          {userdata?.bought?.includes(id) ? (
+            <button
+              style={{
+                marginRight: "0.5rem",
+                marginLeft: "0.5rem",
+                backgroundColor: colors.green,
+                cursor: "not-allowed",
+              }}
+              type="button"
+              className="cart-btn"
+              disabled
+            >
+              Bought
+            </button>
+          ) : !added ? (
             <button
               style={{ marginRight: "0.5rem", marginLeft: "0.5rem" }}
               type="button"
