@@ -16,7 +16,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import Account from "../components/Account";
 import UserContext from "../context/UserContext";
-import { async } from "@firebase/util";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import Products from "../components/Products";
 import Orders from "../components/Orders";
@@ -305,7 +304,7 @@ function Profile() {
 
               {menuselection === 1 && <Account />}
               {menuselection === 2 && (
-                <Products userProfileData={userProfileData} />
+                <Products userProfileData={userProfileData} isCurrentUser={true} />
               )}
               {menuselection === 3 && (
                 <Orders userProfileData={userProfileData} />

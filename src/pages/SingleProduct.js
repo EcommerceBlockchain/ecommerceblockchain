@@ -336,7 +336,7 @@ function SingleProduct() {
                     <li className="d-flex">
                       <strong>Owner</strong>
                       <span>
-                        <Link to={"/userprofile"} state={product.owner}>{ownerName}</Link>
+                        <Link to={product?.owner==userdata.uid?"/profile":"/userprofile"} state={product.owner}>{ownerName}</Link>
                       </span>
                     </li>
                     <li className="d-flex">
@@ -360,8 +360,11 @@ function SingleProduct() {
                   role="tabpanel"
                   aria-labelledby="nav-contact-tab"
                 >
-                  <div className="row">
-                    <div className="col-lg-7">
+                  <div className="row" style={{justifyContent:"space-between"}}>
+                    {
+                      product?.reviews?.length==0?
+                      <p className="col-lg-6" style={{textAlign:"center"}}>No reviews yet</p>
+                      :<div className="col-lg-6">
                       <div className="media review-block mb-4">
                         <img
                           src="assets/images/avater-1.jpg"
@@ -440,6 +443,7 @@ function SingleProduct() {
                         </div>
                       </div>
                     </div>
+                    }
 
                     <div className="col-lg-5">
                       <div className="review-comment mt-5 mt-lg-0">
