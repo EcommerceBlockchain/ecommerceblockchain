@@ -325,7 +325,9 @@ function Profile() {
               {menuselection === 3 && (
                 <Orders userProfileData={userProfileData} />
               )}
-              {menuselection === 4 && <Transactions />}
+              {menuselection === 4 && (
+                <Transactions userProfileData={userProfileData} />
+              )}
             </div>
           </div>
         </main>

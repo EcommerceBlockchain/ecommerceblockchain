@@ -41,18 +41,6 @@ function Products({ userProfileData, isCurrentUser }) {
         >
           Products
         </h5>
-        {isCurrentUser && (
-          <Link to={"/addproduct"}>
-            <div className="mt-3">
-              <button
-                className="btn-primary p-2"
-                style={{ border: "none", boxShadow: "none", fontSize: "12px" }}
-              >
-                Add Product
-              </button>
-            </div>
-          </Link>
-        )}
       </div>
       <div
         className={isCurrentUser ? "mt-3" : "user-product-title"}

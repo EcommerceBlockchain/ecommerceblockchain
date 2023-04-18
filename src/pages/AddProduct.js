@@ -83,7 +83,7 @@ function AddProduct() {
                         is_active: true,
                         name: values.productName,
                         preview_image: preImages,
-                        reviews: [],
+                        reviews: {},
                         tag: tags,
                         timestamp: Timestamp.fromDate(new Date()),
                         owner: uid,

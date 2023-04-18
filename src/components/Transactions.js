@@ -1,9 +1,60 @@
-import React from "react";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import React, { useEffect } from "react";
+import { useState } from "react";
 
-function Transactions() {
+function Transactions({ userProfileData }) {
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const getdata = () => {
+    setLoading(true);
+    getDocs(
+      query(
+        collection(getFirestore(), "transactions"),
+        where("to", "array-contains-any", userProfileData?.walletAddress)
+      )
+    ).then((res) => {
+      res.docs.forEach((item) => {
+        console.log(item.data(), "mast");
+        setTransactions((prev) => [...prev, { ...item.data(), id: item.id }]);
+      });
+    });
+    getDocs(
+      query(
+        collection(getFirestore(), "transactions"),
+        where("from", "in", userProfileData?.walletAddress)
+      )
+    ).then((res) => {
+      res.docs.forEach((item) => {
+        console.log(item.data(), "mast 2");
+        setTransactions((prev) => [...prev, { ...item.data(), id: item.id }]);
+      });
+    });
+
+    console.log("transactions,", transactions);
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    setTransactions([]);
+    getdata();
+  }, []);
+
   return (
     <div>
       <p>Transactions</p>
+
+      {transactions?.map((item) => {
+        return <p>{item.id}</p>;
+      })}
       {/* {userProfileData.transaction.map((item) => {
         return <h5>{item}</h5>;
       })} */}

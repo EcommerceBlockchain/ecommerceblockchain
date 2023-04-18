@@ -3,7 +3,6 @@ import Footer from "../src/components/Footer"; //Include Footer
 import Home from "../src/pages/Home";
 import Shop from "../src/pages/Shop";
 import SingleProduct from "./pages/SingleProduct";
-import Checkout from "../src/pages/Checkout";
 import Cart from "../src/pages/Cart";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
@@ -63,10 +62,6 @@ function App() {
               <Route path="/shop" element={<Shop />} />
               <Route path="/single-product" element={<SingleProduct />} />
 
-              <Route
-                path="/checkout"
-                element={user ? <Checkout /> : <Login />}
-              />
               <Route path="/cart" element={user ? <Cart /> : <Login />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />

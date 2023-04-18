@@ -61,7 +61,20 @@ function Home() {
     setBestSeller(bestseller);
   };
 
-  const addwallet = async () => {};
+  const addwallet = () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const smcon = new ethers.Contract(
+      smartConracts.addProduct,
+      addproductabi,
+      provider
+    );
+
+    products.forEach((item, index) => {
+      smcon.getPath(item.id).then((res) => {
+        console.log(index, res);
+      });
+    });
+  };
 
   useEffect(() => {
     getProducts();

@@ -9,12 +9,15 @@ import { ethers } from "ethers";
 import smartContracts from "../blockchain/smartContracts";
 import addproductabi from "../blockchain/abis/addProduct.json";
 import GetFileByPath from "../service/GetFileByPath";
+import activity from "../images/activity.gif";
 
 function Orders({ userProfileData }) {
   const [products, setProducts] = useState([]);
   const [downloadurls, setDownloadurls] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const getdata = () => {
+    setLoading(true);
     setProducts([]);
     setDownloadurls([]);
     userProfileData?.bought?.forEach(async (element, index) => {
@@ -32,6 +35,7 @@ function Orders({ userProfileData }) {
         });
       });
     });
+    setLoading(false);
   };
 
   function downloadFile(file, name, extension) {
@@ -58,58 +62,63 @@ function Orders({ userProfileData }) {
   return (
     <div>
       <p>Orders</p>
-      <div>
-        <table class="user-table align-items-center table table-hover">
-          <thead>
-            <tr>
-              <th class="border-bottom">Thumbnail</th>
-              <th class="border-bottom">Name</th>
-              <th class="border-bottom">Price</th>
-              <th class="border-bottom">Download</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products?.map((item, index) => {
-              return (
-                <tr>
-                  <td className="product-thumbnail" data-title="Thumbnail">
-                    <Link to={"/single-product"} state={{ id: item.id }}>
-                      <img
-                        src={item.preview_image[0]}
-                        className="attachment-woocommerce_thumbnail size-woocommerce_thumbnail img-fluid"
-                        alt={item.name}
-                      />
-                    </Link>
-                  </td>
-                  <td>
-                    <Link to={"/single-product"} state={{ id: item.id }}>
-                      {item.name}
-                    </Link>
-                  </td>
-                  <td>
-                    <span class="fw-normal">{item.cost} Eth</span>
-                  </td>
+      {loading && <img width={30} src={activity} alt="activity" />}
+      {products.length === 0 && !loading ? (
+        <p>No Orders to display</p>
+      ) : (
+        <div>
+          <table class="user-table align-items-center table table-hover">
+            <thead>
+              <tr>
+                <th class="border-bottom">Thumbnail</th>
+                <th class="border-bottom">Name</th>
+                <th class="border-bottom">Price</th>
+                <th class="border-bottom">Download</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products?.map((item, index) => {
+                return (
+                  <tr>
+                    <td className="product-thumbnail" data-title="Thumbnail">
+                      <Link to={"/single-product"} state={{ id: item.id }}>
+                        <img
+                          src={item.preview_image[0]}
+                          className="attachment-woocommerce_thumbnail size-woocommerce_thumbnail img-fluid"
+                          alt={item.name}
+                        />
+                      </Link>
+                    </td>
+                    <td>
+                      <Link to={"/single-product"} state={{ id: item.id }}>
+                        {item.name}
+                      </Link>
+                    </td>
+                    <td>
+                      <span class="fw-normal">{item.cost} Eth</span>
+                    </td>
 
-                  <td>
-                    <button
-                      class="btn"
-                      onClick={() =>
-                        downloadFile(
-                          downloadurls[index],
-                          item.name,
-                          item.extension
-                        )
-                      }
-                    >
-                      <FaDownload color={colors.primaryBlue} size={15} />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    <td>
+                      <button
+                        class="btn"
+                        onClick={() =>
+                          downloadFile(
+                            downloadurls[index],
+                            item.name,
+                            item.extension
+                          )
+                        }
+                      >
+                        <FaDownload color={colors.primaryBlue} size={15} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

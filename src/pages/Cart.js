@@ -72,7 +72,7 @@ function Cart() {
     let isTransactionSuccessfull = false;
     setLoading(true);
     Object.values(OwnersWithPrice).forEach((item) => {
-      price.push(ethers.utils.parseEther(item.toString()));
+      price.push(ethers.utils.parseEther(item.toFixed(10).toString()));
     });
 
     try {
@@ -84,6 +84,7 @@ function Cart() {
         provider
       );
       const signContact = smcon.connect(signer);
+
       const transaction = await signContact.sendAmountsToAddresses(
         [...price, ethers.utils.parseEther((subTotal * 0.05).toFixed(10))],
         [
@@ -101,6 +102,19 @@ function Cart() {
         .then((res) => {
           console.log(res);
           isTransactionSuccessfull = true;
+          productIds.forEach((item) => {
+            getDoc(doc(getFirestore(), "products", item))
+              .then((docs) => {
+                setDoc(
+                  doc(getFirestore(), "products", item),
+                  {
+                    quantity_sold: docs.data().quantity_sold + 1,
+                  },
+                  { merge: true }
+                );
+              })
+              .then("quantity modified");
+          });
         })
         .catch((err) => {
           console.log("errrr", err);

@@ -9,15 +9,19 @@ import {
   query,
   setDoc,
   where,
+  Timestamp,
 } from "firebase/firestore";
 import { useEffect, useState, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import StarRatings from "react-star-ratings";
 import UserContext from "../context/UserContext";
+import userlogo from "../images/user.png";
 
 import GoToTop from "../components/GoToTop";
 import activity from "../images/activity.gif";
 import { getAuth } from "firebase/auth";
 import colors from "../colors";
+import { object } from "yup";
 
 function SingleProduct() {
   const userid = getAuth()?.currentUser?.uid;
@@ -29,6 +33,8 @@ function SingleProduct() {
   const [ownerName, setOwnerName] = useState("");
   const [loader, setLoader] = useState(false);
   const [added, setAdded] = useState(false);
+  const [timestamp, setTimestamp] = useState([]);
+  const [rating, setRating] = useState(0);
 
   const [tag, setTags] = useState([]);
 
@@ -44,6 +50,14 @@ function SingleProduct() {
     console.log(pro.data().owner, "yayyaya");
     const getOwner = await getDoc(
       doc(getFirestore(), "users", pro.data().owner)
+    );
+    setTimestamp(
+      new Date(
+        pro.data()?.timestamp?.seconds * 1000 +
+          pro.data()?.timestamp?.nanoseconds / 1000000
+      )
+        .toDateString()
+        .split(" ")
     );
     console.log(getOwner.data());
     setOwnerName(getOwner.data().username);
@@ -102,12 +116,53 @@ function SingleProduct() {
     }
   };
 
+  const addReview = () => {
+    let comment = document.getElementById("comment");
+    getDoc(doc(getFirestore(), "products", id)).then((res) => {
+      setDoc(
+        doc(getFirestore(), "products", id),
+        {
+          reviews: {
+            ...res.data().reviews,
+            [getAuth().currentUser.uid]: {
+              rating: rating,
+              review: comment.value,
+              timestamp: Timestamp.fromDate(new Date()),
+            },
+          },
+          rating: parseFloat(
+            (
+              (res.data().rating + rating) /
+              (Object.keys(res.data().reviews).length === 0 ? 1 : 2)
+            ).toFixed(1)
+          ),
+        },
+        { merge: true }
+      );
+      setDoc(
+        doc(getFirestore(), "users", getAuth().currentUser.uid),
+        {
+          avg_rating:
+            (userdata?.avg_rating +
+              (res.data().rating + rating) /
+                (Object.keys(res.data().reviews).length === 0 ? 1 : 2)) /
+            (userdata?.avg_rating === 0 ? 1 : 2),
+        },
+        { merge: true }
+      );
+      comment.value = "";
+      setRating(0);
+    });
+  };
+
   useEffect(() => {
     setAdded(false);
     getProduct();
     getRelatedProducts();
     getCart();
   }, []);
+
+  if (!product) return <div></div>;
 
   return (
     <div className="single-product-container">
@@ -118,6 +173,15 @@ function SingleProduct() {
             <div className="col-lg-6">
               <div className="content text-center">
                 <h1 className="mb-3">{product.name}</h1>
+                <StarRatings
+                  numberOfStars={5}
+                  starEmptyColor="grey"
+                  starHoverColor={colors.darkYellow}
+                  starRatedColor={colors.darkYellow}
+                  starDimension="30px"
+                  starSpacing="5px"
+                  rating={product?.rating}
+                />
                 <p>
                   {product?.description?.length > 150
                     ? product.description.slice(0, 150) + "..."
@@ -335,7 +399,12 @@ function SingleProduct() {
                     aria-controls="nav-contact"
                     aria-selected="false"
                   >
-                    Reviews(2)
+                    Reviews(
+                    {product?.reviews
+                      ? Object.keys(product?.reviews ? product?.reviews : {})
+                          .length
+                      : 0}
+                    )
                   </a>
                 </div>
               </nav>
@@ -353,7 +422,7 @@ function SingleProduct() {
                       <span>
                         <Link
                           to={
-                            product?.owner == userdata.uid
+                            product?.owner === getAuth().currentUser.uid
                               ? "/profile"
                               : "/userprofile"
                           }
@@ -364,12 +433,8 @@ function SingleProduct() {
                       </span>
                     </li>
                     <li className="d-flex">
-                      <strong>Dimensions </strong>
-                      <span>720 x 576 pixels</span>
-                    </li>
-                    <li className="d-flex">
-                      <strong>File Name </strong>
-                      <span></span>
+                      <strong>Type</strong>
+                      <span>{product?.extension}</span>
                     </li>
 
                     <li className="d-flex">
@@ -379,6 +444,12 @@ function SingleProduct() {
                           ? (product?.fileSize / 1024 / 1024).toFixed(2)
                           : ""}{" "}
                         MB
+                      </span>
+                    </li>
+                    <li className="d-flex">
+                      <strong>Date</strong>
+                      <span>
+                        {timestamp[2] + " " + timestamp[1] + " " + timestamp[3]}
                       </span>
                     </li>
                   </ul>
@@ -393,112 +464,95 @@ function SingleProduct() {
                     className="row"
                     style={{ justifyContent: "space-between" }}
                   >
-                    {product?.reviews?.length == 0 ? (
+                    {Object.keys(product?.reviews ? product?.reviews : {})
+                      .length === 0 ? (
                       <p className="col-lg-6" style={{ textAlign: "center" }}>
                         No reviews yet
                       </p>
                     ) : (
-                      <div className="col-lg-6">
-                        <div className="media review-block mb-4">
-                          <img
-                            src="assets/images/avater-1.jpg"
-                            alt="reviewimg"
-                            className="img-fluid mr-4"
-                          />
-                          <div className="media-body">
-                            <div className="product-review">
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                            </div>
-                            <h6>
-                              Digimart{" "}
-                              <span className="text-sm text-muted font-weight-normal ml-3">
-                                Jan 1, 2023
-                              </span>
-                            </h6>
-                            <p>
-                              Lorem ipsum dolor sit amet, consectetur
-                              adipisicing elit. Ipsum suscipit consequuntur in,
-                              perspiciatis laudantium ipsa fugit. Iure esse
-                              saepe error dolore quod.
-                            </p>
-                          </div>
-                        </div>
+                      <div
+                        className="col-lg-6"
+                        style={{
+                          overflow: "scroll",
+                          maxHeight: "500px",
+                        }}
+                      >
+                        {Object.keys(product?.reviews).map((item) => {
+                          return (
+                            <div
+                              className="media review-block mb-4 p-3"
+                              style={{
+                                borderRadius: "1rem",
+                                boxShadow: "2px 2px 5px rgba(0,0,0,0.2)",
+                                border: "1px solid lightgrey",
+                              }}
+                            >
+                              <div className="media-body">
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: "2rem",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <img
+                                    src={userlogo}
+                                    alt="reviewimg"
+                                    className="img-fluid"
+                                    style={{ width: "60px" }}
+                                  />
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      paddingTop: "15px",
+                                    }}
+                                  >
+                                    <h6>{item}</h6>
+                                    <div
+                                      className="product-review"
+                                      style={{ position: "relative", top: -15 }}
+                                    >
+                                      <StarRatings
+                                        numberOfStars={5}
+                                        starEmptyColor="grey"
+                                        starHoverColor={colors.darkYellow}
+                                        starRatedColor={colors.darkYellow}
+                                        starDimension="15px"
+                                        starSpacing="1px"
+                                        rating={
+                                          product?.reviews?.[item]?.rating
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
 
-                        <div className="media review-block">
-                          <img
-                            src="assets/images/avater-2.jpg"
-                            alt="reviewimg"
-                            className="img-fluid mr-4"
-                          />
-                          <div className="media-body">
-                            <div className="product-review">
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star"></i>
-                              </span>
-                              <span>
-                                <i className="tf-ion-android-star-outline"></i>
-                              </span>
+                                <div>
+                                  <p style={{ paddingLeft: "92px" }}>
+                                    {product?.reviews?.[item]?.review}
+                                  </p>
+                                  <p
+                                    style={{ textAlign: "right" }}
+                                    className="text-sm text-muted font-weight-normal ml-3"
+                                  >
+                                    Jan 1, 2023
+                                  </p>
+                                </div>
+                              </div>
                             </div>
-                            <h6>
-                              Digimart{" "}
-                              <span className="text-sm text-muted font-weight-normal ml-3">
-                                Jan 1, 2023
-                              </span>
-                            </h6>
-                            <p>
-                              Lorem ipsum dolor sit amet, consectetur
-                              adipisicing elit. Ipsum suscipit consequuntur in,
-                              perspiciatis laudantium ipsa fugit. Iure esse
-                              saepe error dolore quod.
-                            </p>
-                          </div>
-                        </div>
+                          );
+                        })}
                       </div>
                     )}
 
-                    <div className="col-lg-5">
-                      <div className="review-comment mt-5 mt-lg-0">
-                        <h4 className="mb-3">Add a Review</h4>
+                    {getAuth().currentUser.uid !== product?.owner && (
+                      <div className="col-lg-5">
+                        <div className="review-comment mt-5 mt-lg-0">
+                          <h4 className="mb-3">Add a Review</h4>
 
-                        <form action="#">
                           <div className="starrr"></div>
-                          <div className="form-group">
-                            <input
-                              type="text"
-                              className="form-control"
-                              placeholder="Your Name"
-                            />
-                          </div>
-                          <div className="form-group">
-                            <input
-                              type="email"
-                              className="form-control"
-                              placeholder="Your Email"
-                            />
-                          </div>
+
                           <div className="form-group">
                             <textarea
                               name="comment"
@@ -508,17 +562,27 @@ function SingleProduct() {
                               rows="4"
                               placeholder="Your Review"
                             ></textarea>
+                            <StarRatings
+                              numberOfStars={5}
+                              starEmptyColor="grey"
+                              starHoverColor={colors.darkYellow}
+                              starRatedColor={colors.darkYellow}
+                              starDimension="20px"
+                              starSpacing="5px"
+                              rating={rating}
+                              changeRating={setRating}
+                            />
                           </div>
 
                           <a
-                            routerLink="/single-product"
                             className="btn btn-main btn-small"
+                            onClick={addReview}
                           >
                             Submit Review
                           </a>
-                        </form>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
