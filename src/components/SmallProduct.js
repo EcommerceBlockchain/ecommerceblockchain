@@ -1,7 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import StarRatings from "react-star-ratings";
+import colors from "../colors";
 
-function SmallProduct({ name, id, price, preImg }) {
+function SmallProduct({ name, id, price, preImg, rating }) {
   const naviagte = useNavigate();
 
   return (
@@ -26,7 +28,18 @@ function SmallProduct({ name, id, price, preImg }) {
       </div>
       <div className="media-body">
         <h6 className="featured-entry-title mb-0">{name}</h6>
-        <span className="price">{price} Eth</span>
+        <div style={{ marginBottom: -10 }}>
+          <span className="price">{price} Eth</span>
+        </div>
+        <StarRatings
+          numberOfStars={5}
+          starEmptyColor="grey"
+          starHoverColor={colors.darkYellow}
+          starRatedColor={colors.darkYellow}
+          starDimension="10px"
+          starSpacing="1px"
+          rating={rating}
+        />
       </div>
     </div>
   );

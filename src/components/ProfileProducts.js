@@ -1,4 +1,4 @@
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import React from "react";
 import { useEffect, useState } from "react";
 import Product from "./Product";
@@ -15,8 +15,6 @@ function ProfileProducts({ userProfileData, isCurrentUser }) {
     setLoading(true);
     setProducts([]);
 
-    if (products.length == userProfileData?.products?.length) return;
-
     userProfileData?.products?.forEach((element, index) => {
       getDoc(doc(getFirestore(), "products", element)).then((res) => {
         setProducts((prev) => [...prev, { ...res.data(), id: element }]);
@@ -25,11 +23,21 @@ function ProfileProducts({ userProfileData, isCurrentUser }) {
     setLoading(false);
   };
 
-  const deleteProduct = () => {};
+  const deleteProduct = (_id, _active) => {
+    setDoc(
+      doc(getFirestore(), "products", _id),
+      {
+        is_active: !_active,
+      },
+      { merge: true }
+    ).then(() => {
+      getdata();
+    });
+  };
 
   useEffect(() => {
     getdata();
-  }, [userProfileData]);
+  }, []);
 
   return (
     <div>
@@ -44,7 +52,7 @@ function ProfileProducts({ userProfileData, isCurrentUser }) {
         <p>Products</p>
         {isCurrentUser && (
           <div>
-            <Link to={"/addproduct"}>
+            <Link to={"/addproduct"} state={null}>
               <button
                 className="btn-primary p-2"
                 style={{ border: "none", boxShadow: "none", fontSize: "12px" }}
@@ -73,7 +81,7 @@ function ProfileProducts({ userProfileData, isCurrentUser }) {
             <tbody>
               {products?.map((item, index) => {
                 return (
-                  <tr>
+                  <tr key={index}>
                     <td className="product-thumbnail" data-title="Thumbnail">
                       <Link to={"/single-product"} state={{ id: item.id }}>
                         <img
@@ -93,19 +101,25 @@ function ProfileProducts({ userProfileData, isCurrentUser }) {
                     </td>
 
                     <td>
-                      <button class="btn">
+                      <Link class="btn" to={"/addproduct"} state={item}>
                         <FaEdit size={15} color={colors.yellow} />
-                      </button>
+                      </Link>
                     </td>
                     <td>
                       {item.is_active ? (
-                        <button class="btn" onClick={deleteProduct}>
+                        <button
+                          class="btn"
+                          onClick={() => deleteProduct(item.id, item.is_active)}
+                        >
                           <span class="fw-normal" style={{ color: colors.red }}>
                             Deactivate
                           </span>
                         </button>
                       ) : (
-                        <button class="btn" onClick={deleteProduct}>
+                        <button
+                          class="btn"
+                          onClick={() => deleteProduct(item.id, item.is_active)}
+                        >
                           <span
                             class="fw-normal"
                             style={{ color: colors.green }}

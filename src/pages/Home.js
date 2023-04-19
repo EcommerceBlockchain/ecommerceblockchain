@@ -14,6 +14,7 @@ import {
   setDoc,
   getDoc,
   doc,
+  where,
 } from "firebase/firestore";
 import { ethers } from "ethers";
 import GetFileByPath from "../service/GetFileByPath";
@@ -33,7 +34,11 @@ function Home() {
     let array = [];
     let newarrival = [];
     let bestseller = [];
-    let qu = query(collection(getFirestore(), "products"), limit(8));
+    let qu = query(
+      collection(getFirestore(), "products"),
+      limit(8),
+      where("is_active", "==", true)
+    );
     const products = await getDocs(qu);
     products.docs.forEach((product) => {
       array.push({ ...product.data(), id: product.id });
@@ -42,6 +47,7 @@ function Home() {
     let qu2 = query(
       collection(getFirestore(), "products"),
       orderBy("timestamp", "desc"),
+      where("is_active", "==", true),
       limit(4)
     );
     const products2 = await getDocs(qu2);
@@ -52,6 +58,7 @@ function Home() {
     let qu3 = query(
       collection(getFirestore(), "products"),
       orderBy("quantity_sold", "desc"),
+      where("is_active", "==", true),
       limit(4)
     );
     const products3 = await getDocs(qu3);
@@ -148,6 +155,7 @@ function Home() {
                   id={item.id}
                   preImg={item.preview_image[0]}
                   owner={item.owner}
+                  rating={item.rating}
                 />
               );
             })}
@@ -179,6 +187,7 @@ function Home() {
                       price={item.cost}
                       id={item.id}
                       preImg={item.preview_image[0]}
+                      rating={item.rating}
                     />
                   );
                 })}
@@ -196,6 +205,7 @@ function Home() {
                       price={item.cost}
                       id={item.id}
                       preImg={item.preview_image[0]}
+                      rating={item.rating}
                     />
                   );
                 })}

@@ -15,6 +15,7 @@ function Orders({ userProfileData }) {
   const [products, setProducts] = useState([]);
   const [downloadurls, setDownloadurls] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loader, setLoader] = useState(-1);
 
   const getdata = () => {
     setLoading(true);
@@ -38,7 +39,8 @@ function Orders({ userProfileData }) {
     setLoading(false);
   };
 
-  function downloadFile(file, name, extension) {
+  function downloadFile(file, name, extension, index) {
+    setLoader(index);
     console.log(file, name);
 
     fetch(file)
@@ -51,6 +53,9 @@ function Orders({ userProfileData }) {
         document.body.appendChild(a);
         a.click();
         a.remove();
+      })
+      .then(() => {
+        setLoader(-1);
       });
   }
 
@@ -105,11 +110,18 @@ function Orders({ userProfileData }) {
                           downloadFile(
                             downloadurls[index],
                             item.name,
-                            item.extension
+                            item.extension,
+                            index
                           )
                         }
                       >
-                        <FaDownload color={colors.primaryBlue} size={15} />
+                        {loader === index ? (
+                          <div>
+                            <img width={20} src={activity} alt="activity" />
+                          </div>
+                        ) : (
+                          <FaDownload color={colors.primaryBlue} size={15} />
+                        )}
                       </button>
                     </td>
                   </tr>

@@ -27,8 +27,11 @@ import ProfileProducts from "../components/ProfileProducts";
 
 function Profile() {
   const { toggleSidebar, collapseSidebar, broken, collapsed } = useProSidebar();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [menuselection, setMenuSelection] = useState(1);
+  const [menuselection, setMenuSelection] = useState(
+    location.state ? location.state : 1
+  );
   const [userProfileData, setUserProfileData] = useState("");
 
   function getData() {

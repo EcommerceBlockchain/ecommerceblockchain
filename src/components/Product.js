@@ -15,8 +15,9 @@ import {
 import activity from "../images/activity.gif";
 import { getAuth } from "firebase/auth";
 import colors from "../colors";
+import StarRatings from "react-star-ratings";
 
-function Product({ name, id, price, preImg, owner }) {
+function Product({ name, id, price, preImg, owner, rating }) {
   const navigate = useNavigate();
   // products:[{id:id,preimg:preimg,name:name}],
   const { userdata } = useContext(UserContext);
@@ -94,7 +95,18 @@ function Product({ name, id, price, preImg, owner }) {
         </div>
         <div className="product-info mt-3">
           <h2 className="product-title h5 mb-0">{name}</h2>
-          <span className="price">{price} Eth</span>
+          <div>
+            <span className="price">{price} Eth</span>
+          </div>
+          <StarRatings
+            numberOfStars={5}
+            starEmptyColor="grey"
+            starHoverColor={colors.darkYellow}
+            starRatedColor={colors.darkYellow}
+            starDimension="15px"
+            starSpacing="5px"
+            rating={rating}
+          />
         </div>
       </div>
       {loader ? (

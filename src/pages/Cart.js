@@ -68,11 +68,13 @@ function Cart() {
 
   const checkout = async () => {
     let price = [];
+    let pricefloat = [];
     let fromAdd = "";
     let isTransactionSuccessfull = false;
     setLoading(true);
     Object.values(OwnersWithPrice).forEach((item) => {
       price.push(ethers.utils.parseEther(item.toFixed(10).toString()));
+      pricefloat.push(parseFloat(item.toFixed(10)));
     });
 
     try {
@@ -93,14 +95,16 @@ function Cart() {
         ],
         {
           value: ethers.utils.parseEther(
-            (subTotal + parseFloat((subTotal * 0.05).toFixed(10))).toString()
+            (subTotal + parseFloat((subTotal * 0.05).toFixed(10)))
+              .toFixed(10)
+              .toString()
           ),
         }
       );
       transaction
         .wait()
         .then((res) => {
-          console.log(res);
+          console.log("transaction", res);
           isTransactionSuccessfull = true;
           productIds.forEach((item) => {
             getDoc(doc(getFirestore(), "products", item))
@@ -124,7 +128,7 @@ function Cart() {
           addDoc(collection(getFirestore(), "transactions"), {
             products: productIds,
             status: isTransactionSuccessfull ? "Success" : "Failed",
-            amount: subTotal + parseFloat((subTotal * 0.05).toFixed(10)),
+            amount: [...pricefloat, subTotal * 0.05],
             timestamp: Timestamp.fromDate(new Date()),
             from: userdata.activeAddress,
             to: [
@@ -132,6 +136,7 @@ function Cart() {
               "0xdCe3c8aa5364B0C161b607beE16BB765cF4A7597",
             ],
             tokenUsed: 0,
+            type: "buy",
           }).then((response) => {
             getDoc(
               doc(getFirestore(), "users", getAuth().currentUser.uid)
@@ -144,7 +149,19 @@ function Cart() {
                 },
                 { merge: true }
               ).then(() => {
+                productIds.forEach((id) => {
+                  deleteDoc(
+                    doc(
+                      getFirestore(),
+                      "users",
+                      getAuth().currentUser.uid,
+                      "cart",
+                      id
+                    )
+                  );
+                });
                 console.log("document id added");
+                navigate("/profile", { state: 3 });
               });
             });
 
@@ -329,7 +346,9 @@ function Cart() {
                       <li className="d-flex justify-content-between pb-2">
                         <h5>Total</h5>
                         <span>
-                          {subTotal + parseFloat((subTotal * 0.05).toFixed(10))}{" "}
+                          {(
+                            subTotal + parseFloat((subTotal * 0.05).toFixed(10))
+                          ).toFixed(10)}{" "}
                           Eth
                         </span>
                       </li>

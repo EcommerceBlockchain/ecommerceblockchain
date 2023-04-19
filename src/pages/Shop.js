@@ -37,7 +37,11 @@ function Shop() {
     setTotal(snapshot.data().count);
     setPageCount(Math.ceil(snapshot.data().count / 6));
     let array = [];
-    let qu = query(collection(getFirestore(), "products"), limit(50));
+    let qu = query(
+      collection(getFirestore(), "products"),
+      limit(50),
+      where("is_active", "==", true)
+    );
     const productsAll = await getDocs(qu);
     productsAll.docs.forEach((product) => {
       array.push({ ...product.data(), id: product.id });
@@ -54,7 +58,8 @@ function Shop() {
       setTotal(0);
       const coll = query(
         collection(getFirestore(), "products"),
-        where("category", "in", CategoryList)
+        where("category", "in", CategoryList),
+        where("is_active", "==", true)
       );
       const snapshot = await getCountFromServer(coll);
       setTotal(snapshot.data().count);
@@ -62,6 +67,7 @@ function Shop() {
       let array = [];
       let qu = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList),
         limit(50)
       );
@@ -78,6 +84,7 @@ function Shop() {
       setTotal(0);
       const coll = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList)
       );
       const snapshot = await getCountFromServer(coll);
@@ -87,6 +94,7 @@ function Shop() {
       let qu = query(
         collection(getFirestore(), "products"),
         where("category", "in", CategoryList),
+        where("is_active", "==", true),
         orderBy("quantity_sold", "desc"),
         limit(50)
       );
@@ -103,6 +111,7 @@ function Shop() {
       setTotal(0);
       const coll = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList)
       );
       const snapshot = await getCountFromServer(coll);
@@ -111,6 +120,7 @@ function Shop() {
       let array = [];
       let qu = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList),
         orderBy("rating", "desc"),
         limit(50)
@@ -128,6 +138,7 @@ function Shop() {
       setTotal(0);
       const coll = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList)
       );
       const snapshot = await getCountFromServer(coll);
@@ -136,6 +147,7 @@ function Shop() {
       let array = [];
       let qu = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList),
         orderBy("timestamp", "desc"),
         limit(50)
@@ -153,6 +165,7 @@ function Shop() {
       setTotal(0);
       const coll = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList)
       );
       const snapshot = await getCountFromServer(coll);
@@ -161,6 +174,7 @@ function Shop() {
       let array = [];
       let qu = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList),
         orderBy("cost"),
         limit(50)
@@ -178,6 +192,7 @@ function Shop() {
       setTotal(0);
       const coll = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList)
       );
       const snapshot = await getCountFromServer(coll);
@@ -186,6 +201,7 @@ function Shop() {
       let array = [];
       let qu = query(
         collection(getFirestore(), "products"),
+        where("is_active", "==", true),
         where("category", "in", CategoryList),
         orderBy("cost", "desc"),
         limit(50)
@@ -208,6 +224,7 @@ function Shop() {
     let popProd = [];
     let qu2 = query(
       collection(getFirestore(), "products"),
+      where("is_active", "==", true),
       orderBy("quantity_sold", "desc"),
       limit(50)
     );
@@ -227,6 +244,7 @@ function Shop() {
     let popProd = [];
     let qu2 = query(
       collection(getFirestore(), "products"),
+      where("is_active", "==", true),
       orderBy("rating", "desc"),
       limit(50)
     );
@@ -247,6 +265,7 @@ function Shop() {
     let popProd = [];
     let qu2 = query(
       collection(getFirestore(), "products"),
+      where("is_active", "==", true),
       orderBy("timestamp", "desc"),
       limit(50)
     );
@@ -266,6 +285,7 @@ function Shop() {
     let popProd = [];
     let qu2 = query(
       collection(getFirestore(), "products"),
+      where("is_active", "==", true),
       orderBy("cost", "desc"),
       limit(50)
     );
@@ -285,6 +305,7 @@ function Shop() {
     let popProd = [];
     let qu2 = query(
       collection(getFirestore(), "products"),
+      where("is_active", "==", true),
       orderBy("cost"),
       limit(50)
     );
@@ -303,6 +324,7 @@ function Shop() {
     let qu2 = query(
       collection(getFirestore(), "products"),
       orderBy("rating", "desc"),
+      where("is_active", "==", true),
       limit(4)
     );
     const products2 = await getDocs(qu2);
@@ -452,6 +474,7 @@ function Shop() {
                         id={item.id}
                         preImg={item.preview_image[0]}
                         owner={item.owner}
+                        rating={item.rating}
                       />
                     );
                   })
@@ -586,6 +609,7 @@ function Shop() {
                       price={item.cost}
                       id={item.id}
                       preImg={item.preview_image[0]}
+                      rating={item.rating}
                     />
                   );
                 })}

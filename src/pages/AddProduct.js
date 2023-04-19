@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import GoToTop from "../components/GoToTop";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   addDoc,
@@ -24,16 +24,24 @@ import addproductabi from "../blockchain/abis/addProduct.json";
 import { getAuth } from "firebase/auth";
 
 function AddProduct() {
+  const location = useLocation();
+  console.log("addproduct", location.state);
   const { userdata } = useContext(UserContext);
-  const [images, setimages] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [originalProductFileName, setOriginalProductFileName] = useState("");
+  const [images, setimages] = useState(
+    location.state ? location.state.preview_image : []
+  );
+  const [tags, setTags] = useState(location.state ? location.state.tag : []);
+  const [originalProductFileName, setOriginalProductFileName] = useState(
+    location.state ? location.state.name : ""
+  );
   const [file, setFile] = useState(null);
   const [fileSize, setFileSize] = useState(0);
   const [extension, setExtension] = useState("");
-  const [category, setCategory] = useState("Select Category");
+  const [category, setCategory] = useState(
+    location.state ? location.state.category : "Select Category"
+  );
   const [formSub, setFormSub] = useState(false);
-  const [ogfile, setogfile] = useState(false);
+  const [ogfile, setogfile] = useState(location.state ? true : false);
   const navigate = useNavigate();
   const validation = Yup.object().shape({
     productName: name,
@@ -43,7 +51,86 @@ function AddProduct() {
 
   const uid = getAuth().currentUser.uid;
 
-  const onPress = async (values) => {
+  const editproduct = async (values) => {
+    setFormSub(true);
+    if (images.length !== 0) {
+      console.log("heelo in edit");
+
+      let preImgArr = [];
+      const storage = getStorage();
+
+      let counter = 0;
+
+      const storeimage = (counter, preImages) => {
+        console.log(
+          values.price,
+          values.productDescription,
+          values.productName,
+          preImages,
+          tags
+        );
+        if (counter == images.length) {
+          console.log(preImages);
+          setDoc(
+            doc(getFirestore(), "products", location.state.id),
+            {
+              cost: parseFloat(values.price),
+              description: values.productDescription,
+              name: values.productName,
+              preview_image: preImages,
+              tag: tags,
+              timestamp: Timestamp.fromDate(new Date()),
+            },
+            { merge: true }
+          ).then(() => {
+            console.log("edit succesful");
+            navigate("/", { replace: true });
+          });
+        } else {
+          const storageRef = ref(
+            storage,
+            `preview_images/${images[counter].name}`
+          );
+          if (images[counter]?.url) {
+            fetch(images[counter].url)
+              .then((res) => {
+                return res.blob();
+              })
+              .then((blob) => {
+                uploadBytes(storageRef, blob).then((snapshot) => {
+                  console.log(
+                    "Uploaded a blob or file!",
+                    snapshot.ref.fullPath
+                  );
+                  const pathReference = ref(storage, snapshot.ref.fullPath);
+                  getDownloadURL(pathReference)
+                    .then((url) => {
+                      console.log(url);
+                      preImages.push(url);
+                      console.log("images array", preImages);
+                    })
+                    .then(() => {
+                      counter += 1;
+                      storeimage(counter, preImages);
+                    });
+                });
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          } else {
+            preImages.push(images[counter]);
+            counter += 1;
+            storeimage(counter, preImages);
+          }
+        }
+      };
+
+      storeimage(counter, preImgArr);
+    }
+  };
+
+  const addproduct = async (values) => {
     setFormSub(true);
     if (
       originalProductFileName &&
@@ -65,7 +152,7 @@ function AddProduct() {
           addDoc(collection(getFirestore(), "products"), {}).then(
             (response) => {
               signContact.setPath(response.id, path).then(async (res) => {
-                console.log(res);
+                console.log("addproduct res", res);
                 let preImgArr = [];
                 const storage = getStorage();
 
@@ -111,6 +198,15 @@ function AddProduct() {
                           });
                         }
                       );
+                      addDoc(collection(getFirestore(), "transactions"), {
+                        product: response.id,
+                        status: "Success",
+                        amount: [10],
+                        timestamp: Timestamp.fromDate(new Date()),
+                        from: userdata.activeAddress,
+                        to: [smartConracts.addProduct],
+                        type: "add",
+                      });
                       navigate("/", { replace: true });
                     });
                   } else {
@@ -169,7 +265,9 @@ function AddProduct() {
           <div className="row justify-content-center">
             <div className="col-lg-6">
               <div className="content text-center">
-                <h1 className="mb-3">Add Product</h1>
+                <h1 className="mb-3">
+                  {location.state ? "Edit Product" : "Add Product"}
+                </h1>
                 <p>
                   Adding a new product to our ecommerce website powered by
                   blockchain technology is a breeze. Simply log in to your
@@ -197,13 +295,15 @@ function AddProduct() {
       <div className="section">
         <Formik
           initialValues={{
-            productName: "",
-            productDescription: "",
-            price: 0,
+            productName: location.state ? location.state.name : "",
+            productDescription: location.state
+              ? location.state.description
+              : "",
+            price: location.state ? location.state.cost : 0,
           }}
           validationSchema={validation}
           onSubmit={(values) => {
-            onPress(values);
+            location.state ? editproduct(values) : addproduct(values);
           }}
         >
           {({ errors, touched, handleChange, handleSubmit, values }) => (
@@ -288,56 +388,58 @@ function AddProduct() {
                           </div>
                         </div>
                       </div>
-                      <div className="section-title">
-                        <h2 className="d-block text-left-sm">Category</h2>
+                      {!location.state && (
+                        <div className="section-title">
+                          <h2 className="d-block text-left-sm">Category</h2>
 
-                        <div
-                          className="heading justify-content-between mb-5"
-                          style={{
-                            border: "1px solid lightgrey",
-                            borderRadius: "10px",
-                            padding: "10px",
-                          }}
-                        >
-                          <div className="product-info-own">
-                            <h5 className="result-count mb-0">
-                              Select Category
-                            </h5>
-                          </div>
-                          <select
-                            style={{ borderColor: colors.primaryBlue }}
-                            name="orderby"
-                            className="orderby form-control mt-2"
-                            aria-label="Shop order"
-                            defaultValue={"Select Category"}
-                            onChange={(e) => {
-                              setCategory(e.target.value);
+                          <div
+                            className="heading justify-content-between mb-5"
+                            style={{
+                              border: "1px solid lightgrey",
+                              borderRadius: "10px",
+                              padding: "10px",
                             }}
                           >
-                            <option value="Select Category">
-                              Select Category
-                            </option>
-                            <option value="Image">Image</option>
-                            <option value="Video">Video</option>
-                            <option value="Audio">Audio</option>
-                            <option value="GIF">GIF</option>
-                            <option value="Documents">
-                              Documents (.pdf, .xlxs, .pptx, etc. )
-                            </option>
-                          </select>
-                          {formSub && category === "Select Category" && (
-                            <p
-                              style={{
-                                fontSize: 14,
-                                marginBottom: "10px",
-                                color: colors.red,
+                            <div className="product-info-own">
+                              <h5 className="result-count mb-0">
+                                Select Category
+                              </h5>
+                            </div>
+                            <select
+                              style={{ borderColor: colors.primaryBlue }}
+                              name="orderby"
+                              className="orderby form-control mt-2"
+                              aria-label="Shop order"
+                              defaultValue={category}
+                              onChange={(e) => {
+                                setCategory(e.target.value);
                               }}
                             >
-                              Please select category
-                            </p>
-                          )}
+                              <option value="Select Category">
+                                Select Category
+                              </option>
+                              <option value="Image">Image</option>
+                              <option value="Video">Video</option>
+                              <option value="Audio">Audio</option>
+                              <option value="GIF">GIF</option>
+                              <option value="Documents">
+                                Documents (.pdf, .xlxs, .pptx, etc. )
+                              </option>
+                            </select>
+                            {formSub && category === "Select Category" && (
+                              <p
+                                style={{
+                                  fontSize: 14,
+                                  marginBottom: "10px",
+                                  color: colors.red,
+                                }}
+                              >
+                                Please select category
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      )}
                       <div className="section-title">
                         <h2 className="d-block text-left-sm">Preview Images</h2>
 
@@ -383,7 +485,7 @@ function AddProduct() {
                                   style={{ position: "relative" }}
                                 >
                                   <img
-                                    src={item.url}
+                                    src={item?.url ? item.url : item}
                                     style={{
                                       width: "150px",
                                       height: "150px",
@@ -503,200 +605,222 @@ function AddProduct() {
                       <em>Press enter to add new tag</em>
                     </div>
                   </section>
-                  <section className="widget widget-sizes mb-5">
-                    <h2 className="d-block text-left-sm">Original Product</h2>
-                    <div
-                      className="heading justify-content-between mb-5"
-                      style={{
-                        border: "1px solid lightgrey",
-                        borderRadius: "10px",
-                        padding: "10px",
-                      }}
-                    >
-                      <div className="product-info-own">
-                        <h5 className="result-count mb-2">Add your file</h5>
-                      </div>
-                      {category === "Image" && (
-                        <input
-                          disabled={originalProductFileName ? true : false}
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            setogfile(true);
-                            setFile(e.target.files[0]);
-                            console.log(e.target.files);
-                            setOriginalProductFileName(e.target.files[0].name);
-                            setFileSize(e.target.files[0].size);
-                            setExtension(e.target.files[0].type.split("/")[1]);
-                          }}
-                          name="uploadfile"
-                          id="img-2"
-                          style={{ display: "none" }}
-                        />
-                      )}
-                      {category === "Video" && (
-                        <input
-                          disabled={originalProductFileName ? true : false}
-                          type="file"
-                          accept="video/*"
-                          onChange={(e) => {
-                            setogfile(true);
-                            setFile(e.target.files[0]);
-
-                            console.log(e.target.files);
-                            setOriginalProductFileName(e.target.files[0].name);
-                            setFileSize(e.target.files[0].size);
-                            setExtension(e.target.files[0].type.split("/")[1]);
-                          }}
-                          name="uploadfile"
-                          id="img-2"
-                          style={{ display: "none" }}
-                        />
-                      )}
-                      {category === "Audio" && (
-                        <input
-                          disabled={originalProductFileName ? true : false}
-                          type="file"
-                          accept=".MPEG,.MP3,.FLAC,.WAV,.WMA,.AAC"
-                          onChange={(e) => {
-                            setogfile(true);
-                            setFile(e.target.files[0]);
-
-                            console.log(e.target.files);
-                            setOriginalProductFileName(e.target.files[0].name);
-                            setFileSize(e.target.files[0].size);
-                            setExtension(e.target.files[0].type.split("/")[1]);
-                          }}
-                          name="uploadfile"
-                          id="img-2"
-                          style={{ display: "none" }}
-                        />
-                      )}
-                      {category === "GIF" && (
-                        <input
-                          disabled={originalProductFileName ? true : false}
-                          type="file"
-                          accept=".gif"
-                          onChange={(e) => {
-                            setogfile(true);
-                            setFile(e.target.files[0]);
-
-                            console.log(e.target.files);
-                            setOriginalProductFileName(e.target.files[0].name);
-                            setFileSize(e.target.files[0].size);
-                            setExtension(e.target.files[0].type.split("/")[1]);
-                          }}
-                          name="uploadfile"
-                          id="img-2"
-                          style={{ display: "none" }}
-                        />
-                      )}
-                      {category === "Documents" && (
-                        <input
-                          disabled={originalProductFileName ? true : false}
-                          type="file"
-                          accept=".doc,.docm,.docx,.dot,.dotm,.dotx,.htm,.html,.mht,.mhtml,.odt,.pdf,.rtf,.txt,.wps,.xml,.xps,.xlsx,.csv,.xls,.pptx,.ppt"
-                          onChange={(e) => {
-                            setogfile(true);
-                            setFile(e.target.files[0]);
-
-                            console.log(e.target.files);
-                            setOriginalProductFileName(e.target.files[0].name);
-                            setFileSize(e.target.files[0].size);
-                            setExtension(e.target.files[0].type.split("/")[1]);
-                          }}
-                          name="uploadfile"
-                          id="img-2"
-                          style={{ display: "none" }}
-                        />
-                      )}
-                      <div style={{ position: "relative" }}>
-                        <label for="img-2">
-                          <div
-                            onClick={() => {
+                  {!location.state && (
+                    <section className="widget widget-sizes mb-5">
+                      <h2 className="d-block text-left-sm">Original Product</h2>
+                      <div
+                        className="heading justify-content-between mb-5"
+                        style={{
+                          border: "1px solid lightgrey",
+                          borderRadius: "10px",
+                          padding: "10px",
+                        }}
+                      >
+                        <div className="product-info-own">
+                          <h5 className="result-count mb-2">Add your file</h5>
+                        </div>
+                        {category === "Image" && (
+                          <input
+                            disabled={originalProductFileName ? true : false}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
                               setogfile(true);
+                              setFile(e.target.files[0]);
+                              console.log(e.target.files);
+                              setOriginalProductFileName(
+                                e.target.files[0].name
+                              );
+                              setFileSize(e.target.files[0].size);
+                              setExtension(
+                                e.target.files[0].type.split("/")[1]
+                              );
                             }}
-                            style={{
-                              cursor: "pointer",
-                              width: "150px",
-                              height: "150px",
-                              border: "1px solid lightgrey",
-                              borderRadius: "10px",
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <img
-                              src={
-                                !originalProductFileName
-                                  ? "https://cdn-icons-png.flaticon.com/512/1091/1091916.png"
-                                  : "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/1200px-Eo_circle_green_checkmark.svg.png"
-                              }
-                              style={{
-                                objectFit: "contain",
-                                width: "30px",
-                                height: "30px",
-                                marginTop: "20px",
-                              }}
-                              alt="plus"
-                            />
+                            name="uploadfile"
+                            id="img-2"
+                            style={{ display: "none" }}
+                          />
+                        )}
+                        {category === "Video" && (
+                          <input
+                            disabled={originalProductFileName ? true : false}
+                            type="file"
+                            accept="video/*"
+                            onChange={(e) => {
+                              setogfile(true);
+                              setFile(e.target.files[0]);
 
-                            {!originalProductFileName && <p>Add File</p>}
-                          </div>
-                        </label>
-                        {!originalProductFileName && formSub && (
-                          <p
-                            style={{
-                              fontSize: 14,
-                              marginBottom: "10px",
-                              color: colors.red,
+                              console.log(e.target.files);
+                              setOriginalProductFileName(
+                                e.target.files[0].name
+                              );
+                              setFileSize(e.target.files[0].size);
+                              setExtension(
+                                e.target.files[0].type.split("/")[1]
+                              );
                             }}
-                          >
-                            Please add product
-                          </p>
+                            name="uploadfile"
+                            id="img-2"
+                            style={{ display: "none" }}
+                          />
                         )}
-                        {category === "Select Category" && ogfile && (
-                          <p
-                            style={{
-                              fontSize: 14,
-                              marginBottom: "10px",
-                              color: colors.red,
+                        {category === "Audio" && (
+                          <input
+                            disabled={originalProductFileName ? true : false}
+                            type="file"
+                            accept=".MPEG,.MP3,.FLAC,.WAV,.WMA,.AAC"
+                            onChange={(e) => {
+                              setogfile(true);
+                              setFile(e.target.files[0]);
+
+                              console.log(e.target.files);
+                              setOriginalProductFileName(
+                                e.target.files[0].name
+                              );
+                              setFileSize(e.target.files[0].size);
+                              setExtension(
+                                e.target.files[0].type.split("/")[1]
+                              );
                             }}
-                          >
-                            Please select category
-                          </p>
+                            name="uploadfile"
+                            id="img-2"
+                            style={{ display: "none" }}
+                          />
                         )}
-                        {originalProductFileName && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "-15px",
-                              left: "135px",
-                              backgroundColor: "lightgrey",
-                              height: "30px",
-                              width: "30px",
-                              borderRadius: "50%",
-                              padding: "10px",
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              cursor: "pointer",
+                        {category === "GIF" && (
+                          <input
+                            disabled={originalProductFileName ? true : false}
+                            type="file"
+                            accept=".gif"
+                            onChange={(e) => {
+                              setogfile(true);
+                              setFile(e.target.files[0]);
+
+                              console.log(e.target.files);
+                              setOriginalProductFileName(
+                                e.target.files[0].name
+                              );
+                              setFileSize(e.target.files[0].size);
+                              setExtension(
+                                e.target.files[0].type.split("/")[1]
+                              );
                             }}
-                            onClick={() => {
-                              setOriginalProductFileName("");
-                              setFileSize(0);
-                              setExtension("");
-                            }}
-                          >
-                            <i className="tf-ion-close"></i>
-                          </div>
+                            name="uploadfile"
+                            id="img-2"
+                            style={{ display: "none" }}
+                          />
                         )}
+                        {category === "Documents" && (
+                          <input
+                            disabled={originalProductFileName ? true : false}
+                            type="file"
+                            accept=".doc,.docm,.docx,.dot,.dotm,.dotx,.htm,.html,.mht,.mhtml,.odt,.pdf,.rtf,.txt,.wps,.xml,.xps,.xlsx,.csv,.xls,.pptx,.ppt"
+                            onChange={(e) => {
+                              setogfile(true);
+                              setFile(e.target.files[0]);
+
+                              console.log(e.target.files);
+                              setOriginalProductFileName(
+                                e.target.files[0].name
+                              );
+                              setFileSize(e.target.files[0].size);
+                              setExtension(
+                                e.target.files[0].type.split("/")[1]
+                              );
+                            }}
+                            name="uploadfile"
+                            id="img-2"
+                            style={{ display: "none" }}
+                          />
+                        )}
+                        <div style={{ position: "relative" }}>
+                          <label for="img-2">
+                            <div
+                              onClick={() => {
+                                setogfile(true);
+                              }}
+                              style={{
+                                cursor: "pointer",
+                                width: "150px",
+                                height: "150px",
+                                border: "1px solid lightgrey",
+                                borderRadius: "10px",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              <img
+                                src={
+                                  !originalProductFileName
+                                    ? "https://cdn-icons-png.flaticon.com/512/1091/1091916.png"
+                                    : "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Eo_circle_green_checkmark.svg/1200px-Eo_circle_green_checkmark.svg.png"
+                                }
+                                style={{
+                                  objectFit: "contain",
+                                  width: "30px",
+                                  height: "30px",
+                                  marginTop: "20px",
+                                }}
+                                alt="plus"
+                              />
+
+                              {!originalProductFileName && <p>Add File</p>}
+                            </div>
+                          </label>
+                          {!originalProductFileName && formSub && (
+                            <p
+                              style={{
+                                fontSize: 14,
+                                marginBottom: "10px",
+                                color: colors.red,
+                              }}
+                            >
+                              Please add product
+                            </p>
+                          )}
+                          {category === "Select Category" && ogfile && (
+                            <p
+                              style={{
+                                fontSize: 14,
+                                marginBottom: "10px",
+                                color: colors.red,
+                              }}
+                            >
+                              Please select category
+                            </p>
+                          )}
+                          {originalProductFileName && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "-15px",
+                                left: "135px",
+                                backgroundColor: "lightgrey",
+                                height: "30px",
+                                width: "30px",
+                                borderRadius: "50%",
+                                padding: "10px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => {
+                                setOriginalProductFileName("");
+                                setFileSize(0);
+                                setExtension("");
+                              }}
+                            >
+                              <i className="tf-ion-close"></i>
+                            </div>
+                          )}
+                        </div>
+                        <p>{originalProductFileName}</p>
                       </div>
-                      <p>{originalProductFileName}</p>
-                    </div>
-                  </section>
+                    </section>
+                  )}
                   <section className="widget widget-sizes mb-5">
                     <h2 className="d-block text-left-sm">Price</h2>
                     <div
@@ -747,7 +871,7 @@ function AddProduct() {
                     }}
                     className="btn btn-main btn-small mt-3"
                   >
-                    Add Product
+                    {location.state ? "Update" : "Add Product"}
                   </button>
                 </div>
               </div>

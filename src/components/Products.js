@@ -64,6 +64,7 @@ function Products({ userProfileData, isCurrentUser }) {
                 price={item?.cost}
                 preImg={item?.preview_image}
                 owner={item?.owner}
+                rating={item?.rating}
               />
             );
           })

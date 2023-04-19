@@ -32,6 +32,7 @@ function Search() {
     let array = [];
     let qu = query(
       collection(getFirestore(), "products"),
+      where("is_active", "==", true),
       orderBy("name"),
       startAt(search),
       endAt(search + "~")
@@ -48,6 +49,7 @@ function Search() {
     let array = [];
     let qu = query(
       collection(getFirestore(), "products"),
+      where("is_active", "==", true),
       where("tag", "array-contains", tag)
     );
     const productss = await getDocs(qu);
@@ -228,6 +230,7 @@ function Search() {
                       id={item.id}
                       preImg={item.preview_image[0]}
                       owner={item.owner}
+                      rating={item.rating}
                     />
                   );
                 })}

@@ -70,7 +70,10 @@ function SingleProduct() {
   const getRelatedProducts = async () => {
     setRelatedProducts([]);
     let relProd = [];
-    let qu2 = query(collection(getFirestore(), "products"));
+    let qu2 = query(
+      collection(getFirestore(), "products"),
+      where("is_active", "==", true)
+    );
     const productsAll = await getDocs(qu2);
     productsAll.docs.forEach((product) => {
       relProd.push({ ...product.data(), id: product.id });
@@ -118,7 +121,7 @@ function SingleProduct() {
 
   const addReview = () => {
     let comment = document.getElementById("comment");
-    getDoc(doc(getFirestore(), "products", id)).then((res) => {
+    getDoc(doc(getFirestore(), "products", id)).then(async (res) => {
       setDoc(
         doc(getFirestore(), "products", id),
         {
@@ -128,6 +131,7 @@ function SingleProduct() {
               rating: rating,
               review: comment.value,
               timestamp: Timestamp.fromDate(new Date()),
+              name: userdata?.name,
             },
           },
           rating: parseFloat(
@@ -473,7 +477,7 @@ function SingleProduct() {
                       <div
                         className="col-lg-6"
                         style={{
-                          overflow: "scroll",
+                          overflowY: "auto",
                           maxHeight: "500px",
                         }}
                       >
@@ -508,7 +512,7 @@ function SingleProduct() {
                                       paddingTop: "15px",
                                     }}
                                   >
-                                    <h6>{item}</h6>
+                                    <h6>{product?.reviews?.[item]?.name}</h6>
                                     <div
                                       className="product-review"
                                       style={{ position: "relative", top: -15 }}
@@ -536,7 +540,14 @@ function SingleProduct() {
                                     style={{ textAlign: "right" }}
                                     className="text-sm text-muted font-weight-normal ml-3"
                                   >
-                                    Jan 1, 2023
+                                    {new Date(
+                                      product?.reviews?.[item]?.timestamp
+                                        ?.seconds *
+                                        1000 +
+                                        product?.reviews?.[item]?.timestamp
+                                          ?.nanoseconds /
+                                          1000000
+                                    ).toLocaleString()}
                                   </p>
                                 </div>
                               </div>
@@ -590,39 +601,6 @@ function SingleProduct() {
           </div>
         </div>
       </section>
-      {/* <section className="section products-main">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-8">
-              <div className="title text-center">
-                <h2 className="mb-4 pb-3">You may like this</h2>
-                <p>The best Online sales to shop these weekend</p>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="row"
-            style={{
-              display: "grid",
-              gap: "2rem",
-              gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-            }}
-          >
-            {relatedProducts.map((item) => {
-              return (
-                <Product
-                  key={item.id}
-                  name={item.name}
-                  price={item.cost}
-                  id={item.id}
-                  preImg={item.preview_image[0]}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </section> */}
 
       <GoToTop />
     </div>
