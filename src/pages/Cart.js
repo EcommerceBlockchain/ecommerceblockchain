@@ -60,13 +60,14 @@ function Cart() {
         });
       })
       .then(() => {
-        setSubTotal(sum);
+        setSubTotal(parseFloat(sum.toFixed(10)));
         setOwnersWithPrice(pro);
       });
     setProducts(cart);
   };
 
   const checkout = async () => {
+    let trans = "";
     let price = [];
     let pricefloat = [];
     let fromAdd = "";
@@ -105,6 +106,7 @@ function Cart() {
         .wait()
         .then((res) => {
           console.log("transaction", res);
+          trans = res.transactionHash;
           isTransactionSuccessfull = true;
           productIds.forEach((item) => {
             getDoc(doc(getFirestore(), "products", item))
@@ -137,6 +139,8 @@ function Cart() {
             ],
             tokenUsed: 0,
             type: "buy",
+            transactionHash: trans,
+            totalAmount: subTotal + parseFloat((subTotal * 0.05).toFixed(10)),
           }).then((response) => {
             getDoc(
               doc(getFirestore(), "users", getAuth().currentUser.uid)

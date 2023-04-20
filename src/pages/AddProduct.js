@@ -10,6 +10,7 @@ import {
   getDoc,
   doc,
   setDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { TagsInput } from "react-tag-input-component";
 import { description, name, price } from "../config/validationSchema";
@@ -22,6 +23,7 @@ import { ethers } from "ethers";
 import smartConracts from "../blockchain/smartContracts";
 import addproductabi from "../blockchain/abis/addProduct.json";
 import { getAuth } from "firebase/auth";
+import activity from "../images/activity.gif";
 
 function AddProduct() {
   const location = useLocation();
@@ -41,6 +43,7 @@ function AddProduct() {
     location.state ? location.state.category : "Select Category"
   );
   const [formSub, setFormSub] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [ogfile, setogfile] = useState(location.state ? true : false);
   const navigate = useNavigate();
   const validation = Yup.object().shape({
@@ -54,6 +57,7 @@ function AddProduct() {
   const editproduct = async (values) => {
     setFormSub(true);
     if (images.length !== 0) {
+      setLoading(true);
       console.log("heelo in edit");
 
       let preImgArr = [];
@@ -84,7 +88,7 @@ function AddProduct() {
             { merge: true }
           ).then(() => {
             console.log("edit succesful");
-            navigate("/", { replace: true });
+            navigate("/profile", { state: 2 });
           });
         } else {
           const storageRef = ref(
@@ -116,6 +120,7 @@ function AddProduct() {
                 });
               })
               .catch((error) => {
+                setLoading(false);
                 console.error(error);
               });
           } else {
@@ -137,6 +142,7 @@ function AddProduct() {
       category !== "Select Category" &&
       images.length !== 0
     ) {
+      setLoading(true);
       console.log("heelo in onpress");
       UploadFile(file)
         .then((path) => {
@@ -151,107 +157,107 @@ function AddProduct() {
 
           addDoc(collection(getFirestore(), "products"), {}).then(
             (response) => {
-              signContact.setPath(response.id, path).then(async (res) => {
-                console.log("addproduct res", res);
-                let preImgArr = [];
-                const storage = getStorage();
+              signContact
+                .setPath(response.id, path)
+                .then(async (res) => {
+                  console.log("addproduct res", await res.wait());
+                  let preImgArr = [];
+                  const storage = getStorage();
 
-                let counter = 0;
+                  let counter = 0;
 
-                const storeimage = (counter, preImages) => {
-                  if (counter == images.length) {
-                    console.log(preImages);
-                    setDoc(
-                      doc(getFirestore(), "products", response.id),
-                      {
-                        category: category,
-                        cost: parseFloat(values.price),
-                        description: values.productDescription,
-                        is_active: true,
-                        name: values.productName,
-                        preview_image: preImages,
-                        reviews: {},
-                        tag: tags,
-                        timestamp: Timestamp.fromDate(new Date()),
-                        owner: uid,
-                        rating: 0,
-                        quantity_sold: 0,
-                        fileSize: fileSize,
-                        extension: extension,
-                      },
-                      { merge: true }
-                    ).then((document) => {
-                      getDoc(doc(getFirestore(), "users", uid)).then(
-                        (userdoc) => {
-                          setDoc(
-                            doc(getFirestore(), "users", uid),
-                            {
-                              ...userdoc.data(),
-                              products: [
-                                ...userdoc.data().products,
-                                response.id,
-                              ],
-                            },
-                            { merge: true }
-                          ).then(() => {
-                            console.log("done updation");
-                          });
-                        }
-                      );
-                      addDoc(collection(getFirestore(), "transactions"), {
-                        product: response.id,
-                        status: "Success",
-                        amount: [10],
-                        timestamp: Timestamp.fromDate(new Date()),
-                        from: userdata.activeAddress,
-                        to: [smartConracts.addProduct],
-                        type: "add",
-                      });
-                      navigate("/", { replace: true });
-                    });
-                  } else {
-                    const storageRef = ref(
-                      storage,
-                      `preview_images/${images[counter].name}`
-                    );
-                    fetch(images[counter].url)
-                      .then((res) => {
-                        return res.blob();
-                      })
-                      .then((blob) => {
-                        uploadBytes(storageRef, blob).then((snapshot) => {
-                          console.log(
-                            "Uploaded a blob or file!",
-                            snapshot.ref.fullPath
-                          );
-                          const pathReference = ref(
-                            storage,
-                            snapshot.ref.fullPath
-                          );
-                          getDownloadURL(pathReference)
-                            .then((url) => {
-                              console.log(url);
-                              preImages.push(url);
-                              console.log("images array", preImages);
-                            })
-                            .then(() => {
-                              counter += 1;
-                              storeimage(counter, preImages);
+                  const storeimage = (counter, preImages) => {
+                    if (counter == images.length) {
+                      console.log(preImages);
+                      setDoc(
+                        doc(getFirestore(), "products", response.id),
+                        {
+                          category: category,
+                          cost: parseFloat(values.price),
+                          description: values.productDescription,
+                          is_active: true,
+                          name: values.productName,
+                          preview_image: preImages,
+                          reviews: {},
+                          tag: tags,
+                          timestamp: Timestamp.fromDate(new Date()),
+                          owner: uid,
+                          rating: 0,
+                          quantity_sold: 0,
+                          fileSize: fileSize,
+                          extension: extension,
+                        },
+                        { merge: true }
+                      ).then((document) => {
+                        getDoc(doc(getFirestore(), "users", uid)).then(
+                          (userdoc) => {
+                            setDoc(
+                              doc(getFirestore(), "users", uid),
+                              {
+                                ...userdoc.data(),
+                                products: [
+                                  ...userdoc.data().products,
+                                  response.id,
+                                ],
+                              },
+                              { merge: true }
+                            ).then(() => {
+                              console.log("done updation");
                             });
-                        });
-                      })
-                      .catch((error) => {
-                        console.error(error);
-                      });
-                  }
-                };
+                          }
+                        );
 
-                storeimage(counter, preImgArr);
-              });
+                        navigate("/profile", { state: 2 });
+                      });
+                    } else {
+                      const storageRef = ref(
+                        storage,
+                        `preview_images/${images[counter].name}`
+                      );
+                      fetch(images[counter].url)
+                        .then((res) => {
+                          return res.blob();
+                        })
+                        .then((blob) => {
+                          uploadBytes(storageRef, blob).then((snapshot) => {
+                            console.log(
+                              "Uploaded a blob or file!",
+                              snapshot.ref.fullPath
+                            );
+                            const pathReference = ref(
+                              storage,
+                              snapshot.ref.fullPath
+                            );
+                            getDownloadURL(pathReference)
+                              .then((url) => {
+                                console.log(url);
+                                preImages.push(url);
+                                console.log("images array", preImages);
+                              })
+                              .then(() => {
+                                counter += 1;
+                                storeimage(counter, preImages);
+                              });
+                          });
+                        })
+                        .catch((error) => {
+                          setLoading(false);
+                          console.error(error);
+                        });
+                    }
+                  };
+
+                  storeimage(counter, preImgArr);
+                })
+                .catch(() => {
+                  setLoading(false);
+                  deleteDoc(doc(getFirestore(), "products", response.id));
+                });
             }
           );
         })
         .catch((err) => {
+          setLoading(false);
           console.log(err);
         });
     }
@@ -864,15 +870,27 @@ function AddProduct() {
                       )}
                     </div>
                   </section>
-                  <button
-                    onClick={() => {
-                      <GoToTop />;
-                      handleSubmit();
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
-                    className="btn btn-main btn-small mt-3"
                   >
-                    {location.state ? "Update" : "Add Product"}
-                  </button>
+                    {loading ? (
+                      <img width={30} src={activity} alt="activity" />
+                    ) : (
+                      <button
+                        onClick={() => {
+                          <GoToTop />;
+                          handleSubmit();
+                        }}
+                        className="btn btn-main btn-small mt-3"
+                      >
+                        {location.state ? "Update" : "Add Product"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

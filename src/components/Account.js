@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import UserContext from "../context/UserContext";
 import colors from "../colors";
 import {
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -11,45 +12,67 @@ import {
 import { FaEdit } from "react-icons/fa";
 import { ethers } from "ethers";
 import { getAuth } from "firebase/auth";
+import activity from "../images/activity.gif";
+
 function Account() {
   const [activeAddress, setActiveAddress] = useState("");
-  const [showWalletAddesses, setShowWalletAddesses] = useState(false);
+  const [showWalletAddresses, setShowWalletAddresses] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [addresses, setAddresses] = useState({});
   const [name, setName] = useState("");
   const [userProfileData, setUserProfileData] = useState({});
 
   const connectWallet = async () => {
-    console.log("address : ", activeAddress);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const accounts = await provider.send("eth_requestAccounts", []);
-    // const ans = await provider.send("wallet_disconnect", []);
-    console.log(accounts);
+    setDoc(
+      doc(getFirestore(), "users", getAuth().currentUser.uid),
+      {
+        walletAddress: arrayUnion(...accounts),
+      },
+      { merge: true }
+    ).then(() => {
+      getData();
+    });
   };
 
   function getData() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+    let add = {};
     getDoc(doc(getFirestore(), "users", getAuth().currentUser.uid)).then(
       (res) => {
         setUserProfileData({ ...res.data() });
         setName(res.data().name);
         setActiveAddress(res.data().activeAddress);
+        // ethers.utils.formatEther(await provider.getBalance(accounts[0]), "ether")
+
+        res.data().walletAddress.forEach(async (item) => {
+          add[item] = parseFloat(
+            ethers.utils.formatEther(await provider.getBalance(item), "ether")
+          );
+        });
+        setAddresses(add);
       }
     );
-    console.log("user data : ", userProfileData);
   }
 
   const savedata = () => {
+    setLoading(true);
     setDoc(
       doc(getFirestore(), "users", getAuth().currentUser.uid),
-      { ...userProfileData, name: name },
+      { ...userProfileData, name: name, activeAddress: activeAddress },
       { merge: true }
     ).then(() => {
       console.log("done");
+      setLoading(false);
     });
 
     console.log("hello");
   };
 
   useEffect(() => {
-    getData();
+    connectWallet();
   }, []);
 
   return (
@@ -110,13 +133,13 @@ function Account() {
                 size={20}
                 style={{
                   position: "absolute",
-                  bottom: 13,
+                  top: 50,
                   right: 20,
                   cursor: "pointer",
                 }}
-                onClick={() => setShowWalletAddesses(!showWalletAddesses)}
+                onClick={() => setShowWalletAddresses(!showWalletAddresses)}
               />
-              {showWalletAddesses && (
+              {showWalletAddresses && (
                 <div
                   className="wallet-address-container"
                   style={{
@@ -124,44 +147,63 @@ function Account() {
                     width: "100%",
                     backgroundColor: "white",
                     padding: "10px",
-                    bottom: 0,
+                    top: 20,
                     left: 0,
                     transform: "translate(0,100%)",
                     textAlign: "left",
                     boxShadow: "0 0 5px 1px rgba(0,0,0,0.2)",
                   }}
                 >
-                  {userProfileData?.walletAddress?.map((address) => (
-                    <p
-                      onClick={() => setActiveAddress(address)}
+                  {Object.keys(addresses).map((address) => (
+                    <div
                       style={{
-                        cursor: "pointer",
-                        color:
-                          address === activeAddress
-                            ? colors.primaryBlue
-                            : "black",
+                        display: "flex",
+                        alignItems: "Center",
+                        justifyContent: "space-between",
                       }}
                     >
-                      {address}
-                    </p>
+                      <p
+                        onClick={() => {
+                          setActiveAddress(address);
+                          setShowWalletAddresses(!showWalletAddresses);
+                        }}
+                        style={{
+                          cursor: "pointer",
+                          color:
+                            address === activeAddress
+                              ? colors.primaryBlue
+                              : "black",
+                        }}
+                      >
+                        {address}
+                      </p>
+
+                      <p>{addresses[address].toFixed(2)} Eth</p>
+                    </div>
                   ))}
-                  <p
-                    onClick={() => {
-                      connectWallet();
-                    }}
-                  >
-                    Add New Wallet Address
-                  </p>
                 </div>
               )}
+              <p style={{ color: colors.red, fontWeight: "500" }}>
+                Note : Please add new address manually in metamask, connect
+                address with this site. After that refresh the page to see
+                updated addresses.
+              </p>
             </div>
           </div>
         </div>
 
         <div className="mt-3">
-          <button type="submit" className="btn btn-primary" onClick={savedata}>
-            Save All
-          </button>
+          {loading ? (
+            <img width={30} src={activity} alt="activity" />
+          ) : (
+            <button
+              type="submit"
+              className="btn btn-primary"
+              onClick={savedata}
+            >
+              Save All
+            </button>
+          )}
         </div>
       </div>
     </div>

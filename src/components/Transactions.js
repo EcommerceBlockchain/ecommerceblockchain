@@ -8,12 +8,16 @@ import {
 } from "firebase/firestore";
 import React, { useEffect } from "react";
 import { useState } from "react";
+import activity from "../images/activity.gif";
+import { Link } from "react-router-dom";
+import colors from "../colors";
 
 function Transactions({ userProfileData }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const getdata = () => {
+    let arr = [];
     setLoading(true);
     getDocs(
       query(
@@ -23,18 +27,40 @@ function Transactions({ userProfileData }) {
     ).then((res) => {
       res.docs.forEach((item) => {
         console.log(item.data(), "mast");
-        setTransactions((prev) => [...prev, { ...item.data(), id: item.id }]);
+        // setTransactions((prev) => [...prev, { ...item.data(), id: item.id }]);
+        arr.push({ ...item.data(), id: item.id, self: false });
+        console.log(
+          "kdkdkdkdkd",
+
+          item.data().amount[
+            item
+              .data()
+              .to.indexOf(
+                item
+                  .data()
+                  .to.filter((x) =>
+                    userProfileData?.walletAddress?.includes(x)
+                  )[0]
+              )
+          ]
+        );
       });
-    });
-    getDocs(
-      query(
-        collection(getFirestore(), "transactions"),
-        where("from", "in", userProfileData?.walletAddress)
-      )
-    ).then((res) => {
-      res.docs.forEach((item) => {
-        console.log(item.data(), "mast 2");
-        setTransactions((prev) => [...prev, { ...item.data(), id: item.id }]);
+      getDocs(
+        query(
+          collection(getFirestore(), "transactions"),
+          where("from", "in", userProfileData?.walletAddress)
+        )
+      ).then((res) => {
+        res.docs.forEach((item) => {
+          console.log(item.data(), "mast 2");
+          // setTransactions((prev) => [...prev, { ...item.data(), id: item.id }]);
+          arr.push({ ...item.data(), id: item.id, self: true });
+        });
+        arr = [...new Set([...arr])];
+        arr.sort((b, a) => {
+          return a.timestamp - b.timestamp;
+        });
+        setTransactions([...arr]);
       });
     });
 
@@ -51,528 +77,115 @@ function Transactions({ userProfileData }) {
   return (
     <div>
       <p>Transactions</p>
-
-      {transactions?.map((item) => {
-        return <p>{item.id}</p>;
-      })}
-      {/* {userProfileData.transaction.map((item) => {
-        return <h5>{item}</h5>;
-      })} */}
-      <table class="user-table align-items-center table table-hover">
-        <thead>
-          <tr>
-            <th class="border-bottom">#</th>
-            <th class="border-bottom">Bill For</th>
-            <th class="border-bottom">Issue Date</th>
-            <th class="border-bottom">Due Date</th>
-            <th class="border-bottom">Total</th>
-            <th class="border-bottom">Status</th>
-            <th class="border-bottom">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300500
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Platinum Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">12 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">12 May 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$799.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-success">Paid</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300499
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Platinum Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">11 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">11 May 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$799.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-success">Paid</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300498
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Platinum Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">11 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">11 May 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$799.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-success">Paid</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300497
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Flexible Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">10 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">10 May 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$233.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-success">Paid</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300496
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Gold Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">12 Mar 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">12 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$533.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-warning">Due</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300495
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Gold Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">10 Mar 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">10 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$533.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-warning">Due</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300494
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Flexible Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">09 Mar 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">09 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$233.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-warning">Due</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300493
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Gold Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">24 Feb 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">24 Mar 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$533.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-danger">Canceled</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300492
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Platinum Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">13 Feb 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">13 Jan 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$799.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-danger">Canceled</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a class="fw-normal card-link" href="#/examples/invoice">
-                300491
-              </a>
-            </td>
-            <td>
-              <span class="fw-normal">Platinum Subscription Plan</span>
-            </td>
-            <td>
-              <span class="fw-normal">07 Apr 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">07 May 2023</span>
-            </td>
-            <td>
-              <span class="fw-normal">$799.00</span>
-            </td>
-            <td>
-              <span class="fw-normal text-success">Paid</span>
-            </td>
-            <td>
-              <div role="group" class="dropdown btn-group">
-                <button
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  type="button"
-                  class="text-dark m-0 p-0 dropdown-toggle dropdown-toggle-split btn btn-link"
-                >
-                  <span class="icon icon-sm">
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="ellipsis-h"
-                      class="svg-inline--fa fa-ellipsis-h fa-w-16 icon-dark"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      {loading && <img width={30} src={activity} alt="activity" />}
+      {transactions.length === 0 && !loading ? (
+        <p>No Transactions to display</p>
+      ) : (
+        <div>
+          <table class="user-table align-items-center table table-hover">
+            <thead>
+              <tr>
+                <th class="border-bottom">Hash</th>
+                <th class="border-bottom">Products</th>
+                <th class="border-bottom">Amount</th>
+                <th class="border-bottom">Timestamp</th>
+                <th class="border-bottom">Action</th>
+                <th class="border-bottom">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions?.map((item, index) => {
+                return (
+                  <tr>
+                    <td style={{ maxWidth: "100px" }}>
+                      <Link class="fw-normal card-link" to={"/"}>
+                        {item.transactionHash}
+                      </Link>
+                    </td>
+                    <td style={{ maxWidth: "150px" }}>
+                      <span class="fw-normal">
+                        [
+                        {item.products.map((pro, index) => {
+                          return (
+                            <>
+                              <Link to={"/single-product"} state={{ id: pro }}>
+                                {pro}
+                              </Link>
+                              {index < item.products.length - 1 && (
+                                <span>,</span>
+                              )}
+                            </>
+                          );
+                        })}
+                        ]
+                      </span>
+                    </td>
+                    <td>
+                      {item.self ? (
+                        <span
+                          class="fw-normal"
+                          style={{
+                            color: colors.red,
+                          }}
+                        >
+                          - {item.totalAmount.toFixed(10)} Eth
+                        </span>
+                      ) : (
+                        <span
+                          class="fw-normal"
+                          style={{
+                            color: colors.green,
+                          }}
+                        >
+                          +
+                          {item.amount[
+                            item.to.indexOf(
+                              item.to.filter((x) =>
+                                userProfileData?.walletAddress?.includes(x)
+                              )[0]
+                            )
+                          ].toFixed(10)}{" "}
+                          Eth
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <span class="fw-normal">
+                        {new Date(
+                          item?.timestamp?.seconds * 1000 +
+                            item?.timestamp?.nanoseconds / 1000000
+                        ).toLocaleString()}
+                      </span>
+                    </td>
+                    <td>
+                      {item.self ? (
+                        <span class="fw-normal" style={{ color: colors.red }}>
+                          Debit
+                        </span>
+                      ) : (
+                        <span class="fw-normal" style={{ color: colors.green }}>
+                          Credit
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      {item.status !== "Success" ? (
+                        <span class="fw-normal" style={{ color: colors.red }}>
+                          Failed
+                        </span>
+                      ) : (
+                        <span class="fw-normal" style={{ color: colors.green }}>
+                          Success
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

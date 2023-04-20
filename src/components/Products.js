@@ -35,10 +35,7 @@ function Products({ userProfileData, isCurrentUser }) {
           width: "100%",
         }}
       >
-        <h5
-          className={isCurrentUser ? "mt-3" : "user-products-title"}
-          style={{}}
-        >
+        <h5 className={isCurrentUser ? "mt-3" : "user-products-title"}>
           Products
         </h5>
       </div>

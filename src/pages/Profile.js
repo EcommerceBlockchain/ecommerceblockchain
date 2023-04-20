@@ -35,7 +35,7 @@ function Profile() {
   const [userProfileData, setUserProfileData] = useState("");
 
   function getData() {
-    if (userProfileData !== "") return;
+    // if (userProfileData !== "") return;
 
     getDoc(doc(getFirestore(), "users", getAuth().currentUser.uid)).then(
       (res) => {
