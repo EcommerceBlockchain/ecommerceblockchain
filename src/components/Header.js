@@ -82,12 +82,6 @@ function Header() {
                   </Link>
                 </li>
               )}
-
-              <li className="nav-item">
-                <Link className="nav-link" to={{ pathname: "/aboutus" }}>
-                  About Us
-                </Link>
-              </li>
             </ul>
           </div>
 

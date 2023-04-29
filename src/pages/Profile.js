@@ -42,7 +42,6 @@ function Profile() {
         setUserProfileData({ ...res.data() });
       }
     );
-    console.log("user data : ", userProfileData);
   }
 
   useEffect(() => {

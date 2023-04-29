@@ -65,9 +65,6 @@ function Footer() {
                 <h4 className="mb-4">Useful Link</h4>
                 <ul className="pl-0 list-unstyled mb-0">
                   <li>
-                    <Link to={"/aboutus"}>About Us</Link>
-                  </li>
-                  <li>
                     <Link to={"/shop"}>Our Shop</Link>
                   </li>
                 </ul>
@@ -85,22 +82,6 @@ function Footer() {
                 © Reserved to Digimart {new Date().getFullYear().toString()}
               </p>
             </div>
-            {/* <div className="col-lg-6">
-              <ul className="list-inline mb-0 footer-btm-links text-lg-right mt-2 mt-lg-0">
-                <li className="list-inline-item">
-                  <a href="#">Privacy Policy</a>
-                </li>
-                <li className="list-inline-item">
-                  <a href="#">Terms &amp; Conditions</a>
-                </li>
-                <li className="list-inline-item">
-                  <a href="#">Cookie Policy</a>
-                </li>
-                <li className="list-inline-item">
-                  <a href="#">Terms of Sale</a>
-                </li>
-              </ul>
-            </div> */}
           </div>
         </div>
       </div>

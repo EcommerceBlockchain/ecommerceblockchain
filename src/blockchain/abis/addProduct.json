@@ -5,24 +5,6 @@
         "internalType": "string",
         "name": "id",
         "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "path",
-        "type": "string"
-      }
-    ],
-    "name": "setPath",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "id",
-        "type": "string"
       }
     ],
     "name": "getPath",
@@ -34,6 +16,43 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "products",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "path",
+        "type": "string"
+      }
+    ],
+    "name": "setPath",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   }
 ]

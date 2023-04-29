@@ -207,7 +207,7 @@ function AddProduct() {
                           }
                         );
 
-                        navigate("/profile", { state: 2 });
+                        navigate("/profile", { state: 1 });
                       });
                     } else {
                       const storageRef = ref(

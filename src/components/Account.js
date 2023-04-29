@@ -22,19 +22,19 @@ function Account() {
   const [name, setName] = useState("");
   const [userProfileData, setUserProfileData] = useState({});
 
-  const connectWallet = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send("eth_requestAccounts", []);
-    setDoc(
-      doc(getFirestore(), "users", getAuth().currentUser.uid),
-      {
-        walletAddress: arrayUnion(...accounts),
-      },
-      { merge: true }
-    ).then(() => {
-      getData();
-    });
-  };
+  // const connectWallet = async () => {
+  //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //   const accounts = await provider.send("eth_requestAccounts", []);
+  //   setDoc(
+  //     doc(getFirestore(), "users", getAuth().currentUser.uid),
+  //     {
+  //       walletAddress: arrayUnion(...accounts),
+  //     },
+  //     { merge: true }
+  //   ).then(() => {
+  //     getData();
+  //   });
+  // };
 
   function getData() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -45,7 +45,6 @@ function Account() {
         setUserProfileData({ ...res.data() });
         setName(res.data().name);
         setActiveAddress(res.data().activeAddress);
-        // ethers.utils.formatEther(await provider.getBalance(accounts[0]), "ether")
 
         res.data().walletAddress.forEach(async (item) => {
           add[item] = parseFloat(
@@ -72,7 +71,8 @@ function Account() {
   };
 
   useEffect(() => {
-    connectWallet();
+    // connectWallet();
+    getData();
   }, []);
 
   return (
@@ -147,7 +147,7 @@ function Account() {
                     width: "100%",
                     backgroundColor: "white",
                     padding: "10px",
-                    top: 20,
+                    top: -20,
                     left: 0,
                     transform: "translate(0,100%)",
                     textAlign: "left",

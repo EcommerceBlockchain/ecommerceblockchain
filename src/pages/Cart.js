@@ -92,7 +92,7 @@ function Cart() {
         [...price, ethers.utils.parseEther((subTotal * 0.05).toFixed(10))],
         [
           ...Object.keys(OwnersWithPrice),
-          "0xdCe3c8aa5364B0C161b607beE16BB765cF4A7597",
+          "0x0b659AD5315877cA92eF753f08b67b0CeDd3bB75",
         ],
         {
           value: ethers.utils.parseEther(
@@ -165,7 +165,7 @@ function Cart() {
                   );
                 });
                 console.log("document id added");
-                navigate("/profile", { state: 3 });
+                navigate("/profile", { state: 1 });
               });
             });
 
