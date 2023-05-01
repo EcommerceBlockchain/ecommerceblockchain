@@ -68,7 +68,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route
                 path="/addproduct"
-                element={user ? <AddProduct /> : <Login />}
+                element={<AddProduct />}
               />
               <Route path="/profile" element={user ? <Profile /> : <Login />} />
               <Route path="/userprofile" element={<UserProfile />} />
