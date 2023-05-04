@@ -32,6 +32,7 @@ function Orders({ userProfileData }) {
         );
 
         smcon.getPath(element).then((res) => {
+          console.log("res", res);
           setDownloadurls((prev) => [...prev, GetFileByPath(res)]);
         });
       });

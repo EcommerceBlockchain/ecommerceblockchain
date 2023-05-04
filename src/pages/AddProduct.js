@@ -160,7 +160,7 @@ function AddProduct() {
               signContact
                 .setPath(response.id, path)
                 .then(async (res) => {
-                  console.log("addproduct res", await res.wait());
+                  console.log("addproduct res", response.id, path);
                   let preImgArr = [];
                   const storage = getStorage();
 

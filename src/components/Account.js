@@ -147,7 +147,7 @@ function Account() {
                     width: "100%",
                     backgroundColor: "white",
                     padding: "10px",
-                    top: -20,
+                    top: 20,
                     left: 0,
                     transform: "translate(0,100%)",
                     textAlign: "left",

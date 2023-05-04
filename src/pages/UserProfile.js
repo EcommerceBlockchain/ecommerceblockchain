@@ -5,6 +5,8 @@ import UserContext from "../context/UserContext";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import userlogo from "../images/user.png";
 import Products from "../components/Products";
+import StarRatings from "react-star-ratings";
+import colors from "../colors";
 
 function UserProfile() {
   const [userData, setUserData] = useState("");
@@ -89,19 +91,32 @@ function UserProfile() {
                 {userData?.email}
               </p>
             </div>
-            <p
+            <div
               style={{
-                paddingLeft: "10px",
-                margin: 0,
-                fontWeight: "300",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              Avg.rating :
-              {userData?.avg_rating == 0
-                ? "NAN"
-                : userData?.avg_rating +
-                  `<span><i className="tf-ion-android-star"></i></span>`}
-            </p>
+              <p
+                style={{
+                  paddingLeft: "10px",
+                  fontWeight: "300",
+                  marginTop: 23,
+                }}
+              >
+                Avg.rating :
+              </p>
+              <StarRatings
+                numberOfStars={5}
+                starEmptyColor="grey"
+                starHoverColor={colors.darkYellow}
+                starRatedColor={colors.darkYellow}
+                starDimension="20px"
+                starSpacing="5px"
+                rating={userdata?.avg_rating}
+              />
+            </div>
           </div>
         </div>
       </div>

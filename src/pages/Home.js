@@ -36,8 +36,9 @@ function Home() {
     let bestseller = [];
     let qu = query(
       collection(getFirestore(), "products"),
-      limit(8),
-      where("is_active", "==", true)
+      where("is_active", "==", true),
+      orderBy("quantity_sold", "desc"),
+      limit(8)
     );
     const products = await getDocs(qu);
     products.docs.forEach((product) => {
@@ -131,7 +132,7 @@ function Home() {
           <div className="row justify-content-center">
             <div className="col-lg-8">
               <div className="title text-center">
-                <h2>New arrivals</h2>
+                <h2>Popular Products</h2>
                 <p>The best Online sales to shop these weekend</p>
               </div>
             </div>
