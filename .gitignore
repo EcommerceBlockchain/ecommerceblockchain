@@ -22,3 +22,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+=========================================
+
+
+credentials:
+username: yash1234@gmail.com
+password: abcd123
+privatekey: 0x97ee3488bdcf4abddb98a8f9865c43b629475a23b9a3d8c8fd08a24403fd7b27
+account: 0x4fD88c546211256F67bC4945CDF81895A957DfF4

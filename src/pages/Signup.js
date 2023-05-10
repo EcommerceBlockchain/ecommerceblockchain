@@ -235,7 +235,7 @@ function SignUp() {
                   <div className="login-form border p-5">
                     <div className="text-center heading">
                       <h2 className="mb-2">Sign Up</h2>
-                      <p className="lead">
+                      <p className="text-color">
                         Already have an account?{" "}
                         <Link to={{ pathname: "/login" }}> Login now</Link>
                       </p>

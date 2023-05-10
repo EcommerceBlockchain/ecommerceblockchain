@@ -122,7 +122,7 @@ a:focus,
 a:hover {
   text-decoration: none;
   outline: 0;
-  color: #3071e7;
+  color: #3a7137;
 }
 
 .btn.active:focus,
@@ -198,7 +198,7 @@ input[type="tel"]:focus {
 }
 
 .btn-main {
-  background: #3071e7;
+  background: #3a7137;
   color: #fff !important;
   border-color: #3071e7;
 }
@@ -211,7 +211,7 @@ input[type="tel"]:focus {
 
 .btn-main-transparent {
   background: transparent;
-  border: 2px solid #3071e7;
+  border: 2px solid #3a7137;
   color: #000;
 }
 
@@ -869,18 +869,6 @@ a.text-primary:hover {
   z-index: 2;
   -webkit-transition: all 0.35s ease-in-out;
   transition: all 0.35s ease-in-out;
-}
-
-.slider .btn-main:before {
-  position: absolute;
-  content: "";
-  left: -10px;
-  top: -10px;
-  border: 2px solid #3071e7;
-  width: 100%;
-  height: 100%;
-  -webkit-transition: all 0.25s ease-in-out;
-  transition: all 0.25s ease-in-out;
 }
 
 .slider .btn-main:hover {
@@ -1757,7 +1745,7 @@ a.text-primary:hover {
 }
 
 .text-color {
-  color: #3071e7;
+  color: #3a7137;
 }
 
 .feature {
@@ -2091,7 +2079,7 @@ table.shop_table_responsive {
 }
 
 .login-form .btn:hover {
-  background: #3071e7;
+  background: #30ef87;
 }
 
 @media (max-width: 480px) {
@@ -2274,13 +2262,13 @@ table.shop_table_responsive {
 }
 /*# sourceMappingURL=maps/style.css.map */
 
-.my-products{
+.my-products {
   height: 100%;
   width: 100%;
   overflow-y: auto;
 }
 
-.my-products .products-container{
+.my-products .products-container {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -2291,11 +2279,12 @@ table.shop_table_responsive {
   width: 100%;
 }
 
-.profile-header{
+.profile-header {
   gap: 0.7rem;
 }
 
-.profile-header > h4,.my-products .user-products-title{
+.profile-header > h4,
+.my-products .user-products-title {
   border-bottom: 1px solid black;
   width: fit-content;
   font-size: 24px;
@@ -2303,81 +2292,86 @@ table.shop_table_responsive {
   font-weight: 600;
 }
 
-:root{
+:root {
   --bs-red: #fa5252;
---bs-orange: #ff9f89;
---bs-yellow: #f5b759;
---bs-green: #05a677;
---bs-teal: #1e90ff;
---bs-gray-dark: #506690;
---bs-primary: #262b40;
---bs-secondary: #61dafb;
---bs-tertiary: #1b998b;
---bs-quaternary: #c96480;
---bs-primary-app: #ebf4f6;
---bs-secondary-app: #424aa0;
---bs-light: #eaedf2;
---bs-lighten: #f0f3f6;
---bs-success: #05a677;
---bs-info: #0948b3;
---bs-warning: #f5b759;
---bs-danger: #fa5252;
---bs-white: #fff;
---bs-gray: #4a5073;
---bs-indigo: #4c5680;
---bs-dark: #262b40;
---bs-soft: #f5f8fb;
---bs-black: #2e3650;
---bs-blue: #0948b3;
---bs-pink: #c96480;
---bs-cyan: #63b1bd;
---bs-purple: #8965e0;
---bs-soft-indigo: #f5e8ff;
---bs-soft-green: #2ca58d;
---bs-gray-100: #f3f7fa;
---bs-gray-200: #f5f8fb;
---bs-gray-300: #f0f3f6;
---bs-gray-400: #eaedf2;
---bs-gray-500: #d1d7e0;
---bs-gray-600: #93a5be;
---bs-gray-700: #66799e;
---bs-gray-800: #506690;
---bs-facebook: #3b5999;
---bs-twitter: #1da1f2;
---bs-google: #db4337;
---bs-instagram: #e4405f;
---bs-pinterest: #bd081c;
---bs-youtube: #cd201f;
---bs-slack: #3aaf85;
---bs-dribbble: #ea4c89;
---bs-dropbox: #1e90ff;
---bs-twitch: #4b367c;
---bs-paypal: #ecb32c;
---bs-behance: #0057ff;
---bs-reddit: #e84422;
---bs-github: #222;
---bs-font-sans-serif: "Nunito Sans",sans-serif;
---bs-font-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
---bs-gradient: linear-gradient(180deg,hsla(0,0%,100%,0.15),hsla(0,0%,100%,0));
---animate-duration: 1s;
---animate-delay: 1s;
---animate-repeat: 1;
---bs-table-bg: transparent;
---bs-table-striped-color: #4a5073;
---bs-table-striped-bg: rgba(46,54,80,0.05);
---bs-table-active-color: #4a5073;
---bs-table-active-bg: rgba(46,54,80,0.1);
---bs-table-hover-color: #4a5073;
---bs-table-hover-bg: rgba(46,54,80,0.075);
+  --bs-orange: #ff9f89;
+  --bs-yellow: #f5b759;
+  --bs-green: #05a677;
+  --bs-teal: #1e90ff;
+  --bs-gray-dark: #506690;
+  --bs-primary: #262b40;
+  --bs-secondary: #61dafb;
+  --bs-tertiary: #1b998b;
+  --bs-quaternary: #c96480;
+  --bs-primary-app: #ebf4f6;
+  --bs-secondary-app: #424aa0;
+  --bs-light: #eaedf2;
+  --bs-lighten: #f0f3f6;
+  --bs-success: #05a677;
+  --bs-info: #0948b3;
+  --bs-warning: #f5b759;
+  --bs-danger: #fa5252;
+  --bs-white: #fff;
+  --bs-gray: #4a5073;
+  --bs-indigo: #4c5680;
+  --bs-dark: #262b40;
+  --bs-soft: #f5f8fb;
+  --bs-black: #2e3650;
+  --bs-blue: #0948b3;
+  --bs-pink: #c96480;
+  --bs-cyan: #63b1bd;
+  --bs-purple: #8965e0;
+  --bs-soft-indigo: #f5e8ff;
+  --bs-soft-green: #2ca58d;
+  --bs-gray-100: #f3f7fa;
+  --bs-gray-200: #f5f8fb;
+  --bs-gray-300: #f0f3f6;
+  --bs-gray-400: #eaedf2;
+  --bs-gray-500: #d1d7e0;
+  --bs-gray-600: #93a5be;
+  --bs-gray-700: #66799e;
+  --bs-gray-800: #506690;
+  --bs-facebook: #3b5999;
+  --bs-twitter: #1da1f2;
+  --bs-google: #db4337;
+  --bs-instagram: #e4405f;
+  --bs-pinterest: #bd081c;
+  --bs-youtube: #cd201f;
+  --bs-slack: #3aaf85;
+  --bs-dribbble: #ea4c89;
+  --bs-dropbox: #1e90ff;
+  --bs-twitch: #4b367c;
+  --bs-paypal: #ecb32c;
+  --bs-behance: #0057ff;
+  --bs-reddit: #e84422;
+  --bs-github: #222;
+  --bs-font-sans-serif: "Nunito Sans", sans-serif;
+  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --bs-gradient: linear-gradient(
+    180deg,
+    hsla(0, 0%, 100%, 0.15),
+    hsla(0, 0%, 100%, 0)
+  );
+  --animate-duration: 1s;
+  --animate-delay: 1s;
+  --animate-repeat: 1;
+  --bs-table-bg: transparent;
+  --bs-table-striped-color: #4a5073;
+  --bs-table-striped-bg: rgba(46, 54, 80, 0.05);
+  --bs-table-active-color: #4a5073;
+  --bs-table-active-bg: rgba(46, 54, 80, 0.1);
+  --bs-table-hover-color: #4a5073;
+  --bs-table-hover-bg: rgba(46, 54, 80, 0.075);
 }
 
-table{
+table {
   font-family: var(--bs-font-sans-serif);
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgba(46,54,80,0);
+  -webkit-tap-highlight-color: rgba(46, 54, 80, 0);
   word-wrap: break-word;
   box-sizing: border-box;
   caption-side: bottom;
@@ -2386,6 +2380,6 @@ table{
   color: #4a5073;
   vertical-align: top;
   border-color: #eaedf2;
-  align-items: center!important;
+  align-items: center !important;
   margin-bottom: 0;
 }

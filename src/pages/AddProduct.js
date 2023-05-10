@@ -95,7 +95,7 @@ function AddProduct() {
             storage,
             `preview_images/${images[counter].name}`
           );
-          if (images[counter]?.url) {
+          if (images[counter].url) {
             fetch(images[counter].url)
               .then((res) => {
                 return res.blob();
@@ -881,10 +881,10 @@ function AddProduct() {
                       <img width={30} src={activity} alt="activity" />
                     ) : (
                       <button
-                        onClick={() => {
-                          <GoToTop />;
-                          handleSubmit();
-                        }}
+                        // onClick={() => {
+                        //   <GoToTop />;
+                        //   handleSubmit;
+                        // }}
                         className="btn btn-main btn-small mt-3"
                       >
                         {location.state ? "Update" : "Add Product"}

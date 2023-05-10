@@ -21,7 +21,7 @@ function Header() {
             className="navbar-brand font-weight-bold"
             to={{ pathname: "/" }}
           >
-            Digimart
+            My Vault
           </Link>
 
           <button
@@ -43,25 +43,6 @@ function Header() {
                   Home
                 </Link>
               </li>
-
-              <li className="nav-item dropdown dropdown-slide">
-                <Link className="nav-link" to={{ pathname: "/shop" }}>
-                  Shop
-                </Link>
-              </li>
-              <li className="nav-item dropdown dropdown-slide">
-                <Link className="nav-link" to={{ pathname: "/search" }}>
-                  Search
-                </Link>
-              </li>
-
-              {userdata && (
-                <li className="nav-item dropdown dropdown-slide">
-                  <Link className="nav-link" to={{ pathname: "/cart" }}>
-                    Cart
-                  </Link>
-                </li>
-              )}
 
               {!userdata ? (
                 <li className="nav-item dropdown dropdown-slide">

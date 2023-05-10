@@ -99,18 +99,18 @@ function Home() {
               }}
             >
               <div className="slider-caption">
-                <span className="lead">Get the Best</span>
+                {/* <span className="lead">Get the Best</span> */}
                 <h1 className="mt-2 mb-5">
-                  <span className="text-color">Digital </span>Products
+                  <span className="text-color">SafeGuard Your </span>Documents
                 </h1>
                 <Link
                   className="btn btn-main"
-                  to={{ pathname: "/shop" }}
+                  to={{ pathname: "/addproduct" }}
                   onClick={() => {
                     addwallet();
                   }}
                 >
-                  Shop
+                  Try for free
                 </Link>
               </div>
               <div className="slider-caption" style={{ width: "70%" }}>
@@ -118,7 +118,7 @@ function Home() {
                   autoplay
                   loop
                   mode="normal"
-                  src="https://assets4.lottiefiles.com/packages/lf20_ikaawl5v.json"
+                  src=""
                 ></lottie-player>
               </div>
             </div>
@@ -126,93 +126,8 @@ function Home() {
         </div>
       </div>
 
-      <section className="section products-main">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-8">
-              <div className="title text-center">
-                <h2>New arrivals</h2>
-                <p>The best Online sales to shop these weekend</p>
-              </div>
-            </div>
-          </div>
 
-          <div
-            className="row"
-            style={{
-              display: "grid",
-              gap: "2rem",
-              gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-            }}
-          >
-            {products.map((item) => {
-              return (
-                <Product
-                  key={item.id}
-                  name={item.name}
-                  price={item.cost}
-                  id={item.id}
-                  preImg={item.preview_image[0]}
-                  owner={item.owner}
-                  rating={item.rating}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
-      <section className="ads section"></section>
-
-      <section className="section products-list">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-4 col-sm-12 col-md-12">
-              <img
-                src="assets/images/etherbg.png"
-                alt="ether img"
-                className="img-fluid w-100"
-              />
-            </div>
-
-            <div className="col-lg-4 col-sm-6 col-md-6">
-              <div className="widget-featured-entries mt-5 mt-lg-0">
-                <h4 className="mb-4 pb-3">Best selllers</h4>
-                {bestSeller.map((item) => {
-                  return (
-                    <SmallProduct
-                      key={item.id}
-                      name={item.name}
-                      price={item.cost}
-                      id={item.id}
-                      preImg={item.preview_image[0]}
-                      rating={item.rating}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="col-lg-4 col-sm-6 col-md-6">
-              <div className="widget-featured-entries mt-5 mt-lg-0">
-                <h4 className="mb-4 pb-3">New Arrivals</h4>
-                {newArrival.map((item) => {
-                  return (
-                    <SmallProduct
-                      key={item.id}
-                      name={item.name}
-                      price={item.cost}
-                      id={item.id}
-                      preImg={item.preview_image[0]}
-                      rating={item.rating}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
       <section className="features border-top">
         <div className="container">
           <div className="row">

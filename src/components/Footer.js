@@ -10,17 +10,17 @@ function Footer() {
           <div className="row">
             <div className="col-md-6 col-lg-4 col-sm-6 mb-5 mb-lg-0 text-center text-sm-left mr-auto">
               <div className="footer-widget">
-                <h4 className="mb-4">Digimart</h4>
-                <p className="lead">Blockchain based ecommerce</p>
+                <h4 className="mb-4">My Vault</h4>
+                <p className="lead">Blockchain based document storage</p>
 
                 <div className="">
                   <p className="mb-0">
-                    <strong>Location : </strong>Mumbai ,India
+                    <strong>Location : </strong>Mumbai, India
                   </p>
                   <p>
                     <strong>Support Email : </strong>{" "}
                     <a href="mailto:support@digimart.com">
-                      support@digimart.com
+                      support@myvault.com
                     </a>
                   </p>
                 </div>
@@ -47,11 +47,6 @@ function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <Link to={"/shop"} state={{ arr: ["GIF"] }}>
-                      GIF
-                    </Link>
-                  </li>
-                  <li>
                     <Link to={"/shop"} state={{ arr: ["Audio"] }}>
                       Audio
                     </Link>
@@ -65,7 +60,7 @@ function Footer() {
                 <h4 className="mb-4">Useful Link</h4>
                 <ul className="pl-0 list-unstyled mb-0">
                   <li>
-                    <Link to={"/shop"}>Our Shop</Link>
+                    <Link to={"/shop"}>Our Product</Link>
                   </li>
                 </ul>
               </div>
@@ -79,7 +74,7 @@ function Footer() {
           <div className="row ">
             <div className="col-lg-6">
               <p className="copyright mb-0 ">
-                © Reserved to Digimart {new Date().getFullYear().toString()}
+                © Reserved to MyVault {new Date().getFullYear().toString()}
               </p>
             </div>
           </div>
