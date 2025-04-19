@@ -272,7 +272,7 @@ function AddProduct() {
             <div className="col-lg-6">
               <div className="content text-center">
                 <h1 className="mb-3">
-                  {location.state ? "Edit Product" : "Add Product"}
+                  {location.state ? "Edit Product" : "New Product"}
                 </h1>
                 <p>
                   Adding a new product to our ecommerce website powered by
@@ -289,7 +289,7 @@ function AddProduct() {
                       <Link to={{ pathname: "/" }}>Home</Link>
                     </li>
                     <li className="breadcrumb-item active" aria-current="page">
-                      Add Product
+                      New Product
                     </li>
                   </ol>
                 </nav>
@@ -783,7 +783,7 @@ function AddProduct() {
                                 color: colors.red,
                               }}
                             >
-                              Please add product
+                              Please New Product
                             </p>
                           )}
                           {category === "Select Category" && ogfile && (
@@ -887,7 +887,7 @@ function AddProduct() {
                         }}
                         className="btn btn-main btn-small mt-3"
                       >
-                        {location.state ? "Update" : "Add Product"}
+                        {location.state ? "Update" : "New Product"}
                       </button>
                     )}
                   </div>

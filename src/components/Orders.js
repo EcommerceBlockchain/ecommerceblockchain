@@ -42,7 +42,6 @@ function Orders({ userProfileData }) {
 
   function downloadFile(file, name, extension, index) {
     setLoader(index);
-    console.log(file, name);
 
     fetch(file)
       .then((response) => response.blob())
@@ -69,6 +68,7 @@ function Orders({ userProfileData }) {
     <div>
       <p>Orders</p>
       {loading && <img width={30} src={activity} alt="activity" />}
+
       {products.length === 0 && !loading ? (
         <p>No Orders to display</p>
       ) : (

@@ -17,7 +17,6 @@ import {
   where,
 } from "firebase/firestore";
 import { ethers } from "ethers";
-import GetFileByPath from "../service/GetFileByPath";
 import smartConracts from "../blockchain/smartContracts";
 import addproductabi from "../blockchain/abis/addProduct.json";
 import { getAuth } from "firebase/auth";
@@ -37,7 +36,7 @@ function Home() {
     let qu = query(
       collection(getFirestore(), "products"),
       where("is_active", "==", true),
-      orderBy("quantity_sold", "desc"),
+      orderBy("rating", "desc"),
       limit(8)
     );
     const products = await getDocs(qu);

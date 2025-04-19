@@ -29,21 +29,6 @@ function Transactions({ userProfileData }) {
         console.log(item.data(), "mast");
         // setTransactions((prev) => [...prev, { ...item.data(), id: item.id }]);
         arr.push({ ...item.data(), id: item.id, self: false });
-        console.log(
-          "kdkdkdkdkd",
-
-          item.data().amount[
-            item
-              .data()
-              .to.indexOf(
-                item
-                  .data()
-                  .to.filter((x) =>
-                    userProfileData?.walletAddress?.includes(x)
-                  )[0]
-              )
-          ]
-        );
       });
       getDocs(
         query(
@@ -60,6 +45,7 @@ function Transactions({ userProfileData }) {
         arr.sort((b, a) => {
           return a.timestamp - b.timestamp;
         });
+
         setTransactions([...arr]);
       });
     });

@@ -127,7 +127,7 @@ function SingleProduct() {
         {
           reviews: {
             ...res.data().reviews,
-            [getAuth().currentUser.uid]: {
+            [getAuth()?.currentUser?.uid]: {
               rating: rating,
               review: comment.value,
               timestamp: Timestamp.fromDate(new Date()),
@@ -144,7 +144,7 @@ function SingleProduct() {
         { merge: true }
       );
       setDoc(
-        doc(getFirestore(), "users", getAuth().currentUser.uid),
+        doc(getFirestore(), "users", getAuth()?.currentUser?.uid),
         {
           avg_rating:
             (userdata?.avg_rating +
@@ -426,7 +426,7 @@ function SingleProduct() {
                       <span>
                         <Link
                           to={
-                            product?.owner === getAuth().currentUser.uid
+                            product?.owner === getAuth()?.currentUser?.uid
                               ? "/profile"
                               : "/userprofile"
                           }
@@ -557,7 +557,7 @@ function SingleProduct() {
                       </div>
                     )}
 
-                    {getAuth().currentUser.uid !== product?.owner && (
+                    {getAuth()?.currentUser?.uid !== product?.owner && (
                       <div className="col-lg-5">
                         <div className="review-comment mt-5 mt-lg-0">
                           <h4 className="mb-3">Add a Review</h4>
